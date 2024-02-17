@@ -1173,7 +1173,6 @@ namespace ArenaSlugcatsConfigurator
 
         public static SlugcatStats.Name? GetRandomSlugcat(bool showList = false)
         {
-
             List<SlugcatStats.Name> list = new();
 
             foreach (var slugcat in Options.GetModdedSlugcats())

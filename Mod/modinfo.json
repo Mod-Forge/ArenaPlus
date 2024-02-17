@@ -1,0 +1,11 @@
+{
+	"id": "arenaslugcatsconfigurator",
+	"name": "Arena Slugcats Configurator",
+	"authors": "ddemile, Zeldack",
+	"description": "A mod that allow you to configure the slugcats in the arena mode",
+	"requirements": ["moreslugcats"],
+	"requirements_names": ["More Slugcats Expansion"],
+	"checksum_override_version": false,
+	"version": "1.3.3",
+	"workshopId": "2945515690"
+}

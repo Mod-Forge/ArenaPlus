@@ -1,0 +1,16 @@
+{
+  "Title": "Arena Slugcats Configurator",
+  "Description": "Allows you to choose which slugcats you can get when choosing the random option on arena mode.\r\n\r\nAnd also:\r\n-You can allow the Saint to throw spears\r\n-Balance the artificer\r\n-You can allow the hunter to pickup stuck spears\r\n-Make the Gourmand generate items adapted to Arena mode\r\n-You can have random slugcats every single round\r\n\r\n(You still need to unlock slugcats)",
+  "ID": "arenaslugcatsconfigurator",
+  "Version": "1.3.3",
+  "TargetGameVersion": "v1.9.06",
+  "Requirements": "moreslugcats",
+  "RequirementNames": "More Slugcats Expansion",
+  "Authors": "ddemile, Zeldack",
+  "Visibility": "Public",
+  "Tags": [
+    "Game Mechanics"
+  ],
+  "WorkshopID": 2945515690,
+  "UploadFilesOnly": true
+}
