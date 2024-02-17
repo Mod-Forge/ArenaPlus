@@ -16,7 +16,9 @@ using System.Linq;
 using Expedition;
 
 
+#pragma warning disable CS0618
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
+#pragma warning restore CS0618
 namespace ArenaSlugcatsConfigurator
 {
     [BepInPlugin("ddemile.arenaslugcatsconfigurator", "Arena Slugcats Configurator", "1.3.3")] // (GUID, mod name, mod version)
@@ -25,8 +27,8 @@ namespace ArenaSlugcatsConfigurator
         public ManualLogSource logSource = BepInEx.Logging.Logger.CreateLogSource("ArenaSlugcatsConfigurator");
         public static MultiplayerUnlocks multiplayerUnlocks;
         public static List<AbstractPhysicalObject> arenaEggs = new();
-        public SymbolButton? presetButton;
-        public MenuLabel? presetLabel;
+        public SymbolButton presetButton;
+        public MenuLabel presetLabel;
         public int currentPreset = 0;
         private static string separator = Path.DirectorySeparatorChar.ToString();
         public static string configFolerPath = Application.persistentDataPath + Path.DirectorySeparatorChar.ToString() + "ModConfigs" + separator + "arenaslugcatsconfigurator";
@@ -1171,7 +1173,7 @@ namespace ArenaSlugcatsConfigurator
             }
         }
 
-        public static SlugcatStats.Name? GetRandomSlugcat(bool showList = false)
+        public static SlugcatStats.Name GetRandomSlugcat(bool showList = false)
         {
             List<SlugcatStats.Name> list = new();
 
