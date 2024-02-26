@@ -527,7 +527,7 @@ namespace ArenaSlugcatsConfigurator
                                 new RandomObject(AbstractPhysicalObject.AbstractObjectType.VultureMask, 10),
                                 new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.FireEgg, 5),
                                 //new randomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.MoonCloak, 5), // don't work
-                                new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, 3),
+                                new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, 1),
                                 new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.EnergyCell, 3),
 
                             };
