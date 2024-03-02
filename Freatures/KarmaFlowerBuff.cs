@@ -3,6 +3,7 @@ using RWCustom;
 using UnityEngine;
 using System;
 using Random = UnityEngine.Random;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 
 namespace ArenaSlugcatsConfigurator.Freatures
@@ -16,6 +17,32 @@ namespace ArenaSlugcatsConfigurator.Freatures
             On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
             On.Player.ClassMechanicsSaint += Player_ClassMechanicsSaint;
             On.KarmaFlower.BitByPlayer += KarmaFlower_BitByPlayer;
+            On.Spear.HitSomethingWithoutStopping += Spear_HitSomethingWithoutStopping;
+        }
+
+        private static void Spear_HitSomethingWithoutStopping(On.Spear.orig_HitSomethingWithoutStopping orig, Spear self, PhysicalObject obj, BodyChunk chunk, PhysicalObject.Appendage appendage)
+        {
+            if (self.room.game.IsArenaSession && !IsChallengeGameSession(self.room.game) && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
+            {
+                if (self.Spear_NeedleCanFeed())
+                {
+                    if (obj is KarmaFlower)
+                    {
+                        ConsoleWrite("do thig whouou");
+                        Player player = self.thrownBy as Player;
+                        if (!player.monkAscension && (player.tongue == null || !player.tongue.Attached))
+                        {
+                            player.maxGodTime = 565f;
+                            player.godTimer = player.maxGodTime;
+                            player.bodyMode = Player.BodyModeIndex.Default;
+                            player.ActivateAscension();
+                        }
+                        obj.Destroy();
+                        return;
+                    }
+                }
+            }
+            orig(self, obj, chunk, appendage);
         }
 
         private static void PlayerGraphics_AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
