@@ -46,6 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
+    <Compile Include="Freatures\ElectroBoom.cs" />
+    <Compile Include="Freatures\EnergyCellBuff.cs" />
+    <Compile Include="Freatures\FlareBombBuff.cs" />
+    <Compile Include="Freatures\FreaturesManager.cs" />
+    <Compile Include="Freatures\KarmaFlowerBuff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

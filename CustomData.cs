@@ -38,4 +38,16 @@ namespace ArenaSlugcatsConfigurator
         // Autres constructeurs si nécessaire
         public RoomCustomData(object obj) : base(obj) { }
     }
+
+    public class PlayerCustomData : CustomData
+    {
+        public int customSpriteIndex;
+        public bool initFinish = false;
+
+        // Constructeur par défaut
+        public PlayerCustomData() : base(null) { }
+
+        // Autres constructeurs si nécessaire
+        public PlayerCustomData(object obj) : base(obj) { }
+    }
 }

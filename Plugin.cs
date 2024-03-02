@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿global using static ArenaSlugcatsConfigurator.Plugin;
+using BepInEx;
 using BepInEx.Logging;
 using MoreSlugcats;
 using RWCustom;
@@ -13,7 +14,6 @@ using System;
 using Random = UnityEngine.Random;
 using System.IO;
 using System.Linq;
-using Expedition;
 
 
 #pragma warning disable CS0618
@@ -24,7 +24,7 @@ namespace ArenaSlugcatsConfigurator
     [BepInPlugin("ddemile.arenaslugcatsconfigurator", "Arena Slugcats Configurator", "1.3.3")] // (GUID, mod name, mod version)
     public class Plugin : BaseUnityPlugin
     {
-        public ManualLogSource logSource = BepInEx.Logging.Logger.CreateLogSource("ArenaSlugcatsConfigurator");
+        public static ManualLogSource logSource = BepInEx.Logging.Logger.CreateLogSource("ArenaSlugcatsConfigurator");
         public static MultiplayerUnlocks multiplayerUnlocks;
         public static List<AbstractPhysicalObject> arenaEggs = new();
         public SymbolButton presetButton;
@@ -49,9 +49,10 @@ namespace ArenaSlugcatsConfigurator
             try { RegisterCommands(); }
             catch { }
 
-            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
 
+            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
+            Freatures.FreaturesManager.OnEnable();
 
             On.Menu.MultiplayerMenu.InitializeSitting += MultiplayerMenu_InitializeSitting;
             //On.Menu.MultiplayerMenu.Update += MultiplayerMenu_Update;
@@ -67,146 +68,34 @@ namespace ArenaSlugcatsConfigurator
             On.Player.CanIPickThisUp += Player_CanIPickThisUp;
             On.Player.Regurgitate += Player_Regurgitate;
             On.Player.ClassMechanicsArtificer += Player_ClassMechanicsArtificer;
+            On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
 
             On.Room.Loaded += Room_Loaded;
-            On.Room.Update += Room_Update;
 
             On.ArenaSitting.SessionEnded += ArenaSitting_SessionEnded;
             On.ArenaGameSession.SpawnPlayers += ArenaGameSession_SpawnPlayers;
             On.ArenaGameSession.Update += ArenaGameSession_Update;
             On.Menu.PlayerResultBox.ctor += PlayerResultBox_ctor;
-            On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
+
 
             On.MoreSlugcats.SingularityBomb.ctor += SingularityBomb_ctor;
             On.JokeRifle.Use += JokeRifle_Use;
             On.MoreSlugcats.AbstractBullet.ctor += AbstractBullet_ctor;
 
             On.Spear.HitSomething += Spear_HitSomething;
-
             On.PuffBall.Explode += PuffBall_Explode;
 
-            //On.MoreSlugcats.EnergyCell.Update += EnergyCell_Update;
-            On.MoreSlugcats.EnergyCell.DrawSprites += EnergyCell_DrawSprites;
-            On.MoreSlugcats.EnergyCell.Use += EnergyCell_Use;
+            On.FirecrackerPlant.Explode += FirecrackerPlant_Explode;
         }
 
-        private void EnergyCell_Use(On.MoreSlugcats.EnergyCell.orig_Use orig, EnergyCell self, bool forced)
+        private void FirecrackerPlant_Explode(On.FirecrackerPlant.orig_Explode orig, FirecrackerPlant self)
         {
-            orig(self, forced);
-            if (self.usingTime == 600f) self.usingTime *= 2f;
-        }
-
-        private void EnergyCell_DrawSprites(On.MoreSlugcats.EnergyCell.orig_DrawSprites orig, EnergyCell self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
-        {
-            orig(self, sLeaser, rCam, timeStacker, camPos);
-            sLeaser.sprites[3].scale = 15f * 1f;
-        }
-
-        private void Room_Update(On.Room.orig_Update orig, Room self)
-        {
+            if (self.room.game.IsArenaSession && !IsChallengeGameSession(self.room.game))
+            {
+                Explosion obj = new Explosion(self.room, self, self.firstChunk.pos, 6, 60f, 5f, 0.0f, 100f, 0.5f, null, 1f, 0f, 1f);
+                self.room.AddObject(obj);
+            }
             orig(self);
-
-            if (!self.game.IsArenaSession || IsChallengeGameSession(self.game))
-            {
-                return;
-            }
-
-            RoomCustomData customData = self.GetCustomData<RoomCustomData>();
-            customData.frame++;
-
-            //if (customData.frame % 20 > 0)
-            //{
-            //    return;
-            //}
-
-            List<EnergyCell> energyCells = new List<EnergyCell>();
-            for (int j = 0; j < self.physicalObjects.Length; j++)
-            {
-                for (int k = 0; k < self.physicalObjects[j].Count; k++)
-                {
-                    if (self.physicalObjects[j][k] is EnergyCell)
-                    {
-                        energyCells.Add(self.physicalObjects[j][k] as EnergyCell);
-                    }
-                }
-            }
-
-
-            for (int j = 0; j < self.physicalObjects.Length; j++)
-            {
-                for (int k = 0; k < self.physicalObjects[j].Count; k++)
-                {
-                    PhysicalObject obj = self.physicalObjects[j][k];
-
-                    bool notProtected = obj is not Creature || (obj as Creature).grasps == null || (obj as Creature).grasps[0] == null || (obj as Creature).grasps[0].grabbed is not EnergyCell || ((obj as Creature).grasps[0].grabbed as EnergyCell).usingTime == 0f;
-
-                    if (!obj.slatedForDeletetion && notProtected)
-                    {
-                        foreach (EnergyCell energyCell in energyCells)
-                        {
-                            bool doBreak = false;
-
-
-
-                            if (!energyCell.slatedForDeletetion)
-                            {
-                                if (energyCell.usingTime > 0f)
-                                {
-                                    (energyCell as PhysicalObject).gravity = 0.45f;
-                                    //energyCell.firstChunk.vel = energyCell.firstChunk.vel.normalized * Math.Min(energyCell.firstChunk.vel.magnitude, 10f);
-                                }
-
-                                if (obj is not EnergyCell)
-                                {
-                                    if (energyCell.usingTime > 0f)
-                                    {
-                                        foreach (BodyChunk chuck in obj.bodyChunks)
-                                        {
-                                            float dist = Vector2.Distance(energyCell.firstChunk.pos, chuck.pos);
-                                            if (dist < 110f * 1f) // 75
-                                            {
-                                                Debug.Log("no gravity to " + obj);
-
-                                                if (obj is Creature)
-                                                {
-                                                    energyCell.firstChunk.vel += (chuck.pos - energyCell.firstChunk.pos).normalized * 0.25f;
-                                                }
-
-
-                                                if (obj is Player)
-                                                {
-                                                    (obj as Player).customPlayerGravity = 0f;
-                                                    (obj as Player).animation = Player.AnimationIndex.ZeroGSwim;
-                                                }
-                                                else
-                                                {
-                                                    chuck.vel.y += obj.gravity;
-                                                    Debug.Log("max: " + chuck.mass * 200);
-                                                    chuck.vel = chuck.vel.normalized * Math.Min(chuck.vel.magnitude, chuck.mass * 400);
-                                                }
-
-                                                doBreak = true;
-                                                //blackList.Add(chuck);
-                                            }
-
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (obj is Player && ((obj as Player).animation == Player.AnimationIndex.ZeroGSwim || (obj as Player).animation == Player.AnimationIndex.ZeroGPoleGrab))
-                                        {
-                                            (obj as Player).customPlayerGravity = 0.9f;
-                                            (obj as Player).animation = Player.AnimationIndex.None;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (doBreak) break;
-                        }
-                    }
-                }
-            }
         }
 
         private void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall self)
@@ -652,9 +541,9 @@ namespace ArenaSlugcatsConfigurator
                                 new RandomObject(AbstractPhysicalObject.AbstractObjectType.VultureMask, 10),
                                 new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.FireEgg, 5),
                                 //new randomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.MoonCloak, 5), // don't work
+                                new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.EnergyCell, 5),
+                                new RandomObject(AbstractPhysicalObject.AbstractObjectType.KarmaFlower, 5),
                                 new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, 1),
-                                new RandomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.EnergyCell, 3),
-
                             };
 
                             newObject = getAbstractPhysicalObject(getRandomObject(objectsList), self, obj.pos);
