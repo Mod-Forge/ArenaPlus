@@ -84,7 +84,15 @@ namespace ArenaSlugcatsConfigurator
 
             Tabs[0].AddItems(udSpearRespawnTimer, lbSpearRespawnTimer);
 
-            vanillaButtonNum += 3;
+            OpCheckBox clkEnableSpearOneShot = new OpCheckBox(Options.enableSpearOneShot, initialPos + checkBoxSpace * 1.3f - checkBoxSpace * 4f);
+            clkEnableSpearOneShot.colorEdge = Color.grey;
+            clkEnableSpearOneShot.description = enableSpearOneShot.info.description;
+            OpLabel lbEnableSpearOneShot = new OpLabel(clkEnableSpearOneShot.pos + labelSpace, default(Vector2), "Player spear oneshot", FLabelAlignment.Left, false, null);
+            lbEnableSpearOneShot.color = clkEnableSpearOneShot.colorEdge;
+
+            Tabs[0].AddItems(clkEnableSpearOneShot, lbEnableSpearOneShot);
+
+            vanillaButtonNum += 4;
 
             OpCheckBox chkDisableSurvivor = new OpCheckBox(Options.disableSurvivor, initialPos - checkBoxSpace * vanillaButtonNum);
             chkDisableSurvivor.colorEdge = PlayerGraphics.DefaultSlugcatColor(SlugcatStats.Name.White);
@@ -331,6 +339,11 @@ namespace ArenaSlugcatsConfigurator
         public static Configurable<int> spearRespawnTimer = Options.instance.config.Bind<int>("spearRespawnTimer", 30, new ConfigurableInfo("The time in seconds before the spears respawn", new ConfigAcceptableRange<int>(0, 100), "", new object[]
         {
             "Spears respawn timer"
+        }));
+
+        public static Configurable<bool> enableSpearOneShot = Options.instance.config.Bind<bool>("enableSpearOneShot", false, new ConfigurableInfo("Whether players spears oneshot other players", null, "", new object[]
+        {
+            "Enable spears respawn?"
         }));
 
         public static Configurable<bool> nerfArtificer = Options.instance.config.Bind<bool>("nerfArtificer", false, new ConfigurableInfo("Whether the Artificer is nerfed in arena", null, "", new object[]

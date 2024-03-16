@@ -10,6 +10,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
             ElectroBoom.OnEnable();
             EnergyCellBuff.OnEnable();
             FlareBombBuff.OnEnable();
+            PlayerOneshot.OnEnable();
         }
     }
 }
