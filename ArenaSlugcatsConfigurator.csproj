@@ -48,6 +48,7 @@
     <Compile Include="ClassOptions.cs" />
     <Compile Include="CustomData.cs" />
     <Compile Include="Extras.cs" />
+    <Compile Include="Freatures\ScavengerUseGun.cs" />
     <Compile Include="Freatures\PlayerOneshot.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Freatures\ElectroBoom.cs" />

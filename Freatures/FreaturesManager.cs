@@ -11,6 +11,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
             EnergyCellBuff.OnEnable();
             FlareBombBuff.OnEnable();
             PlayerOneshot.OnEnable();
+            ScavengerUseGun.OnEnable();
         }
     }
 }
