@@ -11,6 +11,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
 {
     internal static class EnergyCellBuff
     {
+        public static float gravityFieldSize = 1f;
         internal static void OnEnable()
         {
             logSource.LogInfo("EnergyCellBuff OnEnable");
@@ -28,7 +29,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
         private static void EnergyCell_DrawSprites(On.MoreSlugcats.EnergyCell.orig_DrawSprites orig, EnergyCell self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            sLeaser.sprites[3].scale = 15f * 1f;
+            sLeaser.sprites[3].scale = 15f * gravityFieldSize;
         }
 
         private static void Room_Update(On.Room.orig_Update orig, Room self)
@@ -92,7 +93,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
                                         foreach (BodyChunk chuck in obj.bodyChunks)
                                         {
                                             float dist = Vector2.Distance(energyCell.firstChunk.pos, chuck.pos);
-                                            if (dist < 110f * 1f) // 75
+                                            if (dist < 110f * gravityFieldSize) // 75
                                             {
                                                 //Debug.Log("no gravity to " + obj);
 
@@ -111,7 +112,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
                                                 {
                                                     chuck.vel.y += obj.gravity;
                                                     //Debug.Log("max: " + chuck.mass * 200);
-                                                    chuck.vel = chuck.vel.normalized * Math.Min(chuck.vel.magnitude, chuck.mass * 400);
+                                                    chuck.vel = chuck.vel.normalized * Math.Min(chuck.vel.magnitude, chuck.mass * 100);
                                                 }
 
                                                 doBreak = true;
