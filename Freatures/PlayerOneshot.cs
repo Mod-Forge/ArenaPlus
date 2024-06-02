@@ -6,8 +6,9 @@ namespace ArenaSlugcatsConfigurator.Freatures
 {
     internal static class PlayerOneshot
     {
-        public static string[] expetions = new string[0]
-        { 
+        public static string[] expetions = new string[1]
+        {
+            "Gourmand"
         };
 
         internal static void OnEnable()
