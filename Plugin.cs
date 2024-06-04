@@ -101,7 +101,7 @@ namespace ArenaSlugcatsConfigurator
         private void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall self)
         {
             //ConsoleWrite("puff explode " + self.slatedForDeletetion);
-            if (self.slatedForDeletetion)
+            if (self.slatedForDeletetion || !self.room.game.IsArenaSession || IsChallengeGameSession(self.room.game))
             {
                 orig(self);
                 return;
