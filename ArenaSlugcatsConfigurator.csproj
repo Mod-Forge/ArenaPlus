@@ -48,14 +48,15 @@
     <Compile Include="ClassOptions.cs" />
     <Compile Include="CustomData.cs" />
     <Compile Include="Extras.cs" />
-    <Compile Include="Freatures\ScavengerUseGun.cs" />
-    <Compile Include="Freatures\PlayerOneshot.cs" />
+    <Compile Include="Features\ResultMenuSlugcatSelection.cs" />
+    <Compile Include="Features\ScavengerUseGun.cs" />
+    <Compile Include="Features\PlayerOneshot.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="Freatures\ElectroBoom.cs" />
-    <Compile Include="Freatures\EnergyCellBuff.cs" />
-    <Compile Include="Freatures\FlareBombBuff.cs" />
-    <Compile Include="Freatures\FreaturesManager.cs" />
-    <Compile Include="Freatures\KarmaFlowerBuff.cs" />
+    <Compile Include="Features\ElectroBoom.cs" />
+    <Compile Include="Features\EnergyCellBuff.cs" />
+    <Compile Include="Features\FlareBombBuff.cs" />
+    <Compile Include="Features\FeaturesManager.cs" />
+    <Compile Include="Features\KarmaFlowerBuff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

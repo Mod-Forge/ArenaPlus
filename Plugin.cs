@@ -52,7 +52,7 @@ namespace ArenaSlugcatsConfigurator
 
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
-            Freatures.FreaturesManager.OnEnable();
+            Freatures.FeaturesManager.Register();
 
             On.Menu.MultiplayerMenu.InitializeSitting += MultiplayerMenu_InitializeSitting;
             //On.Menu.MultiplayerMenu.Update += MultiplayerMenu_Update;
@@ -85,18 +85,18 @@ namespace ArenaSlugcatsConfigurator
             On.Spear.HitSomething += Spear_HitSomething;
             On.PuffBall.Explode += PuffBall_Explode;
 
-            On.FirecrackerPlant.Explode += FirecrackerPlant_Explode;
+            //On.FirecrackerPlant.Explode += FirecrackerPlant_Explode;
         }
 
-        private void FirecrackerPlant_Explode(On.FirecrackerPlant.orig_Explode orig, FirecrackerPlant self)
-        {
-            if (self.room.game.IsArenaSession && !IsChallengeGameSession(self.room.game))
-            {
-                Explosion obj = new Explosion(self.room, self, self.firstChunk.pos, 6, 60f, 5f, 0.0f, 100f, 0.5f, null, 1f, 0f, 1f);
-                self.room.AddObject(obj);
-            }
-            orig(self);
-        }
+        //private void FirecrackerPlant_Explode(On.FirecrackerPlant.orig_Explode orig, FirecrackerPlant self)
+        //{
+        //    if (self.room.game.IsArenaSession && !IsChallengeGameSession(self.room.game))
+        //    {
+        //        Explosion obj = new Explosion(self.room, self, self.firstChunk.pos, 6, 60f, 5f, 0.0f, 100f, 0.5f, null, 1f, 0f, 1f);
+        //        self.room.AddObject(obj);
+        //    }
+        //    orig(self);
+        //}
 
         private void PuffBall_Explode(On.PuffBall.orig_Explode orig, PuffBall self)
         {
@@ -1185,6 +1185,64 @@ namespace ArenaSlugcatsConfigurator
             {
                 return false;
             }
+        }
+
+        public static List<SlugcatStats.Name> GetSlugcatsList()
+        {
+            List<SlugcatStats.Name> list = new();
+
+            foreach (var slugcat in Options.GetModdedSlugcats())
+            {
+                if (!slugcat.configurable.Value)
+                {
+                    list.Add(slugcat.nameObject);
+                }
+            }
+            if (!Options.disableSurvivor.Value)
+            {
+                list.Add(SlugcatStats.Name.White);
+            }
+            if (!Options.disableMonk.Value)
+            {
+                list.Add(SlugcatStats.Name.Yellow);
+            }
+            if (!Options.disableHunter.Value && Options.IsSlugcatUnlocked(SlugcatStats.Name.Red))
+            {
+                list.Add(SlugcatStats.Name.Red);
+            }
+            if (!Options.disableRivulet.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Rivulet))
+            {
+                list.Add(MoreSlugcatsEnums.SlugcatStatsName.Rivulet);
+            }
+            if (!Options.disableArtificer.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Artificer))
+            {
+                list.Add(MoreSlugcatsEnums.SlugcatStatsName.Artificer);
+            }
+            if (!Options.disableSaint.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Saint))
+            {
+                list.Add(MoreSlugcatsEnums.SlugcatStatsName.Saint);
+            }
+            if (!Options.disableSpearmaster.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Spear))
+            {
+                list.Add(MoreSlugcatsEnums.SlugcatStatsName.Spear);
+            }
+            if (!Options.disableGourmand.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Gourmand))
+            {
+                list.Add(MoreSlugcatsEnums.SlugcatStatsName.Gourmand);
+            }
+            if (list.Count < 1)
+            {
+                list.Add(SlugcatStats.Name.White);
+                list.Add(SlugcatStats.Name.Yellow);
+            }
+
+            if (Mathf.Round(Random.Range(0, 40 / Mathf.Ceil(list.Count / 2))) == 0)
+            {
+                list.Add(MoreSlugcatsEnums.SlugcatStatsName.Sofanthiel);
+            }
+
+
+            return list;
         }
 
         public static SlugcatStats.Name GetRandomSlugcat(bool showList = false)
