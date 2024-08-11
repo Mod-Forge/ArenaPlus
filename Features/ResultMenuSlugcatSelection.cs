@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Random = UnityEngine.Random;
 
 namespace ArenaSlugcatsConfigurator.Freatures
 {
@@ -15,10 +16,21 @@ namespace ArenaSlugcatsConfigurator.Freatures
         {
             logSource.LogInfo("ResultMenuSlugcatSelection Register");
 
-            On.Menu.PlayerResultBox.Update += PlayerResultBox_Update;  
+            On.Menu.PlayerResultBox.Update += PlayerResultBox_Update;
+            On.Menu.PlayerResultBox.ctor += PlayerResultBox_ctor;
         }
 
         public static Player.InputPackage[] lastInput = new Player.InputPackage[4];
+        public static int[] randomSeeds = new int[4];
+        public static SlugcatStats.Name[] lastCharactersNames = new SlugcatStats.Name[4];
+
+
+        private static void PlayerResultBox_ctor(On.Menu.PlayerResultBox.orig_ctor orig, PlayerResultBox self, Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, ArenaSitting.ArenaPlayer player, int index)
+        {
+            orig(self, menu, owner, pos, size, player, index);
+            randomSeeds[player.playerNumber] = (int)(Random.value * 100);
+            lastCharactersNames[player.playerNumber] = player.playerClass;
+        }
 
         private static void PlayerResultBox_Update(On.Menu.PlayerResultBox.orig_Update orig, Menu.PlayerResultBox self)
         {
@@ -29,7 +41,35 @@ namespace ArenaSlugcatsConfigurator.Freatures
                 //logSource.LogInfo($"input y: {inputPackage.y}");
                 if (inputPackage.y != 0 && lastInput[self.player.playerNumber].y == 0)
                 {
-                    List<SlugcatStats.Name> list = Plugin.GetSlugcatsList();
+                    List<SlugcatStats.Name> fullList = Plugin.GetSlugcatsList();
+
+                    System.Random rand = new System.Random(randomSeeds[self.player.playerNumber]);
+                    //Random.InitState(randomSeeds[self.player.playerNumber]);
+                    List<SlugcatStats.Name> list = new List<SlugcatStats.Name>();
+
+                    if (true)
+                    {
+                        list.Add(lastCharactersNames[self.player.playerNumber]);
+                        logSource.LogInfo($"seed: {randomSeeds[self.player.playerNumber]}");
+
+                        int emergencyCountdown = 100;
+                        while (list.Count < 4 && emergencyCountdown > 0)
+                        {
+                            SlugcatStats.Name name = fullList[rand.Next(0, fullList.Count - 1)];
+                            if (!list.Contains(name))
+                            {
+                                list.Add(name);
+                            }
+                            emergencyCountdown--;
+                        }
+                        logSource.LogInfo($"list size: {list.Count} in {100 - emergencyCountdown} try");
+                    }
+                    else
+                    {
+                        list = fullList;
+                    }
+
+
                     int index = 0;
                     if (list.Contains(self.player.playerClass))
                     {
