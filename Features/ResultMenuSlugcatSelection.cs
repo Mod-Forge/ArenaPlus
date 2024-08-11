@@ -18,16 +18,16 @@ namespace ArenaSlugcatsConfigurator.Freatures
             On.Menu.PlayerResultBox.Update += PlayerResultBox_Update;  
         }
 
-        public static Player.InputPackage lastInput;
+        public static Player.InputPackage[] lastInput = new Player.InputPackage[4];
 
         private static void PlayerResultBox_Update(On.Menu.PlayerResultBox.orig_Update orig, Menu.PlayerResultBox self)
         {
             orig(self);
-            if (!self.player.readyForNextRound && RainWorldInstance.processManager.arenaSetup.playerClass[self.player.playerNumber] != null && self.DeadPortraint)
+            if (!self.player.readyForNextRound && RainWorldInstance.processManager.arenaSetup.playerClass[self.player.playerNumber] != null && self.DeadPortraint && self is not FinalResultbox)
             {
                 Player.InputPackage inputPackage = RWInput.PlayerInput(self.player.playerNumber);
                 //logSource.LogInfo($"input y: {inputPackage.y}");
-                if (inputPackage.y != 0 && lastInput.y == 0)
+                if (inputPackage.y != 0 && lastInput[self.player.playerNumber].y == 0)
                 {
                     List<SlugcatStats.Name> list = Plugin.GetSlugcatsList();
                     int index = 0;
@@ -46,7 +46,6 @@ namespace ArenaSlugcatsConfigurator.Freatures
 
                     SlugcatStats.Name newName = list[index];
 
-                    RainWorldInstance.processManager.arenaSitting.AddPlayerWithClass(self.player.playerNumber, newName);
                     self.player.playerClass = newName;
                     //self.portrait.sprite.SetElementByName(string.Concat(new string[]
                     //{
@@ -72,7 +71,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
 
                     self.subObjects.Add(self.portrait);
                 }
-                lastInput = inputPackage;
+                lastInput[self.player.playerNumber] = inputPackage;
             }
 
         }
