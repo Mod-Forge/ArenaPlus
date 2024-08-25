@@ -6,6 +6,8 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Menu;
+using ArenaSlugcatsConfigurator.Features.ResultMenuSlugcatSelection;
 
 namespace ArenaSlugcatsConfigurator
 {
@@ -49,5 +51,16 @@ namespace ArenaSlugcatsConfigurator
 
         // Autres constructeurs si nécessaire
         public PlayerCustomData(object obj) : base(obj) { }
+    }
+
+    public class PlayerResultBoxCustomData : CustomData
+    {
+        public VisualScrollButton scrollUpButton;
+        public VisualScrollButton scrollDownButton;
+        // Constructeur par défaut
+        public PlayerResultBoxCustomData() : base(null) { }
+
+        // Autres constructeurs si nécessaire
+        public PlayerResultBoxCustomData(object obj) : base(obj) { }
     }
 }

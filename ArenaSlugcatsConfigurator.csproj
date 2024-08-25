@@ -48,7 +48,8 @@
     <Compile Include="ClassOptions.cs" />
     <Compile Include="CustomData.cs" />
     <Compile Include="Extras.cs" />
-    <Compile Include="Features\ResultMenuSlugcatSelection.cs" />
+    <Compile Include="Features\ResultMenuSlugcatSelection\ResultMenuSlugcatSelection.cs" />
+    <Compile Include="Features\ResultMenuSlugcatSelection\VisualScrollButton.cs" />
     <Compile Include="Features\ScavengerUseGun.cs" />
     <Compile Include="Features\PlayerOneshot.cs" />
     <Compile Include="Plugin.cs" />

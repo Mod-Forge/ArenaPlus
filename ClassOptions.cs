@@ -50,6 +50,14 @@ namespace ArenaSlugcatsConfigurator
 
             Tabs[0].AddItems(clkEnableRandomEveryRounds, lbEnableRandomEveryRounds);
 
+            OpCheckBox clkEnableResultMenuSlugcatSelection = new OpCheckBox(Options.enableResultMenuSelection, initialPos + checkBoxSpace * 1.3f + new Vector2(220f, 0f));
+            clkEnableResultMenuSlugcatSelection.colorEdge = Color.grey;
+            clkEnableResultMenuSlugcatSelection.description = enableResultMenuSelection.info.description;
+            OpLabel lbEnableResultMenuSlugcatSelection = new OpLabel(clkEnableResultMenuSlugcatSelection.pos + labelSpace, default(Vector2), "Slugcat selector in result menu", FLabelAlignment.Left, false, null);
+            lbEnableResultMenuSlugcatSelection.color = clkEnableResultMenuSlugcatSelection.colorEdge;
+
+            Tabs[0].AddItems(clkEnableResultMenuSlugcatSelection, lbEnableResultMenuSlugcatSelection);
+
             OpCheckBox clkEnableMaskBlock = new OpCheckBox(Options.enableMaskBlock, initialPos + checkBoxSpace * 1.3f - checkBoxSpace);
             clkEnableMaskBlock.colorEdge = Color.grey;
             clkEnableMaskBlock.description = enableMaskBlock.info.description;
@@ -319,6 +327,11 @@ namespace ArenaSlugcatsConfigurator
         public static Configurable<bool> enableRandomEveryRound = Options.instance.config.Bind<bool>("enableRandomEveryRound", false, new ConfigurableInfo("Whether the random slugcat is random every rounds", null, "", new object[]
         {
             "Keep slugcats selectable?"
+        }));
+
+        public static Configurable<bool> enableResultMenuSelection = Options.instance.config.Bind<bool>("enableResultMenuSelection", false, new ConfigurableInfo("Whether the winner can change slugcat in the result menu", null, "", new object[]
+        {
+            "Keep slugcat selection in result menu?"
         }));
 
         public static Configurable<bool> enableMaskBlock = Options.instance.config.Bind<bool>("enableMaskBlock", true, new ConfigurableInfo("Whether masks block projectiles before breaking", null, "", new object[]

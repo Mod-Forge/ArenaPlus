@@ -1,4 +1,6 @@
 ﻿
+using ArenaSlugcatsConfigurator.Features.ResultMenuSlugcatSelection;
+
 namespace ArenaSlugcatsConfigurator.Freatures
 {
     internal static class FeaturesManager
@@ -13,6 +15,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
             PlayerOneshot.Register();
             ScavengerUseGun.Register();
             ResultMenuSlugcatSelection.Register();
+            Hooks.Register();
         }
     }
 }
