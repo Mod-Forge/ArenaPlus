@@ -23,25 +23,29 @@ namespace ArenaSlugcatsConfigurator.Freatures
 
         public static int SelectionCount = 3;
 
-        public static Player.InputPackage[] lastInput = new Player.InputPackage[SelectionCount];
-        public static int[] randomSeeds = new int[SelectionCount];
-        public static SlugcatStats.Name[] lastCharactersNames = new SlugcatStats.Name[SelectionCount];
+        public static Player.InputPackage[] lastInput = new Player.InputPackage[4];
+        public static int[] randomSeeds = new int[4];
+        public static SlugcatStats.Name[] lastCharactersNames = new SlugcatStats.Name[4];
 
 
         private static void PlayerResultBox_ctor(On.Menu.PlayerResultBox.orig_ctor orig, PlayerResultBox self, Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, ArenaSitting.ArenaPlayer player, int index)
         {
             orig(self, menu, owner, pos, size, player, index);
             if (!Options.enableResultMenuSelection.Value) return;
-            PlayerResultBoxCustomData data = self.GetCustomData<PlayerResultBoxCustomData>();
-            data.scrollUpButton = new VisualScrollButton(menu, self, "UP", new Vector2(0.01f - 30f, (0.01f + self.size.y) - 40), 0);
-            data.scrollUpButton.inactive = false;
-            self.subObjects.Add(data.scrollUpButton);
-            data.scrollDownButton = new VisualScrollButton(menu, self, "DOWN", new Vector2(0.01f - 30f, -25.99f + 40), 2);
-            data.scrollUpButton.inactive = false;
-            self.subObjects.Add(data.scrollDownButton);
+            try
+            {
+                PlayerResultBoxCustomData data = self.GetCustomData<PlayerResultBoxCustomData>();
+                data.scrollUpButton = new VisualScrollButton(menu, self, "UP", new Vector2(0.01f - 30f, (0.01f + self.size.y) - 40), 0);
+                data.scrollUpButton.inactive = false;
+                self.subObjects.Add(data.scrollUpButton);
+                data.scrollDownButton = new VisualScrollButton(menu, self, "DOWN", new Vector2(0.01f - 30f, -25.99f + 40), 2);
+                data.scrollUpButton.inactive = false;
+                self.subObjects.Add(data.scrollDownButton);
 
-            randomSeeds[player.playerNumber] = (int)(Random.value * 100);
-            lastCharactersNames[player.playerNumber] = player.playerClass;
+                randomSeeds[player.playerNumber] = (int)(Random.value * 100);
+                lastCharactersNames[player.playerNumber] = player.playerClass;
+            }
+            catch (Exception e) { logSource.LogError(e); }
         }
 
         private static void PlayerResultBox_Update(On.Menu.PlayerResultBox.orig_Update orig, Menu.PlayerResultBox self)
