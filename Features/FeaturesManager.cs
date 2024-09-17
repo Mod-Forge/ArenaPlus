@@ -1,4 +1,5 @@
 ﻿
+using ArenaSlugcatsConfigurator.Features;
 using ArenaSlugcatsConfigurator.Features.ResultMenuSlugcatSelection;
 
 namespace ArenaSlugcatsConfigurator.Freatures
@@ -16,6 +17,7 @@ namespace ArenaSlugcatsConfigurator.Freatures
             ScavengerUseGun.Register();
             ResultMenuSlugcatSelection.Register();
             Hooks.Register();
+            ClassChangeButtons.Register();
         }
     }
 }

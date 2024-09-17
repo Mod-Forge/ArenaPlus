@@ -941,9 +941,40 @@ namespace ArenaSlugcatsConfigurator
         //    orig(self);
         //}
 
+        public static SlugcatStats.Name PreviousClass(Menu.MultiplayerMenu menu, SlugcatStats.Name curClass)
+        {
+            SlugcatStats.Name name;
+            if (curClass == null)
+            {
+                Plugin.logSource.LogInfo($"go from random to last({ExtEnum<SlugcatStats.Name>.values.Count - 1})");
+                name = new SlugcatStats.Name(ExtEnum<SlugcatStats.Name>.values.GetEntry(ExtEnum<SlugcatStats.Name>.values.Count - 1), false);
+            }
+            else
+            {
+                if (curClass.Index < 1)
+                {
+                    Plugin.logSource.LogInfo($"go from first({curClass.Index}) to random");
+                    return null;
+                }
+                Plugin.logSource.LogInfo($"go from {curClass.Index} to {curClass.Index - 1}");
+                name = new SlugcatStats.Name(ExtEnum<SlugcatStats.Name>.values.GetEntry(curClass.Index - 1), false);
+            }
+            if (SlugcatStats.HiddenOrUnplayableSlugcat(name) || IsSlucatDisabled(name))
+            {
+                return PreviousClass(menu, name);
+            }
+            if (name != SlugcatStats.Name.White && name != SlugcatStats.Name.Yellow && !menu.multiplayerUnlocks.ClassUnlocked(name))
+            {
+                return PreviousClass(menu, name);
+            }
+            if (name != null && Input.GetKey(KeyCode.LeftControl)) return null;
+            return name;
+        }
+
         private SlugcatStats.Name MultiplayerMenu_NextClass(On.Menu.MultiplayerMenu.orig_NextClass orig, Menu.MultiplayerMenu self, SlugcatStats.Name curClass)
         {
             SlugcatStats.Name name = orig(self, curClass);
+            if (name != null && Input.GetKey(KeyCode.LeftControl)) return null;
             if (IsSlucatDisabled(name) && !Options.keepSlugcatsSelectable.Value) return MultiplayerMenu_NextClass(orig, self, name);
             return name;
         }
