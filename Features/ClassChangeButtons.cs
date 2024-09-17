@@ -77,7 +77,7 @@ namespace ArenaSlugcatsConfigurator.Features
 
         private static void MultiplayerMenu_Singal(On.Menu.MultiplayerMenu.orig_Singal orig, Menu.MultiplayerMenu self, Menu.MenuObject sender, string message)
         {
-            Plugin.logSource.LogInfo("got message: " + message);
+            //Plugin.logSource.LogInfo("got message: " + message);
             if (message != null && self.currentGameType == ArenaSetup.GameTypeID.Competitive || self.currentGameType == ArenaSetup.GameTypeID.Sandbox)
             {
                 for (int num6 = 0; num6 < self.playerClassButtons.Length; num6++)
