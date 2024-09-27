@@ -86,6 +86,16 @@ namespace ArenaSlugcatsConfigurator
             On.PuffBall.Explode += PuffBall_Explode;
 
             //On.FirecrackerPlant.Explode += FirecrackerPlant_Explode;
+            On.RainWorld.DeactivateAllPlayers += RainWorld_DeactivateAllPlayers;
+        }
+
+        private void RainWorld_DeactivateAllPlayers(On.RainWorld.orig_DeactivateAllPlayers orig, RainWorld self)
+        {
+            if (self.processManager.currentMainLoop is MultiplayerMenu)
+            {
+                return;
+            }
+            orig(self);
         }
 
         //private void FirecrackerPlant_Explode(On.FirecrackerPlant.orig_Explode orig, FirecrackerPlant self)
