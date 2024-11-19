@@ -244,6 +244,29 @@ namespace ArenaSlugcatsConfigurator
                 Tabs[0].AddItems(chkHunterCanPickupStuckSpear, lbHunterCanPickupStuckSpear);
             }
 
+            // lock cursor
+            OpCheckBox chkLockCursor = new OpCheckBox(Options.lockCursor, initialPos - checkBoxSpace * vanillaButtonNum);
+            chkLockCursor.colorEdge = Color.grey;
+            chkLockCursor.description = lockCursor.info.description;
+            //chkLockCursor.OnValueChanged += (UIconfig config, string value, string oldValue) =>
+            //{
+            //Plugin.logSource.LogInfo("value change " + bool.Parse(value));
+            //    if (bool.Parse(value))
+            //    {
+            //        Cursor.lockState = CursorLockMode.Confined;
+            //    }
+            //    else
+            //    {
+            //        Cursor.lockState = CursorLockMode.None;
+            //    }
+            //};
+
+            OpLabel lbLockCursor = new OpLabel(chkLockCursor.pos + labelSpace, default(Vector2), "Lock cursor", FLabelAlignment.Left, false, null);
+            lbLockCursor.color = chkLockCursor.colorEdge;
+            Tabs[0].AddItems(chkLockCursor, lbLockCursor);
+
+
+
             var slugcats = GetModdedSlugcats();
 
             if (slugcats.Count > 0)
@@ -318,6 +341,11 @@ namespace ArenaSlugcatsConfigurator
         }
 
         public static Options instance = new();
+
+        public static Configurable<bool> lockCursor = Options.instance.config.Bind<bool>("lockCursor", false, new ConfigurableInfo("Whether the cursor is lock to the game window", null, "", new object[]
+        {
+            "Lock cursor to the window?"
+        }));
 
         public static Configurable<bool> keepSlugcatsSelectable = Options.instance.config.Bind<bool>("keepSlugcatsSelectable", false, new ConfigurableInfo("Whether disabled slugcats are disabled only in random (not in the select menu)", null, "", new object[]
         {

@@ -14,6 +14,7 @@ using System;
 using Random = UnityEngine.Random;
 using System.IO;
 using System.Linq;
+using UnityEngine.PlayerLoop;
 
 
 #pragma warning disable CS0618
@@ -24,6 +25,7 @@ namespace ArenaSlugcatsConfigurator
     [BepInPlugin("ddemile.arenaslugcatsconfigurator", "Arena Slugcats Configurator", "1.3.3")] // (GUID, mod name, mod version)
     public class Plugin : BaseUnityPlugin
     {
+        public static RainWorld RW => UnityEngine.Object.FindObjectOfType<RainWorld>();
         public static ManualLogSource logSource = BepInEx.Logging.Logger.CreateLogSource("ArenaSlugcatsConfigurator");
         public static MultiplayerUnlocks multiplayerUnlocks;
         public static List<AbstractPhysicalObject> arenaEggs = new();
@@ -43,12 +45,23 @@ namespace ArenaSlugcatsConfigurator
             }
         }
 
+        public void FixedUpdate()
+        {
+            if (Options.lockCursor.Value && RW?.processManager.currentMainLoop is RainWorldGame game && !game.GamePaused)
+            {
+                Cursor.lockState = CursorLockMode.Confined;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
+
         public void OnEnable()
         {
             Log("Mod enabled", "info");
             try { RegisterCommands(); }
             catch { }
-
 
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
