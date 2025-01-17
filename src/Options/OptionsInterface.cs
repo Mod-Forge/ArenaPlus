@@ -17,7 +17,8 @@ namespace ArenaPlus.Options
             base.Initialize();
 
             List<OpTab> tabs = [
-                new FeaturesTab(this)
+                //new FeaturesTab(this),
+                new VanillaSlugcatsTab(this)
             ];
 
             if (SlugcatsUtils.GetModdedSlugcats().Count > 0)

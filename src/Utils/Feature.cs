@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static ArenaPlus.Utils.HookRegister;
+using ArenaPlus.Options.Tabs;
 
 namespace ArenaPlus.Utils
 {
@@ -28,6 +29,7 @@ namespace ArenaPlus.Utils
         public bool EnabledByDefault { get; } = featureInfo.enabledByDefault;
 
         public static List<Feature> features = [];
+        public static List<Category> categories = [];
 
         public static void LoadFeatures()
         {
@@ -125,5 +127,17 @@ namespace ArenaPlus.Utils
         }
 
         protected abstract void Register();
+    }
+
+    public class Category(string name, List<Feature> features)
+    {
+        public readonly string name = name;
+        public readonly List<Feature> features = features;
+    }
+
+    internal enum BuiltInCategory
+    {
+        General,
+        Reworks
     }
 }
