@@ -1,4 +1,5 @@
-﻿using ArenaPlus.Utils;
+﻿using ArenaPlus.Lib;
+using ArenaPlus.Utils;
 using MoreSlugcats;
 using RWCustom;
 using System;
@@ -8,13 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features.Reworks
+namespace ArenaPlus.Features.Test
 {
     [FeatureInfo(
         id: "karmaFlowerRework",
         name: "Saint karma flower (Spoiler)",
         color: "ffff00",
-        category: "Secret Reworks",
+        category: BuiltInCategory.Spoilers,
         description: "Allow players to ascend (Saint spoiler)",
         enabledByDefault: true
     )]
@@ -69,7 +70,7 @@ namespace ArenaPlus.Features.Reworks
         {
             if (self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game) && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.bites < 2)
             {
-                Player player = (grasp.grabber as Player);
+                Player player = grasp.grabber as Player;
                 if (!player.monkAscension && (player.tongue == null || !player.tongue.Attached))
                 {
                     player.maxGodTime = 565f;
@@ -122,7 +123,7 @@ namespace ArenaPlus.Features.Reworks
             if (rCam.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(rCam.room.game) && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
             {
                 PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
-                if (!rCam.room.game.DEBUGMODE && ModManager.MSC && self.player.room != null && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint && sLeaser.sprites.Length >= (customData.customSpriteIndex + 2 + self.numGodPips))
+                if (!rCam.room.game.DEBUGMODE && ModManager.MSC && self.player.room != null && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint && sLeaser.sprites.Length >= customData.customSpriteIndex + 2 + self.numGodPips)
                 {
 
                     //if (self.player.room.GetCustomData<RoomCustomData>().frame % 60 == 0)
@@ -195,11 +196,11 @@ namespace ArenaPlus.Features.Reworks
                         {
                             self.rubberRadius = num14;
                         }
-                        float num15 = self.player.maxGodTime / (float)self.numGodPips;
+                        float num15 = self.player.maxGodTime / self.numGodPips;
                         for (int m = 0; m < self.numGodPips; m++)
                         {
-                            float num16 = num15 * (float)m;
-                            float num17 = num15 * (float)(m + 1);
+                            float num16 = num15 * m;
+                            float num17 = num15 * (m + 1);
                             if (self.player.godTimer <= num16)
                             {
                                 sLeaser.sprites[customData.customSpriteIndex + 2 + m].scale = 0f;
@@ -242,7 +243,7 @@ namespace ArenaPlus.Features.Reworks
                     {
                         sLeaser.sprites[n].alpha = self.rubberAlphaPips;
                         Vector2 vector14 = new Vector2(sLeaser.sprites[customData.customSpriteIndex + 1].x, sLeaser.sprites[customData.customSpriteIndex + 1].y);
-                        vector14 += Custom.rotateVectorDeg(Vector2.one * self.rubberRadius, (float)(n - 15) * (360f / (float)self.numGodPips));
+                        vector14 += Custom.rotateVectorDeg(Vector2.one * self.rubberRadius, (n - 15) * (360f / self.numGodPips));
                         sLeaser.sprites[n].x = vector14.x;
                         sLeaser.sprites[n].y = vector14.y;
                     }

@@ -7,13 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using MoreSlugcats;
+using ArenaPlus.Lib;
 
-namespace ArenaPlus.Features.Reworks
+namespace ArenaPlus.Features.Rework2
 {
     [FeatureInfo(
         id: "energyCellRework",
         name: "Energy cell rework",
-        category: "Reworks",
+        category: "R2",
         description: "Make the energy cell float, remove gravity in it's action field and more",
         enabledByDefault: true
     )]

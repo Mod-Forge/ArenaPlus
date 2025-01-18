@@ -1,4 +1,5 @@
-﻿using ArenaPlus.Utils;
+﻿using ArenaPlus.Lib;
+using ArenaPlus.Utils;
 using Menu;
 using RWCustom;
 using System;
@@ -10,7 +11,7 @@ using UnityEngine;
 
 namespace ArenaPlus.Features.UI
 {
-    [ImmutableFeature()]
+    [ImmutableFeature]
     internal class ResultMenuSlugcatSelection : ImmutableFeature
     {
         public static readonly int selectionCount = 3;
@@ -60,7 +61,7 @@ namespace ArenaPlus.Features.UI
                     //logSource.LogInfo($"input y: {inputPackage.y}");
                     if (inputPackage.y != 0 && lastInput[self.player.playerNumber].y == 0)
                     {
-                        List<SlugcatStats.Name> fullList = SlugcatsUtils.GetSlugcats();
+                        List<SlugcatStats.Name> fullList = SlugcatsUtils.GetActiveSlugcats();
 
                         System.Random rand = new System.Random(randomSeeds[self.player.playerNumber]);
                         //Random.InitState(randomSeeds[self.player.playerNumber]);

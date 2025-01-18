@@ -1,4 +1,4 @@
-﻿using ArenaPlus.Utils;
+﻿using ArenaPlus.Lib;
 using RWCustom;
 using System;
 using System.Collections.Generic;
@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features.Reworks
+namespace ArenaPlus.Features.Test
 {
     [FeatureInfo(
         id: "vultureMaskRework",
         name: "Vulture mask block",
-                category: "Reworks",
+        category: BuiltInCategory.Reworks,
         description: "Wether vulture masks block projectiles before breaking",
         enabledByDefault: true
     )]

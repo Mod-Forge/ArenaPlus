@@ -11,18 +11,10 @@ namespace ArenaPlus.Utils
 {
     internal static class SlugcatsUtils
     {
-        public static List<SlugcatObject> GetModdedSlugcats()
+        public static List<SlugcatObject> GetSlugcats()
         {
-            List<string> vanillaSlugcats = [
-                "White",
-                "Yellow",
-                "Red",
+            List<string> exceptions = [
                 "Night",
-                "Rivulet",
-                "Artificer",
-                "Saint",
-                "Spear",
-                "Gourmand",
                 "Slugpup",
                 "Inv",
                 "JollyPlayer1",
@@ -30,14 +22,30 @@ namespace ArenaPlus.Utils
                 "JollyPlayer3",
                 "JollyPlayer4"
             ];
-            return ExtEnumBase.GetNames(typeof(SlugcatStats.Name)).ToList().Where(name => !vanillaSlugcats.Contains(name)).ToList().ConvertAll(name => SlugcatObject.slugcats.Find(slugcat => slugcat.codeName == name) ?? new SlugcatObject(name));
+
+            return ExtEnumBase.GetNames(typeof(SlugcatStats.Name)).ToList().Where(name => !exceptions.Contains(name)).ToList().ConvertAll(name => SlugcatObject.slugcats.Find(slugcat => slugcat.codeName == name) ?? new SlugcatObject(name));
         }
 
-        public static List<SlugcatStats.Name> GetSlugcats()
+        public static List<SlugcatObject> GetModdedSlugcats()
+        {
+            List<string> vanillaSlugcats = [
+                "White",
+                "Yellow",
+                "Red",
+                "Rivulet",
+                "Artificer",
+                "Saint",
+                "Spear",
+                "Gourmand"
+            ];
+            return GetSlugcats().Where(slugcat => !vanillaSlugcats.Contains(slugcat.name)).ToList();
+        }
+
+        public static List<SlugcatStats.Name> GetActiveSlugcats()
         {
             List<SlugcatStats.Name> list = [];
 
-            foreach (var slugcat in GetModdedSlugcats())
+            foreach (var slugcat in GetSlugcats())
             {
                 if (!slugcat.configurable.Value)
                 {
@@ -87,13 +95,12 @@ namespace ArenaPlus.Utils
                 list.Add(MoreSlugcatsEnums.SlugcatStatsName.Sofanthiel);
             }
 
-
             return list;
         }
 
         public static SlugcatStats.Name GetRandomSlugcat(bool showList = false)
         {
-            List<SlugcatStats.Name> list = GetSlugcats();
+            List<SlugcatStats.Name> list = GetActiveSlugcats();
 
             if (showList)
             {
@@ -121,10 +128,7 @@ namespace ArenaPlus.Utils
             this.nameObject = new SlugcatStats.Name(name, register: false);
             this.name = SlugcatStats.getSlugcatName(nameObject);
             this.color = PlayerGraphics.DefaultSlugcatColor(nameObject);
-            this.configurable = OptionsInterface.instance.config.Bind($"disable{this.codeName}", false, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", new object[]
-            {
-                    $"{this.name} disabled?"
-            }));
+            this.configurable = OptionsInterface.instance.config.Bind($"enable{this.codeName}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
             slugcats.Add(this);
         }
     }

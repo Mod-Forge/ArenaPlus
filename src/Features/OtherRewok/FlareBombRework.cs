@@ -1,4 +1,5 @@
-﻿using ArenaPlus.Utils;
+﻿using ArenaPlus.Lib;
+using ArenaPlus.Utils;
 using RWCustom;
 using System;
 using System.Collections.Generic;
@@ -7,17 +8,22 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features.Reworks
+namespace ArenaPlus.Features.Rework1
 {
     [FeatureInfo(
         id: "flareBombRework",
         name: "Flare bomb rework",
-        category: "Reworks",
+        category: "R1",
         description: "Make the flare bomb blind players",
         enabledByDefault: true
     )]
-    file class FlareBombRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    internal class FlareBombRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
+        internal static void Test()
+        {
+
+        }
+
         protected override void Register()
         {
             On.FlareBomb.DrawSprites += FlareBomb_DrawSprites;

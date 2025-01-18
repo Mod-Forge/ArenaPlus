@@ -17,13 +17,13 @@ namespace ArenaPlus.Options
             base.Initialize();
 
             List<OpTab> tabs = [
-               new VanillaSlugcatsTab(this)
+               new FeaturesTab(this)
             ];
 
-            //if (SlugcatsUtils.GetModdedSlugcats().Count > 0)
-            //{
-            //    tabs.Add(new ModdedSlugcatsTab(this));
-            //}
+            if (SlugcatsUtils.GetModdedSlugcats().Count > 0)
+            {
+                tabs.Add(new SlugcatsTab(this));
+            }
 
             foreach (var tab in tabs)
             {
@@ -40,7 +40,7 @@ namespace ArenaPlus.Options
             base.Update();
             foreach (var tab in Tabs)
             {
-                if (tab is VanillaSlugcatsTab ft)
+                if (tab is FeaturesTab ft)
                 {
                     ft.Update();
                 }

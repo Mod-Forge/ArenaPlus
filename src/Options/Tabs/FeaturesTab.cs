@@ -1,39 +1,154 @@
-﻿using Menu.Remix.MixedUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ArenaPlus.Utils;
+using ArenaPlus.Lib;
+using ArenaPlus.Options.Elements;
+using Menu.Remix.MixedUI;
+using Menu.Remix.MixedUI.ValueTypes;
 using UnityEngine;
 
 namespace ArenaPlus.Options.Tabs
 {
     internal class FeaturesTab : OpTab
     {
-        private static readonly Vector2 checkBoxSpace = new(0f, 20f + 10f);
-        private static readonly Vector2 labelSpace = new(40f, 3f);
-        private static readonly Vector2 initialPos = new Vector2(20f, 405f) - checkBoxSpace;
+        private const int MARGIN = 10;
+        private const int HEIGHT = 475 - 20;
+        private const int CHECKBOX_SIZE = 24;
+        private readonly Vector2 INITIAL_POS = new(20, 375);
+
+        private readonly Dictionary<Feature, OpCheckBox> checkBoxes = [];
+        internal OpScrollBox scrollBox;
 
         public FeaturesTab(OptionInterface owner) : base(owner, "Features")
         {
-            int height = 475 - 20;
-            int contentSize = Feature.features.Count * 30 + 24;
-            int index = 0;
+            bool updating = false;
+            int size = 48;
+            int lineYOffset = 2;
 
-            OpScrollBox moddedScrollBox = new(initialPos - new Vector2(0, height - 100), new Vector2(560, height), contentSize, false, false);
+            scrollBox = new(INITIAL_POS - new Vector2(0, HEIGHT - 100), new Vector2(560, HEIGHT), HEIGHT, false, false);
+            AddItems(scrollBox, new OpRect(INITIAL_POS - new Vector2(0, HEIGHT - 100) - new Vector2(0, 5), new Vector2(560, HEIGHT + 10)));
 
-            AddItems(moddedScrollBox, new OpRect(initialPos - new Vector2(0, height - 100) - new Vector2(0, 5), new Vector2(560, height + 10)));
-
-            foreach (var feature in Feature.features)
+            float lastYPos = HEIGHT;
+            foreach (var category in FeaturesManager.categories)
             {
-                OpCheckBox checkbox = new(feature.configurable, new Vector2(20f, 0f) + new Vector2(0, Mathf.Max(height, contentSize) - 40 - index * checkBoxSpace.y));
-                checkbox.description = feature.configurable.info.description;
-                OpLabel label = new(checkbox.pos + labelSpace, default, feature.Name, FLabelAlignment.Left, false, null);
-                index++;
+                OpExpandable expandable = new(new Vector2(20, lastYPos - 20), new Vector2(500, size), 1);
 
-                moddedScrollBox.AddItems(checkbox, label);
+                expandables.Add(expandable);
+                scrollBox.AddItems(expandable);
+
+                expandable.AddItem(
+                    new OpLine(new Vector2(MARGIN-3, - size - lineYOffset), new Vector2(500 - MARGIN * 2, 2))
+                );
+
+                OpCheckBox toggleAllCheckBox = expandable.AddItem(
+                    new OpCheckBox(category.configurable, new Vector2(10, -size / 2 - 12))
+                );
+
+
+                toggleAllCheckBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
+                {
+                    if (updating) return;
+
+                    category.features.ForEach(feature =>
+                    {
+                        if (!checkBoxes.TryGetValue(feature, out OpCheckBox checkBox)) return;
+
+                        checkBox.SetValueBool(value == "true");
+                    });
+                };
+
+                var expandButton = expandable.AddItem(
+                    new OpExpandButton(new Vector2(500 - 10 - 24, -size / 2 - 12), new Vector2(24, 24))
+                );
+
+                expandable.SetExpandButton(expandButton);
+
+                OpLabel titleLabel = expandable.AddItem(
+                    new OpLabel(new Vector2(45, -size), new Vector2(10, size), category.name, FLabelAlignment.Left, true)
+                );
+
+                lastYPos = (lastYPos - 20) - size;
+
+                int index = 0;
+                float lastPos = -size - MARGIN - CHECKBOX_SIZE - lineYOffset;
+                foreach (var feature in category.features)
+                {
+                    int xPos = MARGIN + (index % 2) * (500 / 2);
+
+                    OpCheckBox checkBox = expandable.AddItem(
+                        new OpCheckBox(feature.configurable, new Vector2(xPos, lastPos))
+                        {
+                            description = feature.Description,
+                        }
+                    );
+
+                    checkBoxes.Add(feature, checkBox);
+
+                    checkBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
+                    {
+                        updating = true;
+                        toggleAllCheckBox.SetValueBool(IsAllChecked(category.features));
+                        updating = false;
+                    };
+
+                    OpLabel label = expandable.AddItem(
+                        new OpLabel(new Vector2(xPos + CHECKBOX_SIZE + MARGIN, lastPos), new Vector2(0, CHECKBOX_SIZE), feature.Name, FLabelAlignment.Left)
+                    );
+
+                    if (feature.HexColor != "None" && ColorUtility.TryParseHtmlString("#" + feature.HexColor, out UnityEngine.Color color))
+                    {
+                        checkBox.colorEdge = color;
+                        label.color = color;
+                    }
+
+                    if (index++ % 2 == 1)
+                    {
+                        lastPos -= CHECKBOX_SIZE + MARGIN;
+                    }
+                }
             }
         }
+
+        private bool IsAllChecked(List<Feature> features)
+        {
+            return features.All(feature =>
+            {
+                if (!checkBoxes.TryGetValue(feature, out OpCheckBox checkBox)) return false;
+
+                return checkBox.value == "true";
+            });
+        }
+
+        public void Update()
+        {
+            float? lastYPos = null;
+            float firstGudY = 0f;
+            float lasYGudY = 0f;
+            foreach (var expandable in expandables)
+            {
+                if (lastYPos.HasValue)
+                {
+                    expandable.pos = new Vector2(expandable.pos.x, lastYPos.Value - 20);
+                }
+                else
+                {
+                    firstGudY = expandable.GetPos().y + 20;
+                }
+
+                lastYPos = expandable.pos.y - expandable.size.y;
+                lasYGudY = expandable.GetPos().y - expandable.size.y - 20;
+            }
+
+            float lastContentSize = scrollBox.contentSize;
+            float newSize = firstGudY - lasYGudY;
+
+            scrollBox.SetContentSize(newSize);
+
+            scrollBox.targetScrollOffset -= scrollBox.contentSize - lastContentSize;
+            scrollBox.scrollOffset = scrollBox.targetScrollOffset;
+        }
+
+        internal static List<OpExpandable> expandables = [];
     }
 }

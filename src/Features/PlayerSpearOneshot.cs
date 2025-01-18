@@ -1,4 +1,4 @@
-﻿using ArenaPlus.Utils;
+﻿using ArenaPlus.Lib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,6 @@ namespace ArenaPlus.Features
     [FeatureInfo(
         id: "playerSpearOneshot",
         name: "Player spear oneshot",
-        category: "Secret Reworks",
         description: "Whether spears throwed by players oneshot other slugcats",
         enabledByDefault: false
     )]
