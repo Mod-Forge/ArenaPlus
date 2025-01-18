@@ -12,6 +12,7 @@ namespace ArenaPlus.Features.Reworks
     [FeatureInfo(
         id: "puffBallRework",
         name: "Puff ball stun",
+                category: "Reworks",
         description: "Whether puff balls stun players",
         enabledByDefault: true
     )]

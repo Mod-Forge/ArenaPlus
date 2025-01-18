@@ -12,6 +12,7 @@ namespace ArenaPlus.Features.Reworks
     [FeatureInfo(
         id: "vultureMaskRework",
         name: "Vulture mask block",
+                category: "Reworks",
         description: "Wether vulture masks block projectiles before breaking",
         enabledByDefault: true
     )]

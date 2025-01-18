@@ -13,12 +13,14 @@ using ArenaPlus.Options.Tabs;
 namespace ArenaPlus.Utils
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class FeatureInfoAttribute(string id, string name, string description, bool enabledByDefault) : Attribute
+    public class FeatureInfoAttribute(string id, string name, string description, bool enabledByDefault, string category = "General", string color = "ffffff") : Attribute
     {
         public string id = id;
         public string name = name;
         public string description = description;
         public bool enabledByDefault = enabledByDefault;
+        public string category = category;
+        public string color = color;
     }
 
     public abstract class Feature(FeatureInfoAttribute featureInfo)
@@ -27,9 +29,24 @@ namespace ArenaPlus.Utils
         public string Name { get; } = featureInfo.name;
         public string Description { get; } = featureInfo.description;
         public bool EnabledByDefault { get; } = featureInfo.enabledByDefault;
+        public string Category { get; } = featureInfo.category;
+        public string HexColor { get; } = featureInfo.color;
 
         public static List<Feature> features = [];
         public static List<Category> categories = [];
+
+        public static void AddFeature(Feature feature)
+        {
+            features.Add(feature);
+
+            Category category = categories.Find(c => c.name.ToLower() == feature.Category.ToLower());
+            if (category == null)
+            {
+                category = new(feature.Category, []);
+                categories.Add(category);
+            }
+            category.AddFeature(feature);
+        }
 
         public static void LoadFeatures()
         {
@@ -63,7 +80,7 @@ namespace ArenaPlus.Utils
 
                         feature.configurable.OnChange += () => Configurable_OnChange(feature);
 
-                        features.Add(feature);
+                        AddFeature(feature);
                     } else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null)
                     {
                         type.GetConstructors()[0].Invoke([]);
@@ -133,6 +150,12 @@ namespace ArenaPlus.Utils
     {
         public readonly string name = name;
         public readonly List<Feature> features = features;
+        public Configurable<bool> configurable = OptionsInterface.instance.config.Bind(null, false, new ConfigurableInfo($"Enable {name}", null, "", []));
+
+        public void AddFeature(Feature feature)
+        {
+            features.Add(feature);
+        }
     }
 
     internal enum BuiltInCategory

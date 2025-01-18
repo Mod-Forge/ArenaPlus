@@ -36,6 +36,18 @@ namespace ArenaPlus.Options
             Tabs = [.. tabs];
         }
 
+        public override void Update()
+        {
+            base.Update();
+            foreach (var tab in Tabs)
+            {
+                if (tab is VanillaSlugcatsTab ft)
+                {
+                    ft.Update();
+                }
+            }
+        }
+
         public static OptionsInterface instance = new();
     }
 }

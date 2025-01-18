@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -22,103 +23,121 @@ namespace ArenaPlus.Options.Tabs
 
         public VanillaSlugcatsTab(OptionInterface owner) : base(owner, "Vanilla")
         {
-            Category[] categories = [   
-                new Category(name, Feature.features),                new Category("dsgfh", [])
-
-            ];
-
             int height = 475 - 20;
             int contentSize = Feature.features.Count * 30 + 24;
 
-            OpScrollBox moddedScrollBox = new(initialPos - new Vector2(0, height - 100), new Vector2(560, height), contentSize, false, false);
-
-            AddItems(moddedScrollBox, new OpRect(initialPos - new Vector2(0, height - 100) - new Vector2(0, 5), new Vector2(560, height + 10)));
-
-            OpRect rect = new OpRect(initialPos - new Vector2(0, height - 100), new Vector2(560, height));
-
-            OpSimpleButton upButton = new OpSimpleImageButton(new Vector2(0, 100), new Vector2(20, 20), "Sandbox_A");
-            OpSimpleButton leftButton = new OpSimpleImageButton(new Vector2(-100, 0), new Vector2(20, 20), "Sandbox_A");
-            OpSimpleButton rightButton = new OpSimpleImageButton(new Vector2(100, 0), new Vector2(20, 20), "Sandbox_A");
-            OpSimpleButton bottomButton = new OpSimpleImageButton(new Vector2(0, -100), new Vector2(20, 20), "Sandbox_A");
-
-            int size = 48;
-
-            OpExpandable container = new(new Vector2(20, height - 20), new Vector2(500, size));
+            scrollBox = new(initialPos - new Vector2(0, height - 100), new Vector2(560, height), contentSize, false, false);
+            AddItems(scrollBox, new OpRect(initialPos - new Vector2(0, height - 100) - new Vector2(0, 5), new Vector2(560, height + 10)));
 
 
-            moddedScrollBox.AddItems(container);
 
-            var d = container.AddItem(
-                new OpRect(new Vector2(0, -size), new Vector2(500, size))
-            );
+            float lastYPos = height;
 
-            container.OnExpandProgress += (Vector2 progression) =>
+            foreach (var category in Feature.categories)
             {
-                Log("Expanding outside");
-                d.pos -= progression;
-                d.size += progression;
-            };
+                int size = 48;
+                OpExpandable expandable = new(new Vector2(20, lastYPos - 20), new Vector2(500, size), 1);
 
-            container.AddItem(
-                new OpCheckBox(Feature.features[0].configurable, new Vector2(10, -size / 2 - 12))
-            );
+                scrollBox.AddItems(expandable); ;
 
-            var btn = container.AddItem(
-                new OpSimpleImageButton(new Vector2(500 - 10 - 24, -size/2-12), new Vector2(24, 24), "Menu_Symbol_Arrow")    
-            );
+                expandable.AddItem(
+                    new OpCheckBox(category.configurable, new Vector2(10, -size / 2 - 12))
+                );
 
-            container.AddItem(
-                new OpSimpleImageButton(new Vector2(500 - 10 - 24, -size / 2 - 12 - 200), new Vector2(24, 24), "Menu_Symbol_Arrow")
-            );
+                var expandBtn = expandable.AddItem(
+                    new OpSimpleImageButton(new Vector2(500 - 10 - 24, -size / 2 - 12), new Vector2(24, 24), "Menu_Symbol_Arrow")
+                );
 
-            btn.OnClick += (UIfocusable trigger) =>
-            {
-                container.ToggleExpand();
-            };
-
-            btn._rect.pos -= new Vector2(-1000, 1000);
-            btn.sprite.rotation = 180;
-
-            OpLabel leabel = container.AddItem(
-                new OpLabel(new Vector2(45, -size), new Vector2(20, size), "General", FLabelAlignment.Left, true)
-            );
-
-
-            float? lastYPos = null;
-
-            foreach (var category in categories)
-            {
-                break;
-                float verticalOffset = lastYPos != null ? (float) lastYPos - 40f : Mathf.Max(height, contentSize) - 40;
-                var configurable = OptionsInterface.instance.config.Bind(null, false, new ConfigurableInfo("dec", null, "", []));
-                OpCheckBox globalCheckbox = new(configurable, new Vector2(20f, 0f) + new Vector2(0, verticalOffset));
-                OpLabel label = new(globalCheckbox.pos + labelSpace, default(Vector2), $"General", FLabelAlignment.Left, true, null);
-                OpRect separator = new(globalCheckbox.pos - new Vector2(0, 10), new Vector2(500, 2));
-
-                lastYPos = verticalOffset;
-
-                int index = 0;
-                foreach (var item in category.features)
+                expandBtn.OnClick += (UIfocusable trigger) =>
                 {
-                    verticalOffset = (float) lastYPos - (index == 0 ? 50f : 30f);
-                    OpCheckBox checkbox = new(item.configurable, new Vector2(20f, 0f) + new Vector2(0, verticalOffset));
-                    OpLabel la = new(checkbox.pos + labelSpace, default(Vector2), item.Name, FLabelAlignment.Left, false, null);
+                    expandable.ToggleExpand();
+                };
 
-                    //moddedScrollBox.AddItems(checkbox, la);
+                expandBtn.OnUpdate += () =>
+                {
+                    expandBtn.greyedOut = expandable.Moving;
+                    expandBtn.sprite.rotation = expandable.expanded ? 0f : 180f;
+                };
 
-                    lastYPos = verticalOffset;
-                    index++;
+                expandBtn._rect.pos -= new Vector2(-1000, 1000);
+                expandBtn.sprite.rotation = 180;
+
+                OpLabel label = expandable.AddItem(
+                    new OpLabel(new Vector2(45, -size), new Vector2(10, size), category.name, FLabelAlignment.Left, true)
+                );
+
+
+
+
+                expandable.AddItem(new OpSimpleButton(new Vector2(20, -200), Vector2.one * 24));
+
+
+                expandables.Add(expandable);
+                lastYPos = (lastYPos - 20) - size;
+
+
+
+
+                //float verticalOffset = lastYPos != null ? (float) lastYPos - 40f : Mathf.Max(height, contentSize) - 40;
+                //var configurable = OptionsInterface.instance.config.Bind(null, false, new ConfigurableInfo("dec", null, "", []));
+                //OpCheckBox globalCheckbox = new(configurable, new Vector2(20f, 0f) + new Vector2(0, verticalOffset));
+                //OpLabel label = new(globalCheckbox.pos + labelSpace, default(Vector2), $"General", FLabelAlignment.Left, true, null);
+                //OpRect separator = new(globalCheckbox.pos - new Vector2(0, 10), new Vector2(500, 2));
+
+                //lastYPos = verticalOffset;
+
+                //int index = 0;
+                //foreach (var item in category.features)
+                //{
+                //    verticalOffset = (float) lastYPos - (index == 0 ? 50f : 30f);
+                //    OpCheckBox checkbox = new(item.configurable, new Vector2(20f, 0f) + new Vector2(0, verticalOffset));
+                //    OpLabel la = new(checkbox.pos + labelSpace, default(Vector2), item.Name, FLabelAlignment.Left, false, null);
+
+                //    //moddedScrollBox.AddItems(checkbox, la);
+
+                //    lastYPos = verticalOffset;
+                //    index++;
+                //}
+
+                ////moddedScrollBox.AddItems(globalCheckbox, label, separator);
+            }
+
+            Log($"init contentSize {scrollBox.contentSize}");
+        }
+
+        public void Update()
+        {
+            float? lastYPos = null;
+            float firstGudY = 0f;
+            float lasYGudY = 0f;
+            foreach (var expandable in expandables)
+            {
+                if (lastYPos.HasValue)
+                {
+                    expandable.pos = new Vector2(expandable.pos.x, lastYPos.Value - 20);
+                }
+                else
+                {
+                    firstGudY = expandable.GetPos().y + 20;
                 }
 
-                //moddedScrollBox.AddItems(globalCheckbox, label, separator);
+                lastYPos = expandable.pos.y - expandable.size.y;
+                lasYGudY = expandable.GetPos().y - expandable.size.y - 20;
             }
+
+            float newSize = firstGudY - lasYGudY;
+            scrollBox.SetContentSize(newSize);
+            Log($"new contentSize {scrollBox.contentSize} {newSize}");
         }
+
+        internal static OpScrollBox scrollBox;
+        internal static List<OpExpandable> expandables = new List<OpExpandable>();
+
     }
 
     internal class OpContainer : UIelement
     {
         protected readonly HashSet<UIelement> items = [];
-
         public OpContainer(Vector2 pos) : base(pos, default(Vector2))
         {
         }
@@ -182,12 +201,18 @@ namespace ArenaPlus.Options.Tabs
         private Vector2 defaultPos;
         private readonly Vector2 defaultSize;
         private UIelement lowestItem = null;
+        public float lowestY => lowestItem != null ? lowestItem.GetPos().y - 10 : 0;
 
-        public OpExpandable(Vector2 pos, Vector2 defaultSize) : base(pos)
+        protected OpRect rect;
+        public bool hasBorder = true;
+
+
+        public OpExpandable(Vector2 pos, Vector2 defaultSize, float animationDuration = 1f) : base(pos)
         {
             this.defaultPos = pos;
             this.size = defaultSize;
             this.defaultSize = defaultSize;
+            this.animationDuration = animationDuration;
         }
 
         public new T AddItem<T>(T item) where T : UIelement
@@ -206,7 +231,7 @@ namespace ArenaPlus.Options.Tabs
                 item.Hide();
             }
 
-            
+
             return addedItem;
         }
 
@@ -218,15 +243,17 @@ namespace ArenaPlus.Options.Tabs
 
         private bool expanding = false;
         private bool retracting = false;
-        private bool expanded = false;
+        public bool expanded { get; private set; }
 
-        private float ExpandingAnimationProgress => size.y / (GetPos().y - lowestItem.GetPos().y);
-        
-        // TODO: Implement that better
-        private float RetractingAnimationProgress => 0.5f;
+        private float expandedSize => GetPos().y - lowestY;
+        public bool Moving => expanding || retracting || animationProgress > 0;
+        private float animationProgress = 0f;
+        private float animationDuration = 1f;
+        private float lastYPos = 0f;
 
         public void ToggleExpand()
         {
+            if (Moving) return;
             if (expanded)
             {
                 Log("retracting");
@@ -237,74 +264,118 @@ namespace ArenaPlus.Options.Tabs
             }
         }
 
-        private float EaseOutQuart(float x)
+
+        //const n1 = 7.5625;
+        //const d1 = 2.75;
+
+        //if (x< 1 / d1) {
+        //    return n1* x * x;
+        //} else if (x< 2 / d1) {
+        //    return n1* (x -= 1.5 / d1) * x + 0.75;
+        //} else if (x < 2.5 / d1)
+        //{
+        //    return n1 * (x -= 2.25 / d1) * x + 0.9375;
+        //}
+        //else
+        //{
+        //    return n1 * (x -= 2.625 / d1) * x + 0.984375;
+
+
+        private float EaseOut(float x)
         {
-            return x == 1 ? 1 : 1 - Mathf.Pow(2, -10 * x);
-        }
+            //float val = x == 1 ? 1 : 1 - Mathf.Pow(2, -10 * x);
+            const float n1 = 7.5625f;
+            const float d1 = 2.75f;
+
+            if (x < 1 / d1)
+            {
+                return n1 * x * x;
+            }
+            else if (x < 2 / d1)
+            {
+                return n1 * (x -= 1.5f / d1) * x + 0.75f;
+            }
+            else if (x < 2.5 / d1)
+            {
+                return n1 * (x -= 2.25f / d1) * x + 0.9375f;
+            }
+            else
+            {
+                return n1 * (x -= 2.625f / d1) * x + 0.984375f;
+            }
+}
 
         public override void Update()
         {
-            if (expanding || retracting)
+
+            if ((tab != null) && hasBorder && rect == null)
             {
-                Log("Expanding inside");
-                float x = (float)Math.Round(EaseOutQuart(1 - (retracting ? RetractingAnimationProgress : ExpandingAnimationProgress)) * 10 * 4, MidpointRounding.ToEven) / 4;
+                rect = AddItem(new OpRect(new Vector2(0, -defaultSize.y), defaultSize));
+            }
 
-                if (expanding && ExpandingAnimationProgress > 0.99f)
+            if (Moving)
+            {
+                float dt = 0.025f;
+                float step = dt * (1 / animationDuration);
+                animationProgress += step;
+                animationProgress = Mathf.Clamp(animationProgress, 0f, 1f);
+
+                float from = defaultSize.y;
+                float to = expandedSize;
+                if (retracting)
                 {
-                    x += 0.1f;
+                    to = from;
+                    from = expandedSize;
                 }
 
-                Log(RetractingAnimationProgress);
+                float t = EaseOut(animationProgress);
+                float lastT = EaseOut(Mathf.Max(animationProgress - step, 0));
 
-                if (retracting && RetractingAnimationProgress > 0.99f)
+                float y = Mathf.Lerp(from, to, t);
+                float yStep = Mathf.Lerp(from, to, t) - Mathf.Lerp(from, to, lastT);
+
+                Log($"lerp from {from} to {to} by {animationProgress}");
+                Log($"Y: {y} T: {t}");
+
+                if (rect != null)
                 {
-                    x += 0.1f;
+                    rect.pos += Vector2.down * yStep;
+                    rect.size += Vector2.up * yStep;
                 }
 
-                x *= retracting ? -1 : 1;
+                size = new Vector2(0, y);
 
-
-                Log("Progress: " + x);
-                OnExpandProgress(new Vector2(0, x));
-                size += new Vector2(0, x);
-                Log("Expanding inside 2");
+                if (animationProgress >= 1)
+                {
+                    animationProgress = 0f;
+                    expanded = !expanded;
+                    expanding = false;
+                    retracting = false;
+                }
 
 
                 foreach (var item in items)
                 {
-                    if (IsItemInView(item))
+                    if (IsItemInView(item) || (rect != null && item == rect))
                     {
                         item.Show();
-                    } else
+                    }
+                    else
                     {
                         item.Hide();
                     }
                 }
-            }
 
-            if (expanding)
-            {
-                if (GetPos().y - size.y <= lowestItem.GetPos().y)
+                if (OnExpandProgress != null)
                 {
-                    expanded = true;
-                    expanding = false;
-                }
-
-            }
-
-            if (retracting)
-            {
-                if (GetPos().y - size.y >= (defaultPos.y - defaultSize.y - 10))
-                {
-                    expanded = false;
-                    retracting = false;
+                    OnExpandProgress(y, yStep);
                 }
             }
 
             base.Update();
         }
 
-        public delegate void OnExpandProgressHandler(Vector2 progression);
+        public delegate void OnExpandProgressHandler(float sizeY, float yStep);
 
         public event OnExpandProgressHandler OnExpandProgress;
     }

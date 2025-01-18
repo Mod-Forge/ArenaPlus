@@ -13,6 +13,7 @@ namespace ArenaPlus.Features.Reworks
     [FeatureInfo(
         id: "energyCellRework",
         name: "Energy cell rework",
+        category: "Reworks",
         description: "Make the energy cell float, remove gravity in it's action field and more",
         enabledByDefault: true
     )]
