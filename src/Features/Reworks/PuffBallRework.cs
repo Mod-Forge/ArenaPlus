@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features.Rework3
+namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "puffBallRework",
         name: "Puff ball stun",
-        category: "R3",
+        category: BuiltInCategory.Reworks,
         description: "Whether puff balls stun players",
         enabledByDefault: true
     )]

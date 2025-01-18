@@ -18,16 +18,17 @@ namespace ArenaPlus.Options.Tabs
 
         public SlugcatsTab(OptionInterface owner) : base(owner, "Slugcats")
         {
-            int featureOffset = 10;
+            var slugcats = SlugcatsUtils.GetSlugcats();
+
+            int featureOffset = 24;
             int height = 475 - 20;
-            int contentSize = height;
+            int contentSize = (slugcats.Count + FeaturesManager.slugcatFeatures.Count) * 30 + 24;
             int index = 0;
 
             OpScrollBox moddedScrollBox = new(initialPos - new Vector2(0, height - 100), new Vector2(560, height), contentSize, false, false);
 
             AddItems(moddedScrollBox, new OpRect(initialPos - new Vector2(0, height - 100) - new Vector2(0, 5), new Vector2(560, height + 10)));
 
-            var slugcats = SlugcatsUtils.GetSlugcats();
 
             foreach (var slugcat in slugcats)
             {
@@ -37,21 +38,21 @@ namespace ArenaPlus.Options.Tabs
                 OpLabel label = new(checkbox.pos + labelSpace, default, $"Enable {slugcat.name}", FLabelAlignment.Left, false, null);
                 label.color = slugcat.color;
 
+                index++;
+
                 SlugcatFeature[] features = FeaturesManager.slugcatFeatures.Where(feature => feature.Slugcat == slugcat.name).ToArray();
 
                 foreach (var feature in features)
                 {
                     OpCheckBox featureCheckbox = new(feature.configurable, new Vector2(20f + featureOffset, 0f) + new Vector2(0, Mathf.Max(height, contentSize) - 40 - index * checkBoxSpace.y));
-                    checkbox.colorEdge = slugcat.color;
-                    checkbox.description = feature.configurable.info.description;
-                    OpLabel featureLabel = new(checkbox.pos + labelSpace, default, feature.Name, FLabelAlignment.Left, false, null);
-                    label.color = slugcat.color;
+                    featureCheckbox.colorEdge = slugcat.color;
+                    featureCheckbox.description = feature.configurable.info.description;
+                    OpLabel featureLabel = new(featureCheckbox.pos + labelSpace, default, feature.Name, FLabelAlignment.Left, false, null);
+                    featureLabel.color = slugcat.color;
 
-                    moddedScrollBox.AddItems(featureCheckbox, label);
+                    moddedScrollBox.AddItems(featureCheckbox, featureLabel);
                     index++;
                 }
-
-                index++;
 
                 moddedScrollBox.AddItems(checkbox, label);
             }

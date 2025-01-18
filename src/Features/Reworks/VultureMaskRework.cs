@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features.Test
+namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "vultureMaskRework",

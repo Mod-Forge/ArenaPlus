@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace ArenaPlus.Utils
 {
     internal static class GameUtils
@@ -21,6 +22,11 @@ namespace ArenaPlus.Utils
         public static RainWorld RainWorldInstance
         {
             get => UnityEngine.Object.FindObjectOfType<RainWorld>();
+        }
+
+        public static PlayerProgression.MiscProgressionData ProgressionData
+        {
+            get => RainWorldInstance.progression.miscProgressionData;
         }
     }
 }

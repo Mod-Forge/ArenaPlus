@@ -23,7 +23,12 @@ namespace ArenaPlus.Utils
                 "JollyPlayer4"
             ];
 
-            return ExtEnumBase.GetNames(typeof(SlugcatStats.Name)).ToList().Where(name => !exceptions.Contains(name)).ToList().ConvertAll(name => SlugcatObject.slugcats.Find(slugcat => slugcat.codeName == name) ?? new SlugcatObject(name));
+            return ExtEnumBase.GetNames(typeof(SlugcatStats.Name))
+                .Where(name => !exceptions.Contains(name))
+                .ToList()
+                .ConvertAll(name => SlugcatObject.slugcats.Find(slugcat => slugcat.codeName == name) ?? new SlugcatObject(name))
+                .Where(slugcat => IsSlugcatUnlocked(slugcat.nameObject))
+                .ToList();
         }
 
         public static List<SlugcatObject> GetModdedSlugcats()
@@ -109,6 +114,39 @@ namespace ArenaPlus.Utils
             }
 
             return list[Random.Range(0, list.Count)];
+        }
+
+        public static bool IsSlugcatUnlocked(SlugcatStats.Name id)
+        {
+            if (SlugcatStats.HiddenOrUnplayableSlugcat(id))
+            {
+                return false;
+            }
+            if (ModManager.MSC && MoreSlugcats.MoreSlugcats.chtUnlockClasses.Value)
+            {
+                return true;
+            }
+            if (id == SlugcatStats.Name.Red)
+            {
+                return GameUtils.ProgressionData.redUnlocked;
+            }
+            if (id == MoreSlugcatsEnums.SlugcatStatsName.Gourmand)
+            {
+                return GameUtils.ProgressionData.GetTokenCollected(MultiplayerUnlocks.SlugcatUnlockID.Gourmand);
+            }
+            if (id == MoreSlugcatsEnums.SlugcatStatsName.Rivulet)
+            {
+                return GameUtils.ProgressionData.GetTokenCollected(MultiplayerUnlocks.SlugcatUnlockID.Rivulet);
+            }
+            if (id == MoreSlugcatsEnums.SlugcatStatsName.Artificer)
+            {
+                return GameUtils.ProgressionData.GetTokenCollected(MultiplayerUnlocks.SlugcatUnlockID.Artificer);
+            }
+            if (id == MoreSlugcatsEnums.SlugcatStatsName.Saint)
+            {
+                return GameUtils.ProgressionData.GetTokenCollected(MultiplayerUnlocks.SlugcatUnlockID.Saint);
+            }
+            return !(id == MoreSlugcatsEnums.SlugcatStatsName.Spear) || GameUtils.ProgressionData.GetTokenCollected(MultiplayerUnlocks.SlugcatUnlockID.Spearmaster);
         }
     }
 

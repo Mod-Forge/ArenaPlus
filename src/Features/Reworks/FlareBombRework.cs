@@ -8,12 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features.Rework1
+namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "flareBombRework",
         name: "Flare bomb rework",
-        category: "R1",
+        category: BuiltInCategory.Reworks,
         description: "Make the flare bomb blind players",
         enabledByDefault: true
     )]

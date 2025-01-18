@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using SlugBase.Features;
 
 namespace ArenaPlus.Lib
 {
@@ -31,7 +32,7 @@ namespace ArenaPlus.Lib
 
             Category.Preload();
 
-            Assembly[] assemblies = [Assembly.GetExecutingAssembly()];
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies)
             {
 
@@ -47,41 +48,51 @@ namespace ArenaPlus.Lib
 
                 foreach (Type type in types.Where(t => t != null))
                 {
-                    if (assembly.GetName().Name == "ArenaPlus")
+                    try
                     {
-                        Log(type.Namespace + " " + type.Name);
-                    }
-
-                    if (type.GetCustomAttribute<FeatureInfoAttribute>() is FeatureInfoAttribute featureInfo)
-                    {
-                        Log($"Registering feature : {featureInfo.id}");
-
-                        Feature feature = type.GetConstructors()[0].Invoke([featureInfo]) as Feature;
-
-                        if (feature.configurable.Value)
+                        BaseFeature baseFeature = null;
+                        if (type.GetCustomAttribute<FeatureInfoAttribute>() is FeatureInfoAttribute featureInfo)
                         {
-                            feature.Enable();
+                            Feature feature = type.GetConstructors()[0].Invoke([featureInfo]) as Feature;
+
+                            baseFeature = feature;
+
+                            AddFeature(feature);
+                        }
+                        else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null)
+                        {
+                            type.GetConstructors()[0].Invoke([]);
+                        }
+                        else if (type.GetCustomAttribute<SlugcatFeatureInfoAttribute>() is SlugcatFeatureInfoAttribute slugcatFeatureInfo)
+                        {
+                            SlugcatFeature feature = type.GetConstructors()[0].Invoke([slugcatFeatureInfo]) as SlugcatFeature;
+
+                            baseFeature = feature;
+
+                            slugcatFeatures.Add(feature);
                         }
 
-                        feature.configurable.OnChange += () => Configurable_OnChange(feature);
+                        if (baseFeature != null)
+                        {
+                            Log($"Registering feature : {baseFeature.Id}");
 
-                        AddFeature(feature);
-                    }
-                    else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null)
-                    {
-                        type.GetConstructors()[0].Invoke([]);
-                    }
-                    else if (type.GetCustomAttribute<SlugcatFeatureInfoAttribute>() is SlugcatFeatureInfoAttribute slugcatFeatureInfo)
-                    {
-                        SlugcatFeature feature = type.GetConstructors()[0].Invoke([slugcatFeatureInfo]) as SlugcatFeature;
+                            if (baseFeature.configurable.Value)
+                            {
+                                baseFeature.Enable();
+                            }
 
-                        slugcatFeatures.Add(feature);
+                            baseFeature.configurable.OnChange += () => Configurable_OnChange(baseFeature);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LogError(e);
                     }
                 }
             }
         }
 
-        private static void Configurable_OnChange(Feature feature)
+        private static void Configurable_OnChange(BaseFeature feature)
         {
             if (feature.configurable.Value && !feature.registered)
             {

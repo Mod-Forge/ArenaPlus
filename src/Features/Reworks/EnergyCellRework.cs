@@ -9,12 +9,12 @@ using UnityEngine;
 using MoreSlugcats;
 using ArenaPlus.Lib;
 
-namespace ArenaPlus.Features.Rework2
+namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "energyCellRework",
         name: "Energy cell rework",
-        category: "R2",
+        category: BuiltInCategory.Spoilers,
         description: "Make the energy cell float, remove gravity in it's action field and more",
         enabledByDefault: true
     )]
@@ -36,13 +36,13 @@ namespace ArenaPlus.Features.Rework2
             On.Room.Update -= Room_Update;
         }
 
-        private void EnergyCell_Use(On.MoreSlugcats.EnergyCell.orig_Use orig, MoreSlugcats.EnergyCell self, bool forced)
+        private void EnergyCell_Use(On.MoreSlugcats.EnergyCell.orig_Use orig, EnergyCell self, bool forced)
         {
             orig(self, forced);
             if (self.usingTime == 600f) self.usingTime *= 2f;
         }
 
-        private void EnergyCell_DrawSprites(On.MoreSlugcats.EnergyCell.orig_DrawSprites orig, MoreSlugcats.EnergyCell self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        private void EnergyCell_DrawSprites(On.MoreSlugcats.EnergyCell.orig_DrawSprites orig, EnergyCell self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
             sLeaser.sprites[3].scale = 15f * gravityFieldSize;
