@@ -74,35 +74,7 @@ namespace ArenaPlus.Options.Tabs
 
                 expandables.Add(expandable);
                 lastYPos = (lastYPos - 20) - size;
-
-
-
-
-                //float verticalOffset = lastYPos != null ? (float) lastYPos - 40f : Mathf.Max(height, contentSize) - 40;
-                //var configurable = OptionsInterface.instance.config.Bind(null, false, new ConfigurableInfo("dec", null, "", []));
-                //OpCheckBox globalCheckbox = new(configurable, new Vector2(20f, 0f) + new Vector2(0, verticalOffset));
-                //OpLabel label = new(globalCheckbox.pos + labelSpace, default(Vector2), $"General", FLabelAlignment.Left, true, null);
-                //OpRect separator = new(globalCheckbox.pos - new Vector2(0, 10), new Vector2(500, 2));
-
-                //lastYPos = verticalOffset;
-
-                //int index = 0;
-                //foreach (var item in category.features)
-                //{
-                //    verticalOffset = (float) lastYPos - (index == 0 ? 50f : 30f);
-                //    OpCheckBox checkbox = new(item.configurable, new Vector2(20f, 0f) + new Vector2(0, verticalOffset));
-                //    OpLabel la = new(checkbox.pos + labelSpace, default(Vector2), item.Name, FLabelAlignment.Left, false, null);
-
-                //    //moddedScrollBox.AddItems(checkbox, la);
-
-                //    lastYPos = verticalOffset;
-                //    index++;
-                //}
-
-                ////moddedScrollBox.AddItems(globalCheckbox, label, separator);
             }
-
-            Log($"init contentSize {scrollBox.contentSize}");
         }
 
         public void Update()
@@ -125,9 +97,17 @@ namespace ArenaPlus.Options.Tabs
                 lasYGudY = expandable.GetPos().y - expandable.size.y - 20;
             }
 
+            float lastContentSize = scrollBox.contentSize;
             float newSize = firstGudY - lasYGudY;
+
             scrollBox.SetContentSize(newSize);
-            Log($"new contentSize {scrollBox.contentSize} {newSize}");
+
+            if (scrollBox.scrollOffset == 1)
+            {
+                scrollBox.scrollOffset = 0;
+            }
+            scrollBox.targetScrollOffset -= scrollBox.contentSize - lastContentSize;
+            scrollBox.scrollOffset = scrollBox.targetScrollOffset;
         }
 
         internal static OpScrollBox scrollBox;
@@ -333,9 +313,6 @@ namespace ArenaPlus.Options.Tabs
 
                 float y = Mathf.Lerp(from, to, t);
                 float yStep = Mathf.Lerp(from, to, t) - Mathf.Lerp(from, to, lastT);
-
-                Log($"lerp from {from} to {to} by {animationProgress}");
-                Log($"Y: {y} T: {t}");
 
                 if (rect != null)
                 {
