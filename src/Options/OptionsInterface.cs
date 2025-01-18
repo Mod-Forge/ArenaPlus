@@ -17,14 +17,13 @@ namespace ArenaPlus.Options
             base.Initialize();
 
             List<OpTab> tabs = [
-                //new FeaturesTab(this),
-                new VanillaSlugcatsTab(this)
+               new VanillaSlugcatsTab(this)
             ];
 
-            if (SlugcatsUtils.GetModdedSlugcats().Count > 0)
-            {
-                tabs.Add(new ModdedSlugcatsTab(this));
-            }
+            //if (SlugcatsUtils.GetModdedSlugcats().Count > 0)
+            //{
+            //    tabs.Add(new ModdedSlugcatsTab(this));
+            //}
 
             foreach (var tab in tabs)
             {

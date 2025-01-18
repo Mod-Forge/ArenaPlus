@@ -5,12 +5,15 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using ArenaPlus.Utils;
+using Menu;
 using Menu.Remix.MixedUI;
 using Menu.Remix.MixedUI.ValueTypes;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.PlayerLoop;
 
 namespace ArenaPlus.Options.Tabs
@@ -20,16 +23,16 @@ namespace ArenaPlus.Options.Tabs
         private static Vector2 checkBoxSpace = new(0f, 20f + 10f);
         private static readonly Vector2 labelSpace = new(40f, 3f);
         private static readonly Vector2 initialPos = new Vector2(20f, 405f) - checkBoxSpace;
+        private Dictionary<Feature, OpCheckBox> checkBoxes = new();
 
         public VanillaSlugcatsTab(OptionInterface owner) : base(owner, "Vanilla")
         {
             int height = 475 - 20;
             int contentSize = Feature.features.Count * 30 + 24;
 
+
             scrollBox = new(initialPos - new Vector2(0, height - 100), new Vector2(560, height), contentSize, false, false);
-            AddItems(scrollBox, new OpRect(initialPos - new Vector2(0, height - 100) - new Vector2(0, 5), new Vector2(560, height + 10)));
-
-
+            AddItems( new OpRect(initialPos - new Vector2(0, height - 100) - new Vector2(0, 5), new Vector2(560, height + 10)), scrollBox);
 
             float lastYPos = height;
 
@@ -38,11 +41,32 @@ namespace ArenaPlus.Options.Tabs
                 int size = 48;
                 OpExpandable expandable = new(new Vector2(20, lastYPos - 20), new Vector2(500, size), 1);
 
-                scrollBox.AddItems(expandable); ;
+                scrollBox.AddItems(expandable);
 
-                expandable.AddItem(
+                int margin = 10;
+                int lineYOffset = 2; 
+
+                var line = expandable.AddItem(
+                    new OpLine(new Vector2(margin-3, - size - lineYOffset), new Vector2(500 - margin * 2, 2))
+                );
+
+                OpCheckBox toggleAllCheckBox = expandable.AddItem(
                     new OpCheckBox(category.configurable, new Vector2(10, -size / 2 - 12))
                 );
+
+                bool updating = false;
+
+                toggleAllCheckBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
+                {
+                    if (updating) return;
+
+                    category.features.ForEach(feature =>
+                    {
+                        if (!checkBoxes.TryGetValue(feature, out OpCheckBox checkBox)) return;
+
+                        checkBox.SetValueBool(value == "true");
+                    });
+                };
 
                 var expandBtn = expandable.AddItem(
                     new OpSimpleImageButton(new Vector2(500 - 10 - 24, -size / 2 - 12), new Vector2(24, 24), "Menu_Symbol_Arrow")
@@ -66,17 +90,39 @@ namespace ArenaPlus.Options.Tabs
                     new OpLabel(new Vector2(45, -size), new Vector2(10, size), category.name, FLabelAlignment.Left, true)
                 );
 
-
-
-
-                expandable.AddItem(new OpSimpleButton(new Vector2(20, -200), Vector2.one * 24));
-
-
                 expandables.Add(expandable);
                 lastYPos = (lastYPos - 20) - size;
 
 
+                int index = 0;
+                int checkBoxSize = 24;
+                float lastPos = -size - margin - checkBoxSize - lineYOffset;
+                foreach (var feature in category.features)
+                {
+                    int xPos = margin + (index % 2) * (500 / 2);
 
+                    OpCheckBox checkBox = expandable.AddItem(
+                        new OpCheckBox(feature.configurable, new Vector2(xPos, lastPos))
+                    );
+
+                    checkBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
+                    {
+                        updating = true;
+                        toggleAllCheckBox.SetValueBool(IsAllChecked(category.features));
+                        updating = false;
+                    };
+
+                    checkBoxes.Add(feature, checkBox);
+
+                    expandable.AddItem(
+                        new OpLabel(new Vector2(xPos + checkBoxSize + margin, lastPos), new Vector2(0, checkBoxSize), feature.Name, FLabelAlignment.Left)
+                    );
+
+                    if (index++ % 2 == 1)
+                    {
+                        lastPos -= checkBoxSize + margin;
+                    }
+                }
 
                 //float verticalOffset = lastYPos != null ? (float) lastYPos - 40f : Mathf.Max(height, contentSize) - 40;
                 //var configurable = OptionsInterface.instance.config.Bind(null, false, new ConfigurableInfo("dec", null, "", []));
@@ -103,6 +149,16 @@ namespace ArenaPlus.Options.Tabs
             }
 
             Log($"init contentSize {scrollBox.contentSize}");
+        }
+
+        private bool IsAllChecked(List<Feature> features)
+        {
+            return features.All(feature =>
+            {
+                if (!checkBoxes.TryGetValue(feature, out OpCheckBox checkBox)) return false;
+
+                return checkBox.value == "true";
+            });
         }
 
         public void Update()
@@ -142,18 +198,9 @@ namespace ArenaPlus.Options.Tabs
         {
         }
 
-        private Vector2 scrollOffset;
-
         public T AddItem<T>(T item) where T : UIelement
         {
             items.Add(item);
-            if (InScrollBox)
-            {
-                var oldPos = item.pos;
-                scrollBox.AddItems(item);
-                scrollOffset = item.pos - oldPos;
-                item._RemoveFromScrollBox();
-            }
             item.pos += pos;
             if (InScrollBox && !item.InScrollBox)
             {
@@ -249,7 +296,6 @@ namespace ArenaPlus.Options.Tabs
         public bool Moving => expanding || retracting || animationProgress > 0;
         private float animationProgress = 0f;
         private float animationDuration = 1f;
-        private float lastYPos = 0f;
 
         public void ToggleExpand()
         {
@@ -264,26 +310,9 @@ namespace ArenaPlus.Options.Tabs
             }
         }
 
-
-        //const n1 = 7.5625;
-        //const d1 = 2.75;
-
-        //if (x< 1 / d1) {
-        //    return n1* x * x;
-        //} else if (x< 2 / d1) {
-        //    return n1* (x -= 1.5 / d1) * x + 0.75;
-        //} else if (x < 2.5 / d1)
-        //{
-        //    return n1 * (x -= 2.25 / d1) * x + 0.9375;
-        //}
-        //else
-        //{
-        //    return n1 * (x -= 2.625 / d1) * x + 0.984375;
-
-
         private float EaseOut(float x)
         {
-            //float val = x == 1 ? 1 : 1 - Mathf.Pow(2, -10 * x);
+            return x == 1 ? 1 : 1 - Mathf.Pow(2, -10 * x);
             const float n1 = 7.5625f;
             const float d1 = 2.75f;
 
@@ -303,16 +332,15 @@ namespace ArenaPlus.Options.Tabs
             {
                 return n1 * (x -= 2.625f / d1) * x + 0.984375f;
             }
-}
+        }
+
+        public void AddDefaults()
+        {
+            rect = AddItem(new OpRect(new Vector2(0, -defaultSize.y), defaultSize));
+        }
 
         public override void Update()
         {
-
-            if ((tab != null) && hasBorder && rect == null)
-            {
-                rect = AddItem(new OpRect(new Vector2(0, -defaultSize.y), defaultSize));
-            }
-
             if (Moving)
             {
                 float dt = 0.025f;
@@ -353,7 +381,6 @@ namespace ArenaPlus.Options.Tabs
                     retracting = false;
                 }
 
-
                 foreach (var item in items)
                 {
                     if (IsItemInView(item) || (rect != null && item == rect))
@@ -366,10 +393,7 @@ namespace ArenaPlus.Options.Tabs
                     }
                 }
 
-                if (OnExpandProgress != null)
-                {
-                    OnExpandProgress(y, yStep);
-                }
+                OnExpandProgress?.Invoke(y, yStep);
             }
 
             base.Update();
@@ -378,5 +402,43 @@ namespace ArenaPlus.Options.Tabs
         public delegate void OnExpandProgressHandler(float sizeY, float yStep);
 
         public event OnExpandProgressHandler OnExpandProgress;
+
+        [HookRegister.HookRegister]
+        public static void RegisterHooks()
+        {
+            On.Menu.Remix.MixedUI.UIelement._SetTab += (On.Menu.Remix.MixedUI.UIelement.orig__SetTab orig, UIelement self, OpTab newTab) =>
+            {
+                orig(self, newTab);
+                if (self is OpExpandable expandable)
+                {
+                    expandable.AddDefaults();
+                }
+            };
+        }
+    }
+
+    public class OpLine : UIelement
+    {
+        public FSprite sprite;
+
+        public OpLine(Vector2 pos, Vector2 size) : base(pos, size)
+        {
+            sprite = new FSprite("pixel", true);
+            myContainer.AddChild(
+                sprite
+            );
+            sprite.color = MenuColorEffect.rgbMediumGrey;
+            sprite.anchorX = 0;
+            sprite.anchorY = 0;
+            sprite.SetPosition(Vector2.zero);
+        }
+
+        public override void GrafUpdate(float timeStacker)
+        {
+            myContainer.SetPosition(pos);
+            sprite.scaleX = size.x;
+            sprite.scaleY = size.y;
+
+        }
     }
 }
