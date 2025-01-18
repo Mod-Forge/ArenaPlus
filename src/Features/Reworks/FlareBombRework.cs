@@ -12,7 +12,7 @@ namespace ArenaPlus.Features.Reworks
     [FeatureInfo(
         id: "flareBombRework",
         name: "Flare bomb rework",
-                category: "Reworks",
+        category: "Reworks",
         description: "Make the flare bomb blind players",
         enabledByDefault: true
     )]

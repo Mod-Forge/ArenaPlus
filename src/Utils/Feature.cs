@@ -13,7 +13,7 @@ using ArenaPlus.Options.Tabs;
 namespace ArenaPlus.Utils
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class FeatureInfoAttribute(string id, string name, string description, bool enabledByDefault, string category = "General", string color = "ffffff") : Attribute
+    public class FeatureInfoAttribute(string id, string name, string description, bool enabledByDefault, string category = "General", string color = "None") : Attribute
     {
         public string id = id;
         public string name = name;

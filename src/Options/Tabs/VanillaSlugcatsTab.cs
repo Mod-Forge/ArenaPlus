@@ -102,7 +102,12 @@ namespace ArenaPlus.Options.Tabs
 
                     OpCheckBox checkBox = expandable.AddItem(
                         new OpCheckBox(feature.configurable, new Vector2(xPos, lastPos))
+                        {
+                            description = feature.Description,<
+                        }
                     );
+
+
 
                     checkBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
                     {
@@ -113,9 +118,15 @@ namespace ArenaPlus.Options.Tabs
 
                     checkBoxes.Add(feature, checkBox);
 
-                    expandable.AddItem(
+                    OpLabel l = expandable.AddItem(
                         new OpLabel(new Vector2(xPos + checkBoxSize + margin, lastPos), new Vector2(0, checkBoxSize), feature.Name, FLabelAlignment.Left)
                     );
+
+                    if (feature.HexColor != "None" && ColorUtility.TryParseHtmlString("#" + feature.HexColor, out UnityEngine.Color color))
+                    {
+                        checkBox.colorEdge = color;
+                        l.color = color;
+                    }
 
                     if (index++ % 2 == 1)
                     {
