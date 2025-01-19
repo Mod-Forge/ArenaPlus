@@ -164,7 +164,7 @@ namespace ArenaPlus.Options.Elements
 
         public event OnExpandProgressHandler OnExpandProgress;
 
-        [HookRegister.HookRegister]
+        [HookRegister]
         public static void RegisterHooks()
         {
             On.Menu.Remix.MixedUI.UIelement._SetTab += (On.Menu.Remix.MixedUI.UIelement.orig__SetTab orig, UIelement self, OpTab newTab) =>
