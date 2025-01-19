@@ -54,9 +54,9 @@ namespace ArenaPlus.Utils
         {
             List<SlugcatStats.Name> list = [];
 
-            foreach (var slugcat in GetSlugcats())
+            foreach (var slugcat in GetUnlockedSlugcats())
             {
-                if (slugcat.configurable.Value && IsSlugcatUnlocked(slugcat.nameObject))
+                if (slugcat.configurable.Value)
                 {
                     list.Add(slugcat.nameObject);
                 }
