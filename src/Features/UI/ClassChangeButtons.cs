@@ -15,8 +15,8 @@ namespace ArenaPlus.Features.UI
     {
         protected override void Register()
         {
-            On.Menu.MultiplayerMenu.Singal += MultiplayerMenu_Singal; ;
-            On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += MultiplayerMenu_InitiateGameTypeSpecificButtons; ;
+            On.Menu.MultiplayerMenu.Singal += MultiplayerMenu_Singal;
+            On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += MultiplayerMenu_InitiateGameTypeSpecificButtons;
         }
 
         private void MultiplayerMenu_InitiateGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_InitiateGameTypeSpecificButtons orig, Menu.MultiplayerMenu self)
@@ -53,7 +53,7 @@ namespace ArenaPlus.Features.UI
                 {
                     if (message == "PREVIOUSCLASS" + num6.ToString())
                     {
-                        self.GetArenaSetup.playerClass[num6] = Plugin.PreviousClass(self, self.GetArenaSetup.playerClass[num6]);
+                        self.GetArenaSetup.playerClass[num6] = PreviousClass(self, self.GetArenaSetup.playerClass[num6]);
                         self.playerClassButtons[num6].menuLabel.text = self.Translate(SlugcatStats.getSlugcatName(self.GetArenaSetup.playerClass[num6]));
                         self.playerJoinButtons[num6].portrait.fileName = self.ArenaImage(self.GetArenaSetup.playerClass[num6], num6);
                         self.playerJoinButtons[num6].portrait.LoadFile();
@@ -83,7 +83,8 @@ namespace ArenaPlus.Features.UI
                 //Plugin.logSource.LogInfo($"go from {curClass.Index} to {curClass.Index - 1}");
                 name = new SlugcatStats.Name(ExtEnum<SlugcatStats.Name>.values.GetEntry(curClass.Index - 1), false);
             }
-            if (SlugcatsUtils.IsSlugcatUnlocked(name))
+
+            if (!SlugcatsUtils.IsSlugcatUnlocked(name) || (!FeaturesManager.GetFeature("keepSlugcatsSelectable").Enabled && !SlugcatsUtils.IsSlugcatEnabled(name)))
             {
                 return PreviousClass(menu, name);
             }

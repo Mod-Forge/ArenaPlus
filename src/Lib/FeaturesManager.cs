@@ -104,5 +104,16 @@ namespace ArenaPlus.Lib
             }
         }
 
+        public static Feature GetFeature(string id)
+        {
+            foreach (var category in categories)
+            {
+                foreach (var feature in category.features)
+                {
+                    if (feature.Id == id) return feature;
+                }
+            }
+            throw new Exception($"{id} feature does not exist");
+        }
     }
 }

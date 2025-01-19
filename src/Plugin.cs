@@ -39,5 +39,12 @@ namespace ArenaPlus
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
             FeaturesManager.LoadFeatures();
         }
+
+        public void FixedUpdate()
+        {
+            OnFixedUpdate?.Invoke();
+        }
+
+        internal static event Action OnFixedUpdate;
     }
 }

@@ -31,7 +31,7 @@ namespace ArenaPlus.Lib
             configurable.Value = true;
             registered = true;
 
-            Log("Register");
+            Log($"Enabling {Id}");
             Register();
         }
 
@@ -41,7 +41,7 @@ namespace ArenaPlus.Lib
 
             configurable.Value = false;
             registered = false;
-            Log("Unregister");
+            Log($"Disabling {Id}");
             Unregister();
         }
 

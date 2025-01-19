@@ -1,4 +1,5 @@
-﻿using ArenaPlus.Options;
+﻿using ArenaPlus.Lib;
+using ArenaPlus.Options;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,16 @@ namespace ArenaPlus.Utils
         public static SlugcatObject[] GetUnlockedSlugcats()
         {
             return GetSlugcats().Where(slugcat => IsSlugcatUnlocked(slugcat.nameObject)).ToArray();
+        }
+
+        public static bool IsSlugcatEnabled(SlugcatStats.Name id)
+        {
+            foreach (var slugcat in GetSlugcats())
+            {
+                if (slugcat.nameObject.value == id.value) return slugcat.configurable.Value;
+            }
+
+            return true;
         }
 
         public static List<SlugcatStats.Name> GetActiveSlugcats()
