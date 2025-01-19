@@ -52,7 +52,7 @@ namespace ArenaPlus.Utils
 
             foreach (var slugcat in GetSlugcats())
             {
-                if (!slugcat.configurable.Value)
+                if (slugcat.configurable.Value)
                 {
                     list.Add(slugcat.nameObject);
                 }

@@ -11,20 +11,62 @@ using UnityEngine;
 
 namespace ArenaPlus.Features.UI
 {
-    [ImmutableFeature]
-    internal class ResultMenuSlugcatSelection : ImmutableFeature
+    [FeatureInfo(
+        id: "resultMenuSlugcatSelector",
+        name: "Slugcat selector in result menu",
+        description: "Add a slugcat selector in the result menu with two other choices",
+        enabledByDefault: false
+    )]
+    internal class ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         public static readonly int selectionCount = 3;
 
         public static Player.InputPackage[] lastInput = new Player.InputPackage[4];
-        public static int[] randomSeeds = new int[4];
+        //public static int[] randomSeeds = new int[4];
+        public static SlugcatStats.Name[][] nameList = new SlugcatStats.Name[4][];
         public static SlugcatStats.Name[] lastCharactersNames = new SlugcatStats.Name[4];
+        public static int[] cooldowns = new int[4];
 
         protected override void Register()
         {
             On.Menu.SymbolButton.Update += SymbolButton_Update;
             On.Menu.PlayerResultBox.Update += PlayerResultBox_Update;
             On.Menu.PlayerResultBox.ctor += PlayerResultBox_ctor;
+        }
+
+        protected override void Unregister()
+        {
+
+        }
+
+        private SlugcatStats.Name[] GenerateSlugcatList(SlugcatStats.Name lastChar)
+        {
+            List<SlugcatStats.Name> allSlugcats = SlugcatsUtils.GetActiveSlugcats();
+            SlugcatStats.Name[] slugcats = new SlugcatStats.Name[selectionCount];
+            if (allSlugcats.Count < selectionCount)
+            {
+                LogError($"Not enough slugcat activated requires minimum {selectionCount} got {allSlugcats.Count}");
+                return slugcats.Select(e => SlugcatStats.Name.Night).ToArray();
+            }
+
+            slugcats[0] = lastChar;
+            for (int i = 1; i < selectionCount; i++)
+            {
+                int emergencyCountdown = 100;
+                SlugcatStats.Name newName = lastChar;
+                while (slugcats.Contains(newName))
+                {
+                    newName = allSlugcats[Random.Range(0, allSlugcats.Count)];
+
+                    if (emergencyCountdown-- <= 0)
+                    {
+                        throw new Exception("no new slugcat found");
+                    }
+                }
+                slugcats[i] = newName;
+            }
+
+            return slugcats;
         }
 
         private void PlayerResultBox_ctor(On.Menu.PlayerResultBox.orig_ctor orig, PlayerResultBox self, Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 size, ArenaSitting.ArenaPlayer player, int index)
@@ -40,8 +82,10 @@ namespace ArenaPlus.Features.UI
                 data.scrollUpButton.inactive = false;
                 self.subObjects.Add(data.scrollDownButton);
 
-                randomSeeds[player.playerNumber] = (int)(Random.value * 100);
                 lastCharactersNames[player.playerNumber] = player.playerClass;
+                nameList[player.playerNumber] = GenerateSlugcatList(lastCharactersNames[player.playerNumber]);
+                cooldowns[player.playerNumber] = 20;
+                //randomSeeds[player.playerNumber] = (int)(Random.value * 100);
             }
             catch (Exception e) { logSource.LogError(e); }
         }
@@ -55,56 +99,31 @@ namespace ArenaPlus.Features.UI
                 data.scrollUpButton.greyedOut = self.player.readyForNextRound;
                 data.scrollDownButton.greyedOut = self.player.readyForNextRound;
 
-                if (!self.player.readyForNextRound)
+                cooldowns[self.player.playerNumber]--;
+
+                if (!self.player.readyForNextRound && cooldowns[self.player.playerNumber] <= 0)
                 {
                     Player.InputPackage inputPackage = RWInput.PlayerInput(self.player.playerNumber);
                     //logSource.LogInfo($"input y: {inputPackage.y}");
                     if (inputPackage.y != 0 && lastInput[self.player.playerNumber].y == 0)
                     {
-                        List<SlugcatStats.Name> fullList = SlugcatsUtils.GetActiveSlugcats();
-
-                        System.Random rand = new System.Random(randomSeeds[self.player.playerNumber]);
-                        //Random.InitState(randomSeeds[self.player.playerNumber]);
-                        List<SlugcatStats.Name> list = new List<SlugcatStats.Name>();
-
-                        if (true)
-                        {
-                            list.Add(lastCharactersNames[self.player.playerNumber]);
-                            logSource.LogInfo($"seed: {randomSeeds[self.player.playerNumber]}");
-
-                            int emergencyCountdown = 100;
-                            while (list.Count < selectionCount && emergencyCountdown > 0)
-                            {
-                                SlugcatStats.Name name = fullList[rand.Next(0, fullList.Count - 1)];
-                                if (!list.Contains(name))
-                                {
-                                    list.Add(name);
-                                }
-                                emergencyCountdown--;
-                            }
-                            logSource.LogInfo($"list size: {list.Count} in {100 - emergencyCountdown} try");
-                        }
-                        else
-                        {
-                            list = fullList;
-                        }
 
 
                         int index = 0;
-                        if (list.Contains(self.player.playerClass))
+                        if (nameList[self.player.playerNumber].Contains(self.player.playerClass))
                         {
-                            index = list.IndexOf(self.player.playerClass);
+                            index = nameList[self.player.playerNumber].IndexOf(self.player.playerClass);
                             logSource.LogInfo($"found index of {self.player.playerClass}: " + index);
                         }
                         index += inputPackage.y;
-                        if (index >= list.Count)
+                        if (index >= nameList[self.player.playerNumber].Count())
                             index = 0;
                         if (index < 0)
-                            index = list.Count - 1;
+                            index = nameList[self.player.playerNumber].Count() - 1;
                         logSource.LogInfo("index: " + index);
 
 
-                        SlugcatStats.Name newName = list[index];
+                        SlugcatStats.Name newName = nameList[self.player.playerNumber][index];
 
                         self.player.playerClass = newName;
                         //self.portrait.sprite.SetElementByName(string.Concat(new string[]
