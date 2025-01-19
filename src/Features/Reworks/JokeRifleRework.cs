@@ -11,9 +11,9 @@ namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "jokeRifleRework",
-        name: "Joke rifle",
+        name: "Joke rifle rework",
         category: BuiltInCategory.Spoilers,
-        description: "Wheter Scavengers can use the Joke Rifle",
+        description: "Wheter Scavengers can use the Joke Rifle (Challenge spoiler)",
         enabledByDefault: true
     )]
     file class JokeRifleRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

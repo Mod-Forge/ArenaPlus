@@ -33,9 +33,10 @@ namespace ArenaPlus
             try { Utils.RegisterUtils.RegisterAllUtils(); } catch (Exception e) { Plugin.LogError(e); }
         }
 
-        // Load any resources, such as sp   rites or sounds
+        // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
         {
+            Futile.atlasManager.LoadAtlas("atlases/huntersprites");
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
             FeaturesManager.LoadFeatures();
         }
