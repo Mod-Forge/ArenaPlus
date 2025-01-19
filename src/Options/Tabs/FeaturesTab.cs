@@ -10,14 +10,15 @@ using UnityEngine;
 
 namespace ArenaPlus.Options.Tabs
 {
-    internal class FeaturesTab : OpTab
+    internal class FeaturesTab : OpCustomTab
     {
-        private const int MARGIN = 10;
-        private const int HEIGHT = 475 - 20;
-        private const int CHECKBOX_SIZE = 24;
+        internal const int MARGIN = 10;
+        internal const int HEIGHT = 475 - 20;
+        internal const int CHECKBOX_SIZE = 24;
         private readonly Vector2 INITIAL_POS = new(20, 375);
 
         private readonly Dictionary<Feature, OpCheckBox> checkBoxes = [];
+        internal List<OpExpandable> expandables = [];
         internal OpScrollBox scrollBox;
 
         public FeaturesTab(OptionInterface owner) : base(owner, "Features")
@@ -106,6 +107,8 @@ namespace ArenaPlus.Options.Tabs
                         label.color = color;
                     }
 
+                    feature.complementaryElementAction?.Invoke(feature, expandable, new Vector2(xPos + CHECKBOX_SIZE + MARGIN + label.GetDisplaySize().x + MARGIN, lastPos));
+
                     if (index++ % 2 == 1)
                     {
                         lastPos -= CHECKBOX_SIZE + MARGIN;
@@ -124,7 +127,7 @@ namespace ArenaPlus.Options.Tabs
             });
         }
 
-        public void Update()
+        internal override void Update()
         {
             float? lastYPos = null;
             float firstGudY = 0f;
@@ -152,7 +155,5 @@ namespace ArenaPlus.Options.Tabs
             scrollBox.targetScrollOffset -= scrollBox.contentSize - lastContentSize;
             scrollBox.scrollOffset = scrollBox.targetScrollOffset;
         }
-
-        internal static List<OpExpandable> expandables = [];
     }
 }

@@ -44,10 +44,10 @@ namespace ArenaPlus.Utils
                 }
             }
         }
+    }
 
-        [AttributeUsage(AttributeTargets.Method)]
-        public class HookRegisterAttribute : Attribute
-        {
-        }
+    [AttributeUsage(AttributeTargets.Method)]
+    public class HookRegisterAttribute : Attribute
+    {
     }
 }

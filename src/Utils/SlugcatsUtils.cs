@@ -11,9 +11,9 @@ namespace ArenaPlus.Utils
 {
     internal static class SlugcatsUtils
     {
-        public static List<SlugcatObject> GetSlugcats()
+        public static SlugcatObject[] GetSlugcats()
         {
-            List<string> exceptions = [
+            string[] exceptions = [
                 "Night",
                 "Slugpup",
                 "Inv",
@@ -27,13 +27,12 @@ namespace ArenaPlus.Utils
                 .Where(name => !exceptions.Contains(name))
                 .ToList()
                 .ConvertAll(name => SlugcatObject.slugcats.Find(slugcat => slugcat.codeName == name) ?? new SlugcatObject(name))
-                .Where(slugcat => IsSlugcatUnlocked(slugcat.nameObject))
-                .ToList();
+                .ToArray();
         }
 
-        public static List<SlugcatObject> GetModdedSlugcats()
+        public static SlugcatObject[] GetModdedSlugcats()
         {
-            List<string> vanillaSlugcats = [
+            string[] vanillaSlugcats = [
                 "White",
                 "Yellow",
                 "Red",
@@ -43,52 +42,26 @@ namespace ArenaPlus.Utils
                 "Spear",
                 "Gourmand"
             ];
-            return GetSlugcats().Where(slugcat => !vanillaSlugcats.Contains(slugcat.name)).ToList();
+            return GetSlugcats().Where(slugcat => !vanillaSlugcats.Contains(slugcat.name)).ToArray();
+        }
+
+        public static SlugcatObject[] GetUnlockedSlugcats()
+        {
+            return GetSlugcats().Where(slugcat => IsSlugcatUnlocked(slugcat.nameObject)).ToArray();
         }
 
         public static List<SlugcatStats.Name> GetActiveSlugcats()
         {
             List<SlugcatStats.Name> list = [];
 
-            foreach (var slugcat in GetSlugcats())
+            foreach (var slugcat in GetUnlockedSlugcats())
             {
                 if (slugcat.configurable.Value)
                 {
                     list.Add(slugcat.nameObject);
                 }
             }
-            //if (!Options.disableSurvivor.Value)
-            //{
-            //    list.Add(SlugcatStats.Name.White);
-            //}
-            //if (!Options.disableMonk.Value)
-            //{
-            //    list.Add(SlugcatStats.Name.Yellow);
-            //}
-            //if (!Options.disableHunter.Value && Options.IsSlugcatUnlocked(SlugcatStats.Name.Red))
-            //{
-            //    list.Add(SlugcatStats.Name.Red);
-            //}
-            //if (!Options.disableRivulet.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Rivulet))
-            //{
-            //    list.Add(MoreSlugcatsEnums.SlugcatStatsName.Rivulet);
-            //}
-            //if (!Options.disableArtificer.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Artificer))
-            //{
-            //    list.Add(MoreSlugcatsEnums.SlugcatStatsName.Artificer);
-            //}
-            //if (!Options.disableSaint.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Saint))
-            //{
-            //    list.Add(MoreSlugcatsEnums.SlugcatStatsName.Saint);
-            //}
-            //if (!Options.disableSpearmaster.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Spear))
-            //{
-            //    list.Add(MoreSlugcatsEnums.SlugcatStatsName.Spear);
-            //}
-            //if (!Options.disableGourmand.Value && Options.IsSlugcatUnlocked(MoreSlugcatsEnums.SlugcatStatsName.Gourmand))
-            //{
-            //    list.Add(MoreSlugcatsEnums.SlugcatStatsName.Gourmand);
-            //}
+
             if (list.Count < 1)
             {
                 list.Add(SlugcatStats.Name.White);

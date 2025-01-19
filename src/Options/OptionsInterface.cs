@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ArenaPlus.Options.Tabs;
+using ArenaPlus.Options.Elements;
 
 namespace ArenaPlus.Options
 {
@@ -16,34 +17,25 @@ namespace ArenaPlus.Options
         {
             base.Initialize();
 
-            List<OpTab> tabs = [
-               new FeaturesTab(this)
+            Tabs = [
+               new FeaturesTab(this),
+               new SlugcatsTab(this)
             ];
 
-            if (SlugcatsUtils.GetModdedSlugcats().Count > 0)
-            {
-                tabs.Add(new SlugcatsTab(this));
-            }
-
-            foreach (var tab in tabs)
+            foreach (var tab in Tabs)
             {
                 OpLabel modTitle = new(new Vector2(20f, 520f), new Vector2(560f, 30f), "Arena+", FLabelAlignment.Center, true, null);
 
                 tab.AddItems(modTitle);
             }
-            
-            Tabs = [.. tabs];
         }
 
         public override void Update()
         {
             base.Update();
-            foreach (var tab in Tabs)
+            foreach (OpCustomTab tab in Tabs.Where(tab => tab is OpCustomTab).Select(tab => tab as OpCustomTab))
             {
-                if (tab is FeaturesTab ft)
-                {
-                    ft.Update();
-                }
+                tab.Update();
             }
         }
 
