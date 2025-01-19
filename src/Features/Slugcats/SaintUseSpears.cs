@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 namespace ArenaPlus.Features.Slugcats
 {
     [SlugcatFeatureInfo(
-        id: "placeholder",
-        name: "Placeholder",
-        description: "Placeholder",
-        slugcat: "Rivulet"
+        id: "saintSpear",
+        name: "Saint can use spears",
+        description: "Whether the Saint can use spears",
+        slugcat: "Saint"
     )]
-    internal class Test(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+    internal class SaintUseSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
         protected override void Register()
         {
+            throw new NotImplementedException("TODO: Implement that");
         }
 
         protected override void Unregister()

@@ -395,7 +395,7 @@ namespace ArenaPlus.Utils
         {
             try
             {
-                GameConsoleWriteLine(message, color.HasValue ? color.Value : Color.white);
+                GameConsoleWriteLine(message, color ?? Color.white);
             }
             catch { }
         }

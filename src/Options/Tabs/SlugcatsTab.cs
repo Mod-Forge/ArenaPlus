@@ -30,18 +30,6 @@ namespace ArenaPlus.Options.Tabs
 
             AddItems(scrollBox, new OpRect(initialPos - new Vector2(0, HEIGHT - 100) - new Vector2(0, 5), new Vector2(560, HEIGHT + 10)));
 
-            OnPreActivate += DrawItems;
-            OnPreUnload += SlugcatsTab_OnPreUnload;
-        }
-
-        private void SlugcatsTab_OnPreUnload()
-        {
-            OnPreActivate -= DrawItems;
-            OnPreUnload -= SlugcatsTab_OnPreUnload;
-        }
-
-        private void DrawItems()
-        {
             foreach (var item in scrollBox.items)
             {
                 item._RemoveFromScrollBox();
@@ -51,8 +39,6 @@ namespace ArenaPlus.Options.Tabs
 
             int featureOffset = 24;
             int index = 0;
-
-            var slugcats = SlugcatsUtils.GetUnlockedSlugcats();
 
             foreach (var slugcat in slugcats)
             {
