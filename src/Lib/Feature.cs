@@ -25,9 +25,9 @@ namespace ArenaPlus.Lib
         public string Category { get; } = featureInfo.category;
         public string HexColor { get; } = featureInfo.color;
 
-        internal Action<Feature, OpExpandable, Vector2> complementaryElementAction;
+        internal Action<OpExpandable, Vector2> complementaryElementAction;
 
-        internal void SetComplementaryElement(Action<Feature, OpExpandable, Vector2> func)
+        internal void SetComplementaryElement(Action<OpExpandable, Vector2> func)
         {
             complementaryElementAction = func;
         }

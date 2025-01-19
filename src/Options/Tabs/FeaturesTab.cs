@@ -107,7 +107,7 @@ namespace ArenaPlus.Options.Tabs
                         label.color = color;
                     }
 
-                    feature.complementaryElementAction?.Invoke(feature, expandable, new Vector2(xPos + CHECKBOX_SIZE + MARGIN + label.GetDisplaySize().x + MARGIN, lastPos));
+                    feature.complementaryElementAction?.Invoke(expandable, new Vector2(xPos + CHECKBOX_SIZE + MARGIN + label.GetDisplaySize().x + MARGIN, lastPos));
 
                     if (index++ % 2 == 1)
                     {
