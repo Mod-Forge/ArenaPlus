@@ -36,14 +36,16 @@ namespace ArenaPlus.Features.UI
 
         protected override void Unregister()
         {
-
+            On.Menu.SymbolButton.Update -= SymbolButton_Update;
+            On.Menu.PlayerResultBox.Update -= PlayerResultBox_Update;
+            On.Menu.PlayerResultBox.ctor -= PlayerResultBox_ctor;
         }
 
         private SlugcatStats.Name[] GenerateSlugcatList(SlugcatStats.Name lastChar)
         {
             List<SlugcatStats.Name> allSlugcats = SlugcatsUtils.GetActiveSlugcats();
             SlugcatStats.Name[] slugcats = new SlugcatStats.Name[selectionCount];
-            if (allSlugcats.Count < selectionCount)
+            if (allSlugcats.Count <= selectionCount)
             {
                 LogError($"Not enough slugcat activated requires minimum {selectionCount} got {allSlugcats.Count}");
                 return slugcats.Select(e => SlugcatStats.Name.Night).ToArray();

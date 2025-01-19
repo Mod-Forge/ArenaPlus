@@ -1,6 +1,7 @@
 ﻿using ArenaPlus.Lib;
 using ArenaPlus.Utils;
 using Menu;
+using MoreSlugcats;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,5 @@ namespace ArenaPlus.Features
                 }
             }
         }
-
     }
 }
