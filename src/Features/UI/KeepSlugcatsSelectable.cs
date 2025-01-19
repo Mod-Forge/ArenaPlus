@@ -15,7 +15,7 @@ namespace ArenaPlus.Features.UI
         description: "Whether disabled slugcats are disabled only in random (not in the select menu)",
         enabledByDefault: false
     )]
-    internal class KeepSlugcatsSelectable(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class KeepSlugcatsSelectable(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         protected override void Register()
         {

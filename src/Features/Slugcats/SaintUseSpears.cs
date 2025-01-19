@@ -16,7 +16,7 @@ namespace ArenaPlus.Features.Slugcats
         description: "Whether the Saint can use spears",
         slugcat: "Saint"
     )]
-    internal class SaintUseSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+    file class SaintUseSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
         protected override void Register()
         {

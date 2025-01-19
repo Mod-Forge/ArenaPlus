@@ -17,7 +17,7 @@ namespace ArenaPlus.Features
         description: "Whether objects in arena are random",
         enabledByDefault: false
     )]
-    internal class ObjectsRandomizer(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class ObjectsRandomizer(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         protected override void Register()
         {

@@ -15,7 +15,7 @@ namespace ArenaPlus.Features
         description: "Whether the cursor is locked to the game window",
         enabledByDefault: false
     )]
-    internal class LockCursor(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class LockCursor(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         protected override void Register()
         {

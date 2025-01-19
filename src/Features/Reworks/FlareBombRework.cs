@@ -17,7 +17,7 @@ namespace ArenaPlus.Features.Reworks
         description: "Make the flare bomb blind players",
         enabledByDefault: true
     )]
-    internal class FlareBombRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class FlareBombRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         internal static void Test()
         {

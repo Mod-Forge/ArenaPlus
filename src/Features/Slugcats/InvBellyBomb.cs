@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ArenaPlus.Features.Slugcats
 {
     [ImmutableFeature]
-    internal class InvBellyBomb : ImmutableFeature
+    file class InvBellyBomb : ImmutableFeature
     {
         private List<AbstractPhysicalObject> arenaEggs = [];
 

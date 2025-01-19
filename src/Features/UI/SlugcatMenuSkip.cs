@@ -10,7 +10,7 @@ using UnityEngine;
 namespace ArenaPlus.Features.UI
 {
     [ImmutableFeature]
-    internal class SlugcatMenuSkip : ImmutableFeature
+    file class SlugcatMenuSkip : ImmutableFeature
     {
         protected override void Register()
         {

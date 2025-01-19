@@ -13,7 +13,7 @@ namespace ArenaPlus.Features.Slugcats
         description: "Whether the Hunter can pickup a stuck spear",
         slugcat: "Hunter"
     )]
-    internal class HunterPickupStuckSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+    file class HunterPickupStuckSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
         protected override void Register()
         {
