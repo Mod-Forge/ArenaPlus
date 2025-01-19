@@ -85,6 +85,8 @@ namespace ArenaPlus.Options.Tabs
 
                     checkBoxes.Add(feature, checkBox);
 
+                    toggleAllCheckBox.SetValueBool(IsAllChecked(category.features));
+
                     checkBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
                     {
                         updating = true;
