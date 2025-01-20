@@ -5,6 +5,7 @@
 1. Add the dll to your mod project libraries
 2. Create a new file (probably named after your feature's name)
 3. Paste one of [those](#feature-types-templates) class in the file
+4. Replace the placeholder values with your feature's one
 
 ## Feature types templates
 ### Feature
