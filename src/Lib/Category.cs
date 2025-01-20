@@ -14,7 +14,8 @@ namespace ArenaPlus.Lib
         internal static string[] renderOrder = [
             "General",
             "Reworks",
-            "Spoilers"
+            "Fun",
+            "Spoilers",
         ];
 
         public readonly string name = name;
@@ -41,6 +42,7 @@ namespace ArenaPlus.Lib
     {
         internal const string General = "General";
         internal const string Reworks = "Reworks";
+        internal const string Fun = "Fun";
         internal const string Spoilers = "Spoilers";
     }
 }
