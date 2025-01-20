@@ -39,7 +39,7 @@ namespace ArenaPlus.Features.Reworks
         protected void FlareBomb_DrawSprites(On.FlareBomb.orig_DrawSprites orig, FlareBomb self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (!self.slatedForDeletetion && self.room == rCam.room && self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game) && self.burning > 0)
+            if (!self.slatedForDeletetion && self.room == rCam.room && GameUtils.IsCompetitiveOrSandboxSession && self.burning > 0)
             {
                 sLeaser.sprites[2].shader = rCam.room.game.rainWorld.Shaders["FlatLightNoisy"];
                 sLeaser.sprites[2].color = Color.white;
@@ -50,7 +50,7 @@ namespace ArenaPlus.Features.Reworks
 
         protected void FlareBomb_Update(On.FlareBomb.orig_Update orig, FlareBomb self, bool eu)
         {
-            if (self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game))
+            if (GameUtils.IsCompetitiveOrSandboxSession)
             {
                 if (self.burning > 0f)
                 {

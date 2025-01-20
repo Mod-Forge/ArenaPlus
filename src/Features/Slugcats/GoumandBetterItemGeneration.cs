@@ -29,7 +29,7 @@ namespace ArenaPlus.Features.Slugcats
 
         private void Player_Regurgitate(On.Player.orig_Regurgitate orig, Player self)
         {
-            if (self.objectInStomach == null && self.isGourmand && self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game))
+            if (self.objectInStomach == null && self.isGourmand && GameUtils.IsCompetitiveOrSandboxSession)
             {
                 if (Random.value < 0.67)
                 {

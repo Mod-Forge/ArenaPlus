@@ -43,7 +43,7 @@ namespace ArenaPlus.Features.Reworks
 
         private void Spear_HitSomethingWithoutStopping(On.Spear.orig_HitSomethingWithoutStopping orig, Spear self, PhysicalObject obj, BodyChunk chunk, PhysicalObject.Appendage appendage)
         {
-            if (self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game) && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
             {
                 if (self.Spear_NeedleCanFeed())
                 {
@@ -68,7 +68,7 @@ namespace ArenaPlus.Features.Reworks
 
         private void KarmaFlower_BitByPlayer(On.KarmaFlower.orig_BitByPlayer orig, KarmaFlower self, Creature.Grasp grasp, bool eu)
         {
-            if (self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game) && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.bites < 2)
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.bites < 2)
             {
                 Player player = grasp.grabber as Player;
                 if (!player.monkAscension && (player.tongue == null || !player.tongue.Attached))
@@ -84,7 +84,7 @@ namespace ArenaPlus.Features.Reworks
 
         private void Player_ClassMechanicsSaint(On.Player.orig_ClassMechanicsSaint orig, Player self)
         {
-            if (self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game) && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
             {
                 if (self.maxGodTime != 565f)
                 {
@@ -120,7 +120,7 @@ namespace ArenaPlus.Features.Reworks
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
 
-            if (rCam.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(rCam.room.game) && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
+            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
             {
                 PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
                 if (!rCam.room.game.DEBUGMODE && ModManager.MSC && self.player.room != null && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint && sLeaser.sprites.Length >= customData.customSpriteIndex + 2 + self.numGodPips)
@@ -258,7 +258,7 @@ namespace ArenaPlus.Features.Reworks
             ConsoleWrite("PlayerGraphics_AddToContainer");
 
 
-            if (rCam.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(rCam.room.game) && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
+            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
             {
                 PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
                 if (!customData.initFinish)
@@ -288,7 +288,7 @@ namespace ArenaPlus.Features.Reworks
             }
 
             orig(self, sLeaser, rCam, newContatiner);
-            if (rCam.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(rCam.room.game) && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
+            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
             {
                 PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
 

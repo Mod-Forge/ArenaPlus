@@ -22,6 +22,9 @@ namespace ArenaPlus.Features.UI
         private void MultiplayerMenu_InitiateGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_InitiateGameTypeSpecificButtons orig, Menu.MultiplayerMenu self)
         {
             orig(self);
+
+            if (self.playerClassButtons == null) return;
+
             try
             {
                 MultiplayerMenuData data = self.GetCustomData<MultiplayerMenuData>();
@@ -33,7 +36,6 @@ namespace ArenaPlus.Features.UI
                     data.nextClassButtons[i].symbolSprite.rotation = 90;
                     data.previousClassButtons[i] = new SymbolButton(self, self.pages[0], "Menu_Symbol_Arrow", "PREVIOUSCLASS" + i.ToString(), self.playerClassButtons[i].pos + new Vector2(0f, 145f));
                     data.previousClassButtons[i].symbolSprite.rotation = -90;
-
 
                     self.pages[0].subObjects.AddRange([data.nextClassButtons[i], data.previousClassButtons[i]]);
                     self.ResetSelection();

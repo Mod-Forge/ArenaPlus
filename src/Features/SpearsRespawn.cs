@@ -1,6 +1,7 @@
 ﻿using ArenaPlus.Lib;
 using ArenaPlus.Options;
 using ArenaPlus.Options.Tabs;
+using ArenaPlus.Utils;
 using Menu.Remix.MixedUI;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,8 @@ namespace ArenaPlus.Features
             }
             orig(self);
 
-            if (self.game.session is not SandboxGameSession && self.room != null && self.playersSpawned && spearsCheckTicks > 30)
+
+            if (self.game.session is not SandboxGameSession && !GameUtils.IsChallengeGameSession(self.game) && self.room != null && self.playersSpawned && spearsCheckTicks > 30)
             {
                 spearsCheckTicks = 0;
                 int spearCount = 0;

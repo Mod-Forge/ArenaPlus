@@ -66,7 +66,7 @@ namespace ArenaPlus.Features.Reworks
         {
             orig(self, world, realizedObject, pos, ID, type, timeToLive);
 
-            if ((bool)world?.game?.IsArenaSession && !GameUtils.IsChallengeGameSession(world?.game))
+            if (GameUtils.IsCompetitiveOrSandboxSession)
             {
                 self.timeToLive = 40;
             }
@@ -89,7 +89,7 @@ namespace ArenaPlus.Features.Reworks
 
         private void JokeRifle_Use(On.JokeRifle.orig_Use orig, JokeRifle self, bool eu)
         {
-            if (self.room.game.IsArenaSession && !GameUtils.IsChallengeGameSession(self.room.game) && self.counter < 1 && self.abstractRifle.currentAmmo() > 0 && self.abstractRifle.ammoStyle == JokeRifle.AbstractRifle.AmmoType.Pearl)
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.counter < 1 && self.abstractRifle.currentAmmo() > 0 && self.abstractRifle.ammoStyle == JokeRifle.AbstractRifle.AmmoType.Pearl)
             {
                 Vector2 pos = self.firstChunk.pos + self.aimDir;
                 Vector2 dir = pos + self.aimDir * 200f;

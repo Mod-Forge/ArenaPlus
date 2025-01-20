@@ -21,7 +21,6 @@ namespace ArenaPlus.Features.Slugcats
 
             if (self.player.slugcatStats?.name.ToString() == "Red")
             {
-
                 FSprite fspriteFace = sLeaser.sprites[9];
                 if (fspriteFace.element.name.StartsWith("Face"))
                 {

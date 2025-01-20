@@ -17,8 +17,6 @@ namespace ArenaPlus.Features.Slugcats
     )]
     file class ArtificerNerf(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
-        public int defaultArtificerExplosionCapacity = 10;
-
         protected override void Register()
         {
             On.Player.ClassMechanicsArtificer += Player_ClassMechanicsArtificer;
@@ -35,7 +33,7 @@ namespace ArenaPlus.Features.Slugcats
             orig(self);
             if (self.pyroParryCooldown > parryCooldown)
             {
-                if (ModManager.MSC && !self.room.game.IsStorySession && !GameUtils.IsChallengeGameSession(self.room.game))
+                if (ModManager.MSC && GameUtils.IsCompetitiveOrSandboxSession)
                 {
                     ConsoleWrite("nerf Artificer");
                     self.pyroJumpCounter += 5;

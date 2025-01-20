@@ -52,10 +52,7 @@ namespace ArenaPlus.Features.Reworks
         {
             orig(self);
 
-            if (!self.game.IsArenaSession || GameUtils.IsChallengeGameSession(self.game))
-            {
-                return;
-            }
+            if (!GameUtils.IsCompetitiveOrSandboxSession) return;
 
             List<EnergyCell> energyCells = [];
             for (int j = 0; j < self.physicalObjects.Length; j++)

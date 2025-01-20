@@ -50,7 +50,7 @@ namespace ArenaPlus.Utils
         public PlayerCustomData(object obj) : base(obj) { }
     }
 
-    public class PlayerResultBoxCustomData : CustomData
+    internal class PlayerResultBoxCustomData : CustomData
     {
         public VisualScrollButton scrollUpButton;
         public VisualScrollButton scrollDownButton;

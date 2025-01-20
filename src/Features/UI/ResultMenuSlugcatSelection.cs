@@ -192,7 +192,7 @@ namespace ArenaPlus.Features.UI
         }
     }
 
-    file class VisualScrollButton : SymbolButton
+    internal class VisualScrollButton : SymbolButton
     {
         // Token: 0x0600437D RID: 17277 RVA: 0x0049F0E5 File Offset: 0x0049D2E5
         public VisualScrollButton(Menu.Menu menu, MenuObject owner, string singalText, Vector2 pos, int direction) : base(menu, owner, "Menu_Symbol_Arrow", singalText, pos)

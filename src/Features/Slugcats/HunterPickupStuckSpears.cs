@@ -1,4 +1,5 @@
 ﻿using ArenaPlus.Lib;
+using ArenaPlus.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,9 @@ namespace ArenaPlus.Features.Slugcats
 
         private bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
         {
-            if (obj is Weapon weapon)
+            if (GameUtils.IsCompetitiveOrSandboxSession && obj is Spear spear)
             {
-                if (weapon.mode == Weapon.Mode.StuckInWall && ModManager.MSC && self.SlugCatClass == SlugcatStats.Name.Red && obj is Spear)
+                if (spear.mode == Weapon.Mode.StuckInWall && ModManager.MSC && self.SlugCatClass == SlugcatStats.Name.Red)
                 {
                     return true;
                 }

@@ -1,4 +1,5 @@
 ﻿using ArenaPlus.Lib;
+using ArenaPlus.Utils;
 using MoreSlugcats;
 using RWCustom;
 using System;
@@ -30,7 +31,7 @@ namespace ArenaPlus.Features.Slugcats
 
         private void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
         {
-            if (self.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Saint && self.grasps[grasp] != null && self.grasps[grasp].grabbed is Spear)
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Saint && self.grasps[grasp] != null && self.grasps[grasp].grabbed is Spear)
             {
                 IntVector2 intVector = new IntVector2(self.ThrowDirection, 0);
                 if (self.animation == Player.AnimationIndex.Flip && (self.input[0].y < 0 || (MMF.cfgUpwardsSpearThrow.Value && self.input[0].y > 0)))
