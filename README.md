@@ -43,7 +43,7 @@ file class YourFeature(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     description: "Your feature description",
     slugcat: "The slugcat name (Ex: Hunter / Rivulet / Saint / SomeCustomSlugcat)"
 )]
-file class HunterPickupStuckSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+file class YourSlugcatFeature(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
 {
     // Same as Feature.Register
     protected override void Register()
@@ -60,7 +60,7 @@ file class HunterPickupStuckSpears(SlugcatFeatureInfoAttribute featureInfo) : Sl
 ### Immutable feature (always on feature)
 ```cs
 [ImmutableFeature]
-file class HunterScar : ImmutableFeature
+file class YourImmutableFeature : ImmutableFeature
 {
     // Called when the feature is registered, during the mods init phase
     protected override void Register()
