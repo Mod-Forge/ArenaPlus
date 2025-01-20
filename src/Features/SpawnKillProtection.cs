@@ -53,6 +53,7 @@ namespace ArenaPlus.Features
         {
             On.ArenaGameSession.ctor -= ArenaGameSession_ctor;
             On.Player.Die -= Player_Die;
+            On.Player.Destroy -= Player_Destroy;
             On.RWInput.PlayerInputLogic_int_int -= RWInput_PlayerInputLogic_int_int;
         }
 
