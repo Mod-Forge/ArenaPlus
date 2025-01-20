@@ -62,7 +62,7 @@ namespace ArenaPlus.Features.UI
             {
                 fLabel = new FLabel(Custom.GetFont(), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas a turpis tortor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin non mauris elit. Curabitur viverra suscipit elit vitae elementum. Donec in fringilla nunc, vel efficitur ipsum. Ut congue felis in neque lobortis, vitae scelerisque diam egestas. Aenean congue lectus ut orci consectetur pulvinar.");
                 hud.fContainers[1].AddChild(fLabel);
-                fLabel.scale = 2f;
+                fLabel.scale = 2.5f;
                 fLabel.anchorX = 0f;
                 Vector2 pos = this.hud.rainWorld.screenSize * new Vector2(0f, 1f) + new Vector2(50, -50);
                 fLabel.SetPosition(pos);
