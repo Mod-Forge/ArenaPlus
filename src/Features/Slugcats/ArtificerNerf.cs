@@ -15,7 +15,7 @@ namespace ArenaPlus.Features.Slugcats
         description: "Whether the Artificer is nerfed in arena",
         slugcat: "Artificer"
     )]
-    internal class ArtificerNerf(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+    file class ArtificerNerf(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
         public int defaultArtificerExplosionCapacity = 10;
 

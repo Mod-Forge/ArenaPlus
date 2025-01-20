@@ -15,7 +15,7 @@ namespace ArenaPlus.Features.Slugcats
         description: "Whether the Gourmand generate better item for crafting in arena",
         slugcat: "Gourmand"
     )]
-    internal class SaintSpear(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+    file class GourmandBetterItemGeneration(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
         protected override void Register()
         {

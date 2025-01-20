@@ -17,7 +17,7 @@ namespace ArenaPlus.Features
         description: "Make the game choose a random slugcat every round when selecting random icon",
         enabledByDefault: false
     )]
-    internal class RandomSlugcatEveryRound(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class RandomSlugcatEveryRound(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         protected override void Register()
         {

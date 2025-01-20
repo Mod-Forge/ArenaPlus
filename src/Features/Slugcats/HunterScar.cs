@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ArenaPlus.Features.Slugcats
 {
     [ImmutableFeature]
-    internal class HunterScar : ImmutableFeature
+    file class HunterScar : ImmutableFeature
     {
         protected override void Register()
         {

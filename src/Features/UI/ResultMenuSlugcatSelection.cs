@@ -17,7 +17,7 @@ namespace ArenaPlus.Features.UI
         description: "Add a slugcat selector in the result menu with two other choices",
         enabledByDefault: false
     )]
-    internal class ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         public static readonly int selectionCount = 3;
 
@@ -192,7 +192,7 @@ namespace ArenaPlus.Features.UI
         }
     }
 
-    public class VisualScrollButton : SymbolButton
+    file class VisualScrollButton : SymbolButton
     {
         // Token: 0x0600437D RID: 17277 RVA: 0x0049F0E5 File Offset: 0x0049D2E5
         public VisualScrollButton(Menu.Menu menu, MenuObject owner, string singalText, Vector2 pos, int direction) : base(menu, owner, "Menu_Symbol_Arrow", singalText, pos)

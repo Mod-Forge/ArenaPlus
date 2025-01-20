@@ -12,7 +12,7 @@ using UnityEngine;
 namespace ArenaPlus.Features.UI
 {
     [ImmutableFeature]
-    internal class KeyboardPause : ImmutableFeature
+    file class KeyboardPause : ImmutableFeature
     {
         protected override void Register()
         {
