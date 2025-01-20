@@ -27,7 +27,7 @@ namespace ArenaPlus.Features
         private Timer spearsRespawnTimer;
         private int spearsCheckTicks;
 
-        internal SpearsRespawn(FeatureInfoAttribute featureInfo) : base(featureInfo)
+        public SpearsRespawn(FeatureInfoAttribute featureInfo) : base(featureInfo)
         {
             SetComplementaryElement((expandable, startPos) =>
             {
@@ -85,19 +85,22 @@ namespace ArenaPlus.Features
             On.ArenaGameSession.Update -= ArenaGameSession_Update;
         }
 
+        private const string timerText = "Spears respawn in";
+
         private void ArenaGameSession_Update(On.ArenaGameSession.orig_Update orig, ArenaGameSession self)
         {
             spearsCheckTicks++;
             if (!self.initiated && spearsRespawnTimer != null)
             {
                 ConsoleWrite("Stop timer: INIT", Color.red);
+                UI.ArenaTimer.StopTimer(timerText);
                 spearsRespawnTimer.Dispose();
                 spearsRespawnTimer = null;
             }
             orig(self);
 
-
-            if (self.game.session is not SandboxGameSession && !GameUtils.IsChallengeGameSession(self.game) && self.room != null && self.playersSpawned && spearsCheckTicks > 30)
+            bool otherTimer = UI.ArenaTimer.Active && UI.ArenaTimer.Text == timerText;
+            if (self.game.session is not SandboxGameSession && !GameUtils.IsChallengeGameSession(self.game) && self.room != null && self.playersSpawned && spearsCheckTicks > 30 && !otherTimer)
             {
                 spearsCheckTicks = 0;
                 int spearCount = 0;
@@ -122,13 +125,28 @@ namespace ArenaPlus.Features
                 {
                     Log("Starting spears respawning timer");
                     ConsoleWrite("Start timer", Color.green);
-                    spearsRespawnTimer = new Timer(x => RespawnTimerEnd(self.room), null, spearsRespawnTimerConfigurable.Value * 1000, 0);
+
+                    if (spearsRespawnTimerConfigurable.Value <= 3)
+                    {
+                        spearsRespawnTimer = new Timer(x => RespawnTimerEnd(self.room), null, spearsRespawnTimerConfigurable.Value * 1000, 0);
+                        UI.ArenaTimer.StartTimer("Spears respawn in", DateTime.Now.AddSeconds(spearsRespawnTimerConfigurable.Value));
+                    }
+                    else
+                    {
+                        spearsRespawnTimer = new Timer(x =>
+                        {
+                            new Timer(y => RespawnTimerEnd(self.room), null, 3 * 1000, 0);
+                            Log("Starting spears respawning 3s timer 2");
+                            UI.ArenaTimer.StartTimer("Spears respawn in", DateTime.Now.AddSeconds(3));
+                        }, null, (spearsRespawnTimerConfigurable.Value - 3) * 1000, 0);
+                    }
                 }
                 else if (spearCount > 0 && spearsRespawnTimer != null)
                 {
                     ConsoleWrite($"Stop timer: {spearCount} > 0", Color.red);
                     spearsRespawnTimer.Dispose();
                     spearsRespawnTimer = null;
+                    UI.ArenaTimer.StopTimer(timerText);
                 }
 
                 ConsoleWrite("spearCount : " + spearCount);
@@ -154,6 +172,11 @@ namespace ArenaPlus.Features
                         spear.RealizeInRoom();
                     }
                 }
+            }
+
+            if (UI.ArenaTimer.Text == "Spears respawn in")
+            {
+                UI.ArenaTimer.StopTimer(timerText);
             }
         }
     }

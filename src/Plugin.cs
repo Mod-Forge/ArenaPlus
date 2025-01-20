@@ -13,6 +13,7 @@ using ArenaPlus.Utils;
 using ArenaPlus.Options;
 using ArenaPlus.Lib;
 using System.Reflection;
+using UnityEngine.Assertions;
 
 namespace ArenaPlus
 {
@@ -24,6 +25,8 @@ namespace ArenaPlus
         public static ManualLogSource log = BepInEx.Logging.Logger.CreateLogSource("ArenaPlus");
         public static void Log(object msg) => log.LogInfo(msg);
         public static void LogError(object msg) => log.LogError(msg);
+
+        public static void Assert(bool check, string message) { if (!check) LogError(message); }
 
 
         // Add hooks

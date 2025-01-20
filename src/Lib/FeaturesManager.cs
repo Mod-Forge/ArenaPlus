@@ -53,6 +53,7 @@ namespace ArenaPlus.Lib
                         BaseFeature baseFeature = null;
                         if (type.GetCustomAttribute<FeatureInfoAttribute>() is FeatureInfoAttribute featureInfo)
                         {
+                            Assert(type.GetConstructors().Length > 0, $"Missing constructor in feature {featureInfo.name}");
                             Feature feature = type.GetConstructors()[0].Invoke([featureInfo]) as Feature;
 
                             baseFeature = feature;
@@ -61,10 +62,12 @@ namespace ArenaPlus.Lib
                         }
                         else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null)
                         {
+                            Assert(type.GetConstructors().Length > 0, message: $"Missing constructor in immutable feature {nameof(type)}");
                             type.GetConstructors()[0].Invoke([]);
                         }
                         else if (type.GetCustomAttribute<SlugcatFeatureInfoAttribute>() is SlugcatFeatureInfoAttribute slugcatFeatureInfo)
                         {
+                            Assert(type.GetConstructors().Length > 0, message: $"Missing constructor in slugcat feature {slugcatFeatureInfo.name}");
                             SlugcatFeature feature = type.GetConstructors()[0].Invoke([slugcatFeatureInfo]) as SlugcatFeature;
 
                             baseFeature = feature;
