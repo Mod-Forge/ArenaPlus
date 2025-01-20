@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ArenaPlus.Utils
 {
-    public static class HookRegister
+    internal static class HookRegister
     {
         public static void RegisterAllHooks()
         {
@@ -47,7 +47,7 @@ namespace ArenaPlus.Utils
     }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public class HookRegisterAttribute : Attribute
+    internal class HookRegisterAttribute : Attribute
     {
     }
 }
