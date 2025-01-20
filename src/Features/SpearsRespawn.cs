@@ -1,6 +1,7 @@
 ﻿using ArenaPlus.Lib;
 using ArenaPlus.Options;
 using ArenaPlus.Options.Tabs;
+using ArenaPlus.Utils;
 using Menu.Remix.MixedUI;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace ArenaPlus.Features
         description: "Whether spears reappear when they are all lost",
         enabledByDefault: false
     )]
-    file class SpearsRespawn : Feature
+    public class SpearsRespawn : Feature
     {
         private readonly Configurable<int> spearsRespawnTimerConfigurable = OptionsInterface.instance.config.Bind("spearsRespawnTimer", 30, new ConfigurableInfo("The time in seconds before the spears respawn", new ConfigAcceptableRange<int>(0, 100), "", []));
         private Timer spearsRespawnTimer;
@@ -41,6 +42,37 @@ namespace ArenaPlus.Features
                     updown.colorEdge = color;
                 }
             });
+        }
+
+        public static void RegisterExecption(Spear spear)
+        {
+            if (!spear.slatedForDeletetion && spear.room != null)
+            {
+                RoomCustomData roomData = CustomDataManager.GetCustomData<RoomCustomData>(spear.room);
+                roomData.spearsRespawnExecption.Add(spear);
+            }
+        }
+
+        private static bool IsException(Spear spear)
+        {
+            if (!spear.slatedForDeletetion && spear.room != null)
+            {
+                RoomCustomData roomData = CustomDataManager.GetCustomData<RoomCustomData>(spear.room);
+                return roomData.spearsRespawnExecption.Contains(spear);
+            }
+            return false;
+        }
+
+        private bool CheckSpearGrability(Spear spear)
+        {
+            foreach (var AbstPLayer in spear.room.game.AlivePlayers)
+            {
+                if (AbstPLayer.realizedCreature is Player player && player.Grabability(spear) != Player.ObjectGrabability.CantGrab)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         protected override void Register()
@@ -74,7 +106,7 @@ namespace ArenaPlus.Features
                     for (int i = 0; i < self.room.physicalObjects[2].Count; i++)
                     {
                         PhysicalObject obj = self.room.physicalObjects[2][i];
-                        if (obj != null && obj is Spear)
+                        if (obj != null && obj is Spear spear && !spear.slatedForDeletetion && CheckSpearGrability(spear) && !IsException(spear))
                         {
                             //ConsoleWrite($"Visible spear {i} : " + (self.game.cameras[0] as RoomCamera).IsViewedByCameraPosition((self.game.cameras[0] as RoomCamera).currentCameraPosition, obj.firstChunk.pos));
                             if (self.game.cameras[0].IsViewedByCameraPosition(self.game.cameras[0].currentCameraPosition, obj.firstChunk.pos))

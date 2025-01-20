@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ArenaPlus.Features;
 using ArenaPlus.Features.UI;
 
 namespace ArenaPlus.Utils
@@ -29,7 +30,7 @@ namespace ArenaPlus.Utils
 
     public class RoomCustomData : CustomData
     {
-        public int frame;
+        public HashSet<Spear> spearsRespawnExecption = new HashSet<Spear>();
 
         // Constructeur par défaut
         public RoomCustomData() : base(null) { }
