@@ -21,7 +21,7 @@ namespace ArenaPlus.Features
         description: "Whether spears reappear when they are all lost",
         enabledByDefault: false
     )]
-    public class SpearsRespawn : Feature
+    internal class SpearsRespawn : Feature
     {
         private readonly Configurable<int> spearsRespawnTimerConfigurable = OptionsInterface.instance.config.Bind("spearsRespawnTimer", 30, new ConfigurableInfo("The time in seconds before the spears respawn", new ConfigAcceptableRange<int>(0, 100), "", []));
         private Timer spearsRespawnTimer;
