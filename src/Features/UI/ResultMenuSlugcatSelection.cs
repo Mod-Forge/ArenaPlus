@@ -19,7 +19,8 @@ namespace ArenaPlus.Features.UI
     )]
     file class ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
-        public static readonly int selectionCount = 3;
+        private static readonly int _selectionCount = 3;
+        public static int selectionCount => SlugcatsUtils.GetActiveSlugcats().Count < _selectionCount ? SlugcatsUtils.GetActiveSlugcats().Count : _selectionCount;
 
         public static Player.InputPackage[] lastInput = new Player.InputPackage[4];
         //public static int[] randomSeeds = new int[4];
@@ -45,7 +46,7 @@ namespace ArenaPlus.Features.UI
         {
             List<SlugcatStats.Name> allSlugcats = SlugcatsUtils.GetActiveSlugcats();
             SlugcatStats.Name[] slugcats = new SlugcatStats.Name[selectionCount];
-            if (allSlugcats.Count <= selectionCount)
+            if (allSlugcats.Count < selectionCount)
             {
                 LogError($"Not enough slugcat activated requires minimum {selectionCount} got {allSlugcats.Count}");
                 return slugcats.Select(e => SlugcatStats.Name.Night).ToArray();
