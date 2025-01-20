@@ -33,7 +33,7 @@ namespace ArenaPlus
         public void OnEnable()
         {
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-            try { Utils.RegisterUtils.RegisterAllUtils(); } catch (Exception e) { Plugin.LogError(e); }
+            try { RegisterUtils.RegisterAllUtils(); } catch (Exception e) { Plugin.LogError(e); }
         }
 
         // Load any resources, such as sprites or sounds

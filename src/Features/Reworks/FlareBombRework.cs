@@ -19,11 +19,6 @@ namespace ArenaPlus.Features.Reworks
     )]
     file class FlareBombRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
-        internal static void Test()
-        {
-
-        }
-
         protected override void Register()
         {
             On.FlareBomb.DrawSprites += FlareBomb_DrawSprites;

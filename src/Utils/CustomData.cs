@@ -18,6 +18,7 @@ namespace ArenaPlus.Utils
         }
 
     }
+
     public class CustomData
     {
         public object owner;
@@ -28,7 +29,7 @@ namespace ArenaPlus.Utils
         }
     }
 
-    public class RoomCustomData : CustomData
+    internal class RoomCustomData : CustomData
     {
         public HashSet<Spear> spearsRespawnExecption = new HashSet<Spear>();
 
@@ -39,7 +40,7 @@ namespace ArenaPlus.Utils
         public RoomCustomData(object obj) : base(obj) { }
     }
 
-    public class PlayerCustomData : CustomData
+    internal class PlayerCustomData : CustomData
     {
         public int customSpriteIndex;
         public bool initFinish = false;
