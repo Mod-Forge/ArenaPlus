@@ -47,8 +47,6 @@ namespace ArenaPlus.Features
             On.Player.Die += Player_Die;
             On.Player.Destroy += Player_Destroy;
             On.RWInput.PlayerInputLogic_int_int += RWInput_PlayerInputLogic_int_int;
-            On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
-            On.PlayerGraphics.InitiateSprites += PlayerGraphics_InitiateSprites;
         }
 
         protected override void Unregister()
@@ -56,38 +54,6 @@ namespace ArenaPlus.Features
             On.ArenaGameSession.ctor -= ArenaGameSession_ctor;
             On.Player.Die -= Player_Die;
             On.RWInput.PlayerInputLogic_int_int -= RWInput_PlayerInputLogic_int_int;
-            On.PlayerGraphics.DrawSprites -= PlayerGraphics_DrawSprites;
-            On.PlayerGraphics.InitiateSprites -= PlayerGraphics_InitiateSprites;
-        }
-
-        private string[][] playerShaders = new string[4][];
-
-        private void PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
-        {
-            orig(self, sLeaser, rCam);
-            playerShaders[self.player.playerState.playerNumber] = new string[sLeaser.sprites.Length];
-            for (int i = 0; i < sLeaser.sprites.Length; i++)
-            {
-                playerShaders[self.player.playerState.playerNumber][i] = sLeaser.sprites[i].shader.name;
-                sLeaser.sprites[i].shader = rCam.game.rainWorld.Shaders["Hologram"];
-
-            }
-
-        }
-
-        private void PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
-        {
-            orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (!SpawnProtectionTimerBehavior.protection)
-            {
-                for (int i = 0; i < playerShaders[self.player.playerState.playerNumber].Length; i++)
-                {
-                    if (playerShaders[self.player.playerState.playerNumber][i] != sLeaser.sprites[i].shader.name)
-                    {
-                        sLeaser.sprites[i].shader = rCam.game.rainWorld.Shaders[playerShaders[self.player.playerState.playerNumber][i]];
-                    }
-                }
-            }
         }
 
         private Player.InputPackage RWInput_PlayerInputLogic_int_int(On.RWInput.orig_PlayerInputLogic_int_int orig, int categoryID, int playerNumber)
