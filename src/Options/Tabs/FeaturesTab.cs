@@ -4,9 +4,12 @@ using System.Drawing;
 using System.Linq;
 using ArenaPlus.Lib;
 using ArenaPlus.Options.Elements;
+using Menu;
 using Menu.Remix.MixedUI;
 using Menu.Remix.MixedUI.ValueTypes;
+using SlugBase.Features;
 using UnityEngine;
+using Feature = ArenaPlus.Lib.Feature;
 
 namespace ArenaPlus.Options.Tabs
 {
@@ -77,10 +80,35 @@ namespace ArenaPlus.Options.Tabs
                 {
                     int xPos = MARGIN + (index % 2) * (500 / 2);
 
+                    string description = feature.configurable.info.description;
+                    if (feature.Require != null)
+                    {
+                        description += "\n(Requirements: " + string.Join(", ", feature.Require.ToList().ConvertAll(id =>
+                        {
+                            if (FeaturesManager.TryGetFeature(id, out var f))
+                            {
+                                return f.Name;
+                            }
+                            return $"Unknown {id}";
+                        })) + ")";
+                    }
+
+                    if (feature.Incompatible != null)
+                    {
+                        description += "\n(Incompatibilites: " + string.Join(", ", feature.Incompatible.ToList().ConvertAll(id =>
+                        {
+                            if (FeaturesManager.TryGetFeature(id, out var f))
+                            {
+                                return f.Name;
+                            }
+                            return $"Unknown {id}";
+                        })) + ")";
+                    }
+
                     OpCheckBox checkBox = expandable.AddItem(
                         new OpCheckBox(feature.configurable, new Vector2(xPos, lastPos))
                         {
-                            description = feature.Description,
+                            description = description,
                         }
                     );
 
@@ -92,6 +120,8 @@ namespace ArenaPlus.Options.Tabs
 
                     checkBox.OnValueChanged += (UIconfig config, string value, string oldValue) =>
                     {
+                        CheckLinkFeature(feature, checkBox);
+                        CompatibilityCheck(feature, checkBox.GetValueBool());
                         updating = true;
                         toggleAllCheckBox.SetValueBool(IsAllChecked(category.features));
                         updating = false;
@@ -115,6 +145,109 @@ namespace ArenaPlus.Options.Tabs
                     }
                 }
             }
+        }
+
+        private Dictionary<Feature, List<OpCheckBox>> changedCheckBoxes = new();
+        private void CheckLinkFeature(Feature feature, OpCheckBox checkBox)
+        {
+            foreach (var item in changedCheckBoxes)
+            {
+                if (item.Value.Contains(checkBox))
+                {
+                    item.Value.Remove(checkBox);
+                    if (checkBoxes.TryGetValue(item.Key, out OpCheckBox ownerCB) && ownerCB.GetValueBool())
+                    {
+                        Log($"disabling link feature {item.Key.Name}");
+                        ownerCB.SetValueBool(false);
+                    }
+                    //IncompatibilityCheck(item.Key, false);
+                    return;
+                }
+            }
+
+            foreach (var category in FeaturesManager.categories)
+            {
+                foreach (var f in category.features)
+                {
+                    if (f.Require != null && f.Require.Contains(feature.Id) && !checkBox.GetValueBool())
+                    {
+                        if (checkBoxes.TryGetValue(f, out OpCheckBox linkCB) && linkCB.GetValueBool())
+                        {
+                            Log($"disabling link requirement feature {f.Name}");
+                            linkCB.SetValueBool(false);
+                        }
+                    }
+
+                    if (f.Incompatible != null && f.Incompatible.Contains(feature.Id) && checkBox.GetValueBool())
+                    {
+                        if (checkBoxes.TryGetValue(f, out OpCheckBox linkCB) && linkCB.GetValueBool())
+                        {
+                            Log($"disabling link incompatibility feature {f.Name}");
+                            linkCB.SetValueBool(false);
+                        }
+                    }
+                }
+            }
+        }
+        private void CompatibilityCheck(Feature feature, bool state)
+        { 
+            if (state)
+            {
+                Log("changer related feature " + feature.Name);
+                if (feature.Require != null)
+                {
+                    foreach (string id in feature.Require)
+                    {
+                        if (FeaturesManager.TryGetFeature(id, out Feature requireFeature) && checkBoxes.TryGetValue(requireFeature, out OpCheckBox requireCB))
+                        {
+                            if (!requireCB.GetValueBool())
+                            {
+                                requireCB.SetValueBool(true);
+                                Log($"changing require feature {requireFeature.Name}");
+                                if (!changedCheckBoxes.ContainsKey(feature))
+                                {
+                                    changedCheckBoxes.Add(feature, new());
+
+                                }
+                                changedCheckBoxes[key: feature].Add(requireCB);
+                            }
+                        }
+                    }
+                }
+
+                if (feature.Incompatible != null)
+                {
+                    foreach (string id in feature.Incompatible)
+                    {
+                        if (FeaturesManager.TryGetFeature(id, out Feature incompatibleFeature) && checkBoxes.TryGetValue(incompatibleFeature, out OpCheckBox incompatibleCB))
+                        {
+                            if (incompatibleCB.GetValueBool())
+                            {
+                                incompatibleCB.SetValueBool(false);
+                                Log($"changing incomptible feature {incompatibleFeature.Name}");
+                                if (!changedCheckBoxes.ContainsKey(feature))
+                                {
+                                    changedCheckBoxes.Add(feature, new());
+
+                                }
+                                changedCheckBoxes[key: feature].Add(incompatibleCB);
+
+                            }
+                        }
+                    }
+                }
+            }
+            else if (changedCheckBoxes.ContainsKey(feature))
+            {
+                Log("reverting change caused by " + feature.Name);
+                List<OpCheckBox> list = new(changedCheckBoxes[feature]);
+                changedCheckBoxes.Remove(feature);
+                foreach (var checkBox in list)
+                {
+                    checkBox.value = checkBox.value == "false" ? "true" : "false";
+                }
+            }
+
         }
 
         private bool IsAllChecked(List<Feature> features)

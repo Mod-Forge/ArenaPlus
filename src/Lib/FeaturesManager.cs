@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using SlugBase.Features;
+using Newtonsoft.Json;
 
 namespace ArenaPlus.Lib
 {
@@ -105,6 +106,23 @@ namespace ArenaPlus.Lib
             {
                 feature.Disable();
             }
+        }
+
+        public static bool TryGetFeature(string id, out Feature feature)
+        {
+            feature = null;
+            foreach (var category in categories)
+            {
+                foreach (var f in category.features)
+                {
+                    if (f.Id == id)
+                    {
+                        feature = f;
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public static Feature GetFeature(string id)
