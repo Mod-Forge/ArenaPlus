@@ -13,7 +13,7 @@ namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "randomSlugcatEveryone",
-        name: "Random Slugcat Everyone (WIP)",
+        name: "Random Slugcat Everyone",
         category: BuiltInCategory.Fun,
         description: "Make \"random slugcat every round\" give the same random slugcat to everyone",
         require: ["randomSlugcatEveryRound"],
@@ -23,12 +23,10 @@ namespace ArenaPlus.Features.Reworks
     {
         protected override void Register()
         {
-            throw new NotImplementedException();
         }
 
         protected override void Unregister()
         {
-            throw new NotImplementedException();
         }
     }
 }

@@ -22,6 +22,7 @@ namespace ArenaPlus.Features
 
         private void MultiplayerMenu_InitializeSitting(On.Menu.MultiplayerMenu.orig_InitializeSitting orig, MultiplayerMenu self)
         {
+            RandomSlugcatEveryRound.randomSlugcat = SlugcatsUtils.GetRandomSlugcat();
             arenaSetup = self.GetArenaSetup;
             orig(self);
             arenaSetup = null;
@@ -31,7 +32,7 @@ namespace ArenaPlus.Features
         {
             if (self.gameTypeSetup.challengeMeta == null && arenaSetup.playerClass[playerNumber] == null)
             {
-                playerClass = SlugcatsUtils.GetRandomSlugcat();
+                playerClass = FeaturesManager.GetFeature("randomSlugcatEveryone").configurable.Value ? RandomSlugcatEveryRound.randomSlugcat : SlugcatsUtils.GetRandomSlugcat();
             }
 
             orig(self, playerNumber, playerClass);

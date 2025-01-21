@@ -17,7 +17,7 @@ namespace ArenaPlus.Features
         description: "Make the game choose a random slugcat every round when selecting random icon",
         enabledByDefault: false
     )]
-    file class RandomSlugcatEveryRound(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    public class RandomSlugcatEveryRound(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         protected override void Register()
         {
@@ -50,13 +50,16 @@ namespace ArenaPlus.Features
         {
             orig(self, session);
             ArenaSetup arenaSetup = session.room.game.rainWorld.processManager.arenaSetup;
+            randomSlugcat = SlugcatsUtils.GetRandomSlugcat();
             for (int i = 0; i < RainWorld.PlayerObjectBodyColors.Length; i++)
             {
                 if (arenaSetup.playersJoined[i] && arenaSetup.playerClass[i] == null)
                 {
-                    self.players.Find(player => player.playerNumber == i).playerClass = SlugcatsUtils.GetRandomSlugcat();
+                    self.players.Find(player => player.playerNumber == i).playerClass = FeaturesManager.GetFeature("randomSlugcatEveryone").configurable.Value ? randomSlugcat : SlugcatsUtils.GetRandomSlugcat();
                 }
             }
         }
+
+        public static SlugcatStats.Name randomSlugcat;
     }
 }

@@ -15,7 +15,7 @@ namespace ArenaPlus.Features.Reworks
         id: "allJokeRifle",
         name: "All Joke Rifle (WIP)",
         category: BuiltInCategory.Spoilers,
-        description: "Replacer every spears with Joke Rifles",
+        description: "Replacer every spears with Joke Rifles (challenge spoiler)",
         incompatible: ["objectsRandomizer"],
         enabledByDefault: false
     )]
