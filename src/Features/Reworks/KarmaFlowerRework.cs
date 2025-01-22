@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static ArenaPlus.Lib.AttachedPlayerFeatureUtils;
+using static ArenaPlus.Lib.PlayerAttachedFeatureUtils;
 
 namespace ArenaPlus.Features.Reworks
 {
@@ -39,6 +39,7 @@ namespace ArenaPlus.Features.Reworks
             On.Player.ClassMechanicsSaint -= Player_ClassMechanicsSaint;
             On.KarmaFlower.BitByPlayer -= KarmaFlower_BitByPlayer;
             On.Spear.HitSomethingWithoutStopping -= Spear_HitSomethingWithoutStopping;
+            On.Player.ActivateAscension -= Player_ActivateAscension;
         }
 
         private void Player_ActivateAscension(On.Player.orig_ActivateAscension orig, Player self)
@@ -245,21 +246,13 @@ namespace ArenaPlus.Features.Reworks
                         powerVisual.sLeaser.sprites[n].x = vector14.x;
                         powerVisual.sLeaser.sprites[n].y = vector14.y;
                     }
-
-
                 }
             }
-
-
         }
     }
 
-    public class KarmaFlowerPowerVisual : AttachedPlayerFeature, IDrawable
+    public class KarmaFlowerPowerVisual(Player player) : PlayerAttachedFeature(player), IDrawable
     {
-        public KarmaFlowerPowerVisual(Player player) : base(player)
-        {
-        }
-
         public RoomCamera.SpriteLeaser sLeaser;
         public const int numGodPips = 12;
 
@@ -275,21 +268,19 @@ namespace ArenaPlus.Features.Reworks
         {
             get
             {
-                if (this.player.room != null && this.player.room.game.setupValues.arenaDefaultColors)
+                if (owner.room != null && owner.room.game.setupValues.arenaDefaultColors)
                 {
-                    return this.player.SlugCatClass;
+                    return owner.SlugCatClass;
                 }
-                return this.player.playerState.slugcatCharacter;
+                return owner.playerState.slugcatCharacter;
             }
         }
-
-
 
         public override void Update(bool eu)
         {
             base.Update(eu);
 
-            if (player.slatedForDeletetion || player.dead || player.godTimer <= 0)
+            if (owner.slatedForDeletetion || owner.dead || owner.godTimer <= 0)
             {
                 Destroy();
                 return;

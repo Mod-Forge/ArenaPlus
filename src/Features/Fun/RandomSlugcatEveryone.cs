@@ -16,7 +16,7 @@ namespace ArenaPlus.Features.Fun
         name: "Random Slugcat Everyone",
         category: BuiltInCategory.Fun,
         description: "Make \"random slugcat every round\" give the same random slugcat to everyone",
-        require: ["randomSlugcatEveryRound"],
+        requires: ["randomSlugcatEveryRound"],
         enabledByDefault: false
     )]
     file class RandomSlugcatEveryone(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

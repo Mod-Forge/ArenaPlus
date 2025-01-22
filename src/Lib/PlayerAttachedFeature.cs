@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ArenaPlus.Lib
 {
-    public static class AttachedPlayerFeatureUtils
+    public static class PlayerAttachedFeatureUtils
     {
-        public static bool AddAttachedFeature(this Player player, AttachedPlayerFeature feature)
+        public static bool AddAttachedFeature(this Player player, PlayerAttachedFeature feature)
         {
             if (player.room == null) return false;
             PlayerCustomData playerData = player.GetCustomData<PlayerCustomData>();
@@ -22,7 +22,7 @@ namespace ArenaPlus.Lib
             return succes;
         }
 
-        public static bool RemoveAttachedFeature(this Player player, AttachedPlayerFeature feature)
+        public static bool RemoveAttachedFeature(this Player player, PlayerAttachedFeature feature)
         {
             PlayerCustomData playerData = player.GetCustomData<PlayerCustomData>();
             if (playerData.attachedFeatures.Contains(feature))
@@ -37,7 +37,7 @@ namespace ArenaPlus.Lib
             return false;
         }
 
-        public static T GetAttachedFeatureType<T>(this Player player) where T : AttachedPlayerFeature
+        public static T GetAttachedFeatureType<T>(this Player player) where T : PlayerAttachedFeature
         {
             PlayerCustomData playerData = player.GetCustomData<PlayerCustomData>();
             return (playerData.attachedFeatures.Any(f => f is T) ? playerData.attachedFeatures.First(f => f is T) : null) as T;
@@ -50,14 +50,10 @@ namespace ArenaPlus.Lib
         }
     }
 
-    public class AttachedPlayerFeature : UpdatableAndDeletable
+    public class PlayerAttachedFeature(Player player) : UpdatableAndDeletable
     {
-        public readonly Player player;
-        public Player owner => this.player;
-        public AttachedPlayerFeature(Player player)
-        {
-            this.player = player;
-        }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006")]
+        public Player owner => player;
 
         public override void Destroy()
         {

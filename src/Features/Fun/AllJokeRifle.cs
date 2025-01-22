@@ -16,7 +16,7 @@ namespace ArenaPlus.Features.Fun
         name: "All Joke Rifle (WIP)",
         category: BuiltInCategory.Spoilers,
         description: "Replacer every spears with Joke Rifles (challenge spoiler)",
-        incompatible: ["objectsRandomizer"],
+        incompatibilities: ["objectsRandomizer"],
         enabledByDefault: false
     )]
     file class AllJokeRifle(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

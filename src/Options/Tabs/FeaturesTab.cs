@@ -81,9 +81,9 @@ namespace ArenaPlus.Options.Tabs
                     int xPos = MARGIN + (index % 2) * (500 / 2);
 
                     string description = feature.configurable.info.description;
-                    if (feature.Require != null)
+                    if (feature.Requires != null)
                     {
-                        description += "\n(Requirements: " + string.Join(", ", feature.Require.ToList().ConvertAll(id =>
+                        description += "\n(Requirements: " + string.Join(", ", feature.Requires.ToList().ConvertAll(id =>
                         {
                             if (FeaturesManager.TryGetFeature(id, out var f))
                             {
@@ -93,9 +93,9 @@ namespace ArenaPlus.Options.Tabs
                         })) + ")";
                     }
 
-                    if (feature.Incompatible != null)
+                    if (feature.Incompatibilities != null)
                     {
-                        description += "\n(Incompatibilites: " + string.Join(", ", feature.Incompatible.ToList().ConvertAll(id =>
+                        description += "\n(Incompatibilites: " + string.Join(", ", feature.Incompatibilities.ToList().ConvertAll(id =>
                         {
                             if (FeaturesManager.TryGetFeature(id, out var f))
                             {
@@ -169,7 +169,7 @@ namespace ArenaPlus.Options.Tabs
             {
                 foreach (var f in category.features)
                 {
-                    if (f.Require != null && f.Require.Contains(feature.Id) && !checkBox.GetValueBool())
+                    if (f.Requires != null && f.Requires.Contains(feature.Id) && !checkBox.GetValueBool())
                     {
                         if (checkBoxes.TryGetValue(f, out OpCheckBox linkCB) && linkCB.GetValueBool())
                         {
@@ -178,7 +178,7 @@ namespace ArenaPlus.Options.Tabs
                         }
                     }
 
-                    if (f.Incompatible != null && f.Incompatible.Contains(feature.Id) && checkBox.GetValueBool())
+                    if (f.Incompatibilities != null && f.Incompatibilities.Contains(feature.Id) && checkBox.GetValueBool())
                     {
                         if (checkBoxes.TryGetValue(f, out OpCheckBox linkCB) && linkCB.GetValueBool())
                         {
@@ -194,9 +194,9 @@ namespace ArenaPlus.Options.Tabs
             if (state)
             {
                 Log("changer related feature " + feature.Name);
-                if (feature.Require != null)
+                if (feature.Requires != null)
                 {
-                    foreach (string id in feature.Require)
+                    foreach (string id in feature.Requires)
                     {
                         if (FeaturesManager.TryGetFeature(id, out Feature requireFeature) && checkBoxes.TryGetValue(requireFeature, out OpCheckBox requireCB))
                         {
@@ -215,9 +215,9 @@ namespace ArenaPlus.Options.Tabs
                     }
                 }
 
-                if (feature.Incompatible != null)
+                if (feature.Incompatibilities != null)
                 {
-                    foreach (string id in feature.Incompatible)
+                    foreach (string id in feature.Incompatibilities)
                     {
                         if (FeaturesManager.TryGetFeature(id, out Feature incompatibleFeature) && checkBoxes.TryGetValue(incompatibleFeature, out OpCheckBox incompatibleCB))
                         {

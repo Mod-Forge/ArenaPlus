@@ -48,7 +48,7 @@ namespace ArenaPlus.Utils
         public bool initFinish = false;
 
         // attached features
-        internal HashSet<AttachedPlayerFeature> attachedFeatures = new HashSet<AttachedPlayerFeature>();
+        internal HashSet<PlayerAttachedFeature> attachedFeatures = new HashSet<PlayerAttachedFeature>();
 
         // Constructeur par défaut
         public PlayerCustomData() : base(null) { }
