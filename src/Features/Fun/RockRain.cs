@@ -9,7 +9,7 @@ using UnityEngine;
 using MoreSlugcats;
 using ArenaPlus.Lib;
 
-namespace ArenaPlus.Features.Reworks
+namespace ArenaPlus.Features.Fun
 {
     [FeatureInfo(
         id: "rockRain",
