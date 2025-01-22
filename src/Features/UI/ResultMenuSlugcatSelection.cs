@@ -1,4 +1,6 @@
 ﻿using ArenaPlus.Lib;
+using ArenaPlus.Options.Tabs;
+using ArenaPlus.Options;
 using ArenaPlus.Utils;
 using Menu;
 using RWCustom;
@@ -8,25 +10,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Menu.Remix.MixedUI;
 
 namespace ArenaPlus.Features.UI
 {
     [FeatureInfo(
         id: "resultMenuSlugcatSelector",
-        name: "Slugcat selector in result menu",
+        name: "Slugcat selector",
         description: "Add a slugcat selector in the result menu with two other choices",
         enabledByDefault: false
     )]
-    file class ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class ResultMenuSlugcatSelection : Feature
     {
-        private static readonly int _selectionCount = 3;
-        public static int selectionCount => SlugcatsUtils.GetActiveSlugcats().Count < _selectionCount ? SlugcatsUtils.GetActiveSlugcats().Count : _selectionCount;
+        public static int selectionCount => SlugcatsUtils.GetActiveSlugcats().Count < selectionCountConfig.Value ? SlugcatsUtils.GetActiveSlugcats().Count : selectionCountConfig.Value;
 
         public static Player.InputPackage[] lastInput = new Player.InputPackage[4];
         //public static int[] randomSeeds = new int[4];
         public static SlugcatStats.Name[][] nameList = new SlugcatStats.Name[4][];
         public static SlugcatStats.Name[] lastCharactersNames = new SlugcatStats.Name[4];
         public static int[] cooldowns = new int[4];
+
+        public static readonly Configurable<int> selectionCountConfig = OptionsInterface.instance.config.Bind("selectionCount", 3, new ConfigurableInfo("The number of slugcat choices in the selector, also counts the current slugcat", new ConfigAcceptableRange<int>(2, 10), "", []));
+
+
+        public ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : base(featureInfo)
+        {
+            SetComplementaryElement((expandable, startPos) =>
+            {
+                OpUpdown updown = expandable.AddItem(
+                    new OpUpdown(selectionCountConfig, startPos, 60f)
+                );
+                updown.pos -= new Vector2(0, (updown.size.y - FeaturesTab.CHECKBOX_SIZE) / 2);
+                updown.description = selectionCountConfig.info.description;
+
+                if (HexColor != "None" && ColorUtility.TryParseHtmlString("#" + HexColor, out Color color))
+                {
+                    updown.colorEdge = color;
+                }
+            });
+        }
 
         protected override void Register()
         {

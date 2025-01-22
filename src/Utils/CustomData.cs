@@ -41,15 +41,24 @@ namespace ArenaPlus.Utils
         public RoomCustomData(object obj) : base(obj) { }
     }
 
-    internal class PlayerCustomData : CustomData
+    internal class CreatureCustomData : CustomData
     {
         // legacy karma flower
         public int customSpriteIndex;
         public bool initFinish = false;
 
         // attached features
-        internal HashSet<PlayerAttachedFeature> attachedFeatures = new HashSet<PlayerAttachedFeature>();
+        internal HashSet<AttachedFeature> attachedFeatures = new HashSet<AttachedFeature>();
 
+        // Constructeur par défaut
+        public CreatureCustomData() : base(null) { }
+
+        // Autres constructeurs si nécessaire
+        public CreatureCustomData(object obj) : base(obj) { }
+    }
+
+    internal class PlayerCustomData : CustomData
+    {
         // Constructeur par défaut
         public PlayerCustomData() : base(null) { }
 
