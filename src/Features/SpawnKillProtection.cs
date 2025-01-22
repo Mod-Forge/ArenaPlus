@@ -21,7 +21,7 @@ namespace ArenaPlus.Features
     )]
     file class SpawnKillProtection : Feature
     {
-        public static readonly Configurable<int> spawnKillProtectionTimerConfigurable = OptionsInterface.instance.config.Bind("spawnKillProtectionTimer", 5, new ConfigurableInfo("The time in seconds of the spawn kill protection", new ConfigAcceptableRange<int>(0, 100), "", []));
+        public static readonly Configurable<int> spawnKillProtectionTimerConfigurable = OptionsInterface.instance.config.Bind("spawnKillProtectionTimer", 5, new ConfigurableInfo("The time in seconds of the spawn kill protection", new ConfigAcceptableRange<int>(1, 100), "", []));
 
 
         public SpawnKillProtection(FeatureInfoAttribute featureInfo) : base(featureInfo)
@@ -88,7 +88,7 @@ namespace ArenaPlus.Features
         private void ArenaGameSession_ctor(On.ArenaGameSession.orig_ctor orig, ArenaGameSession self, RainWorldGame game)
         {
             orig(self, game);
-            if (self is not SandboxGameSession || !self.arenaSitting.sandboxPlayMode)
+            if (self is not SandboxGameSession) // || self.arenaSitting.sandboxPlayMode
             {
                 self.AddBehavior(new SpawnProtectionTimerBehavior(self));
             }
@@ -100,6 +100,7 @@ namespace ArenaPlus.Features
         private static DateTime endTime;
         private const string timerText = "Figth start in";
         public static bool protection => endTime > DateTime.Now;
+        public TimeSpan lastRemaningTime;
 
         public SpawnProtectionTimerBehavior(ArenaGameSession gameSession) : base(gameSession)
         {
@@ -107,13 +108,25 @@ namespace ArenaPlus.Features
 
         public override void Initiate()
         {
-            endTime = DateTime.Now.AddSeconds(SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value);
+            endTime = DateTime.Now.AddSeconds(SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value + 1);
             UI.ArenaTimer.StartTimer(timerText, endTime);
         }
 
         public override void Update()
         {
             if (!protection) return;
+
+            Log($"game paused {game.paused} {game.pauseUpdate} {game.GamePaused} {game.pauseMenu != null}");
+            if (game.GamePaused)
+            {
+                endTime = DateTime.Now + lastRemaningTime;
+                UI.ArenaTimer.StartTimer(timerText, endTime);
+            }
+            else
+            {
+                lastRemaningTime = (endTime - DateTime.Now);
+            }
+
             foreach (var shortCut in game.shortcuts.transportVessels)
             {
                 if (shortCut.creature is not Player)
