@@ -15,7 +15,7 @@ namespace ArenaPlus.Features.Fun
         id: "randomWaterLevel",
         name: "Random water level (WIP)",
         category: BuiltInCategory.Fun,
-        description: "Add water to every levels with a random initial heigth",
+        description: "Add water to every levels with a random initial height",
         enabledByDefault: false
     )]
     file class RandomWaterLevel(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
