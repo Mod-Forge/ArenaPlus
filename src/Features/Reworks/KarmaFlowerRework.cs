@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static ArenaPlus.Lib.AttachedPlayerFeatureUtils;
 
 namespace ArenaPlus.Features.Reworks
 {
@@ -24,21 +25,29 @@ namespace ArenaPlus.Features.Reworks
         protected override void Register()
         {
             Log("Enabling karma flower rework");
-            On.PlayerGraphics.AddToContainer += PlayerGraphics_AddToContainer;
             On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
             On.Player.ClassMechanicsSaint += Player_ClassMechanicsSaint;
             On.KarmaFlower.BitByPlayer += KarmaFlower_BitByPlayer;
             On.Spear.HitSomethingWithoutStopping += Spear_HitSomethingWithoutStopping;
+            On.Player.ActivateAscension += Player_ActivateAscension;
         }
 
         protected override void Unregister()
         {
             Log("Disabling karma flower rework");
-            On.PlayerGraphics.AddToContainer -= PlayerGraphics_AddToContainer;
             On.PlayerGraphics.DrawSprites -= PlayerGraphics_DrawSprites;
             On.Player.ClassMechanicsSaint -= Player_ClassMechanicsSaint;
             On.KarmaFlower.BitByPlayer -= KarmaFlower_BitByPlayer;
             On.Spear.HitSomethingWithoutStopping -= Spear_HitSomethingWithoutStopping;
+        }
+
+        private void Player_ActivateAscension(On.Player.orig_ActivateAscension orig, Player self)
+        {
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint && !self.HasAttachedFeatureType<KarmaFlowerPowerVisual>())
+            {
+                self.AddAttachedFeature(new KarmaFlowerPowerVisual(self));
+            }
+            orig(self);
         }
 
         private void Spear_HitSomethingWithoutStopping(On.Spear.orig_HitSomethingWithoutStopping orig, Spear self, PhysicalObject obj, BodyChunk chunk, PhysicalObject.Appendage appendage)
@@ -49,7 +58,6 @@ namespace ArenaPlus.Features.Reworks
                 {
                     if (obj is KarmaFlower)
                     {
-                        ConsoleWrite("do thig whouou");
                         Player player = self.thrownBy as Player;
                         if (!player.monkAscension && (player.tongue == null || !player.tongue.Attached))
                         {
@@ -119,33 +127,23 @@ namespace ArenaPlus.Features.Reworks
         private void PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-
-            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint)
+            KarmaFlowerPowerVisual powerVisual = self?.player.GetAttachedFeatureType<KarmaFlowerPowerVisual>();
+            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && powerVisual != null && powerVisual.sLeaser != null)
             {
-                PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
-                if (!rCam.room.game.DEBUGMODE && ModManager.MSC && self.player.room != null && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint && sLeaser.sprites.Length >= customData.customSpriteIndex + 2 + self.numGodPips)
+                if (!rCam.room.game.DEBUGMODE && ModManager.MSC && self.player.room != null && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
                 {
-
-                    //if (self.player.room.GetCustomData<RoomCustomData>().frame % 60 == 0)
-                    //{
-                    //    for (int i = 0; i < sLeaser.sprites.Length; i++)
-                    //    {
-                    //        ConsoleWrite($"sprite[{i}]: {sLeaser.sprites[i]}, {customData.customSpriteIndex}");
-                    //    }
-                    //}
-
                     if (self.player.killFac > 0f || self.player.forceBurst)
                     {
-                        sLeaser.sprites[customData.customSpriteIndex].isVisible = true;
-                        sLeaser.sprites[customData.customSpriteIndex].x = sLeaser.sprites[3].x + self.player.burstX;
-                        sLeaser.sprites[customData.customSpriteIndex].y = sLeaser.sprites[3].y + self.player.burstY + 60f;
+                        powerVisual.sLeaser.sprites[0].isVisible = true;
+                        powerVisual.sLeaser.sprites[0].x = sLeaser.sprites[3].x + self.player.burstX;
+                        powerVisual.sLeaser.sprites[0].y = sLeaser.sprites[3].y + self.player.burstY + 60f;
                         float f = Mathf.Lerp(self.player.lastKillFac, self.player.killFac, timeStacker);
-                        sLeaser.sprites[customData.customSpriteIndex].scale = Mathf.Lerp(50f, 2f, Mathf.Pow(f, 0.5f));
-                        sLeaser.sprites[customData.customSpriteIndex].alpha = Mathf.Pow(f, 3f);
+                        powerVisual.sLeaser.sprites[0].scale = Mathf.Lerp(50f, 2f, Mathf.Pow(f, 0.5f));
+                        powerVisual.sLeaser.sprites[0].alpha = Mathf.Pow(f, 3f);
                     }
                     else
                     {
-                        sLeaser.sprites[customData.customSpriteIndex].isVisible = false;
+                        powerVisual.sLeaser.sprites[0].isVisible = false;
                     }
                     if (self.player.killWait > self.player.lastKillWait || self.player.killWait == 1f || self.player.forceBurst)
                     {
@@ -167,15 +165,15 @@ namespace ArenaPlus.Features.Reworks
                         self.rubberMarkX += (sLeaser.sprites[3].x - self.rubberMarkX) * 0.15f;
                         self.rubberMarkY += (sLeaser.sprites[3].y - self.rubberMarkY) * 0.25f;
                     }
-                    sLeaser.sprites[customData.customSpriteIndex + 1].x = self.rubberMarkX;
-                    sLeaser.sprites[customData.customSpriteIndex + 1].y = self.rubberMarkY + 60f;
+                    powerVisual.sLeaser.sprites[0 + 1].x = self.rubberMarkX;
+                    powerVisual.sLeaser.sprites[0 + 1].y = self.rubberMarkY + 60f;
                     float num12;
                     if (self.player.monkAscension)
                     {
                         sLeaser.sprites[9].color = Custom.HSL2RGB(Random.value, Random.value, Random.value);
                         sLeaser.sprites[10].alpha = 0f;
                         sLeaser.sprites[11].alpha = 0f;
-                        sLeaser.sprites[customData.customSpriteIndex + 1].color = sLeaser.sprites[9].color;
+                        powerVisual.sLeaser.sprites[0 + 1].color = sLeaser.sprites[9].color;
                         num12 = 1f;
                     }
                     else
@@ -203,23 +201,23 @@ namespace ArenaPlus.Features.Reworks
                             float num17 = num15 * (m + 1);
                             if (self.player.godTimer <= num16)
                             {
-                                sLeaser.sprites[customData.customSpriteIndex + 2 + m].scale = 0f;
+                                powerVisual.sLeaser.sprites[0 + 2 + m].scale = 0f;
                             }
                             else if (self.player.godTimer >= num17)
                             {
-                                sLeaser.sprites[customData.customSpriteIndex + 2 + m].scale = 1f;
+                                powerVisual.sLeaser.sprites[0 + 2 + m].scale = 1f;
                             }
                             else
                             {
-                                sLeaser.sprites[customData.customSpriteIndex + 2 + m].scale = (self.player.godTimer - num16) / num15;
+                                powerVisual.sLeaser.sprites[0 + 2 + m].scale = (self.player.godTimer - num16) / num15;
                             }
                             if (self.player.karmaCharging > 0 && self.player.monkAscension)
                             {
-                                sLeaser.sprites[customData.customSpriteIndex + 2 + m].color = sLeaser.sprites[9].color;
+                                powerVisual.sLeaser.sprites[0 + 2 + m].color = sLeaser.sprites[9].color;
                             }
                             else
                             {
-                                sLeaser.sprites[customData.customSpriteIndex + 2 + m].color = PlayerGraphics.SlugcatColor(self.CharacterForColor);
+                                powerVisual.sLeaser.sprites[0 + 2 + m].color = PlayerGraphics.SlugcatColor(self.CharacterForColor);
                             }
                         }
                     }
@@ -232,72 +230,107 @@ namespace ArenaPlus.Features.Reworks
                     self.rubberMarkY = sLeaser.sprites[0].y;
 
 
-                    sLeaser.sprites[customData.customSpriteIndex + 1].x = self.rubberMarkX + self.rubberMouseX;
-                    sLeaser.sprites[customData.customSpriteIndex + 1].y = self.rubberMarkY + 60f + self.rubberMouseY;
+                    powerVisual.sLeaser.sprites[0 + 1].x = self.rubberMarkX + self.rubberMouseX;
+                    powerVisual.sLeaser.sprites[0 + 1].y = self.rubberMarkY + 60f + self.rubberMouseY;
                     self.rubberAlphaEmblem += (num12 - self.rubberAlphaEmblem) * 0.05f;
                     self.rubberAlphaPips += (num13 - self.rubberAlphaPips) * 0.05f;
-                    sLeaser.sprites[customData.customSpriteIndex + 1].alpha = self.rubberAlphaEmblem;
+                    powerVisual.sLeaser.sprites[0 + 1].alpha = self.rubberAlphaEmblem;
                     sLeaser.sprites[10].alpha *= 1f - self.rubberAlphaPips;
                     sLeaser.sprites[11].alpha *= 1f - self.rubberAlphaPips;
-                    for (int n = customData.customSpriteIndex + 2; n < customData.customSpriteIndex + 2 + self.numGodPips; n++)
+                    for (int n = 0 + 2; n < 0 + 2 + self.numGodPips; n++)
                     {
-                        sLeaser.sprites[n].alpha = self.rubberAlphaPips;
-                        Vector2 vector14 = new Vector2(sLeaser.sprites[customData.customSpriteIndex + 1].x, sLeaser.sprites[customData.customSpriteIndex + 1].y);
+                        powerVisual.sLeaser.sprites[n].alpha = self.rubberAlphaPips;
+                        Vector2 vector14 = new Vector2(powerVisual.sLeaser.sprites[0 + 1].x, powerVisual.sLeaser.sprites[0 + 1].y);
                         vector14 += Custom.rotateVectorDeg(Vector2.one * self.rubberRadius, (n - 15) * (360f / self.numGodPips));
-                        sLeaser.sprites[n].x = vector14.x;
-                        sLeaser.sprites[n].y = vector14.y;
+                        powerVisual.sLeaser.sprites[n].x = vector14.x;
+                        powerVisual.sLeaser.sprites[n].y = vector14.y;
                     }
 
 
                 }
+            }
+
+
+        }
+    }
+
+    public class KarmaFlowerPowerVisual : AttachedPlayerFeature, IDrawable
+    {
+        public KarmaFlowerPowerVisual(Player player) : base(player)
+        {
+        }
+
+        public RoomCamera.SpriteLeaser sLeaser;
+        public const int numGodPips = 12;
+
+        // from player graphics
+        public float rubberMarkX;
+        public float rubberMarkY;
+        public float rubberMouseX;
+        public float rubberMouseY;
+        public float rubberRadius;
+        public float rubberAlphaPips;
+        public float rubberAlphaEmblem;
+        public SlugcatStats.Name CharacterForColor
+        {
+            get
+            {
+                if (this.player.room != null && this.player.room.game.setupValues.arenaDefaultColors)
+                {
+                    return this.player.SlugCatClass;
+                }
+                return this.player.playerState.slugcatCharacter;
             }
         }
 
-        private void PlayerGraphics_AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+
+
+        public override void Update(bool eu)
         {
-            ConsoleWrite("PlayerGraphics_AddToContainer");
+            base.Update(eu);
 
-
-            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
+            if (player.slatedForDeletetion || player.dead || player.godTimer <= 0)
             {
-                PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
-                if (!customData.initFinish)
-                {
-                    customData.customSpriteIndex = sLeaser.sprites.Length;
-                    customData.initFinish = true;
-
-                    FSprite[] newFSprites = new FSprite[customData.customSpriteIndex + 2 + self.numGodPips];
-                    for (int i = 0; i < sLeaser.sprites.Length; i++)
-                    {
-                        newFSprites[i] = sLeaser.sprites[i];
-                    }
-
-
-                    newFSprites[customData.customSpriteIndex] = new FSprite("Futile_White", true); // not surr why this exist
-                    newFSprites[customData.customSpriteIndex].shader = rCam.game.rainWorld.Shaders["FlatLight"];
-                    newFSprites[customData.customSpriteIndex + 1] = new FSprite("guardEye", true);
-                    for (int i = 0; i < self.numGodPips; i++)
-                    {
-                        newFSprites[customData.customSpriteIndex + 2 + i] = new FSprite("WormEye", true);
-                    }
-
-                    sLeaser.sprites = newFSprites;
-
-                }
-
+                Destroy();
+                return;
             }
+        }
 
-            orig(self, sLeaser, rCam, newContatiner);
-            if (GameUtils.IsCompetitiveOrSandboxSession && rCam.room.game.rainWorld.progression.miscProgressionData.beaten_Saint && self.player.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint)
+        public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            sLeaser.sprites = new FSprite[2 + numGodPips];
+
+            sLeaser.sprites[0] = new FSprite("Futile_White", true);
+            sLeaser.sprites[0].shader = rCam.game.rainWorld.Shaders["FlatLight"];
+            sLeaser.sprites[1] = new FSprite("guardEye", true);
+            for (int i = 0; i < numGodPips; i++)
             {
-                PlayerCustomData customData = (self.owner as Player).GetCustomData<PlayerCustomData>();
+                sLeaser.sprites[2 + i] = new FSprite("WormEye", true);
+            }
+            AddToContainer(sLeaser, rCam, null);
+            this.sLeaser = sLeaser;
+        }
 
-                //rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[12]);
-                for (int j = customData.customSpriteIndex; j < sLeaser.sprites.Length; j++)
-                {
-                    //ConsoleWrite("adding: " + j + ", " + (j - customData.customSpriteIndex) + " / " + sLeaser.sprites.Length + ", " + customData.customSpriteIndex);
-                    rCam.ReturnFContainer("HUD2").AddChild(sLeaser.sprites[j]);
-                }
+        public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+        {
+            newContatiner ??= rCam.ReturnFContainer("HUD2");
+
+            foreach (FSprite fsprite in sLeaser.sprites)
+            {
+                fsprite.RemoveFromContainer();
+                newContatiner.AddChild(fsprite);
+            }
+        }
+
+        public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+        }
+
+        public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            if (slatedForDeletetion || room != rCam.room)
+            {
+                sLeaser.CleanSpritesAndRemove();
             }
         }
     }

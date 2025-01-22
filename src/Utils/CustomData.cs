@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ArenaPlus.Features;
 using ArenaPlus.Features.UI;
+using ArenaPlus.Lib;
 
 namespace ArenaPlus.Utils
 {
@@ -42,8 +43,12 @@ namespace ArenaPlus.Utils
 
     internal class PlayerCustomData : CustomData
     {
+        // legacy karma flower
         public int customSpriteIndex;
         public bool initFinish = false;
+
+        // attached features
+        internal HashSet<AttachedPlayerFeature> attachedFeatures = new HashSet<AttachedPlayerFeature>();
 
         // Constructeur par défaut
         public PlayerCustomData() : base(null) { }
