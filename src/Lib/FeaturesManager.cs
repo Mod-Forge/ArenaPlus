@@ -11,12 +11,12 @@ using Newtonsoft.Json;
 
 namespace ArenaPlus.Lib
 {
-    internal static class FeaturesManager
+    public static class FeaturesManager
     {
-        public static List<Category> categories = [];
-        public static List<SlugcatFeature> slugcatFeatures = [];
+        internal static List<Category> categories = [];
+        internal static List<SlugcatFeature> slugcatFeatures = [];
 
-        public static void AddFeature(Feature feature)
+        internal static void AddFeature(Feature feature)
         {
             Category category = categories.Find(c => c.name.ToLower() == feature.Category.ToLower());
             if (category == null)
