@@ -25,6 +25,18 @@ namespace ArenaPlus.Utils
             }
         }
 
+        public static bool IsCompetitiveSession
+        {
+            get
+            {
+                if (RainWorldInstance.processManager.currentMainLoop is RainWorldGame game)
+                {
+                    return game.IsArenaSession && game.session is not SandboxGameSession;
+                }
+                else return false;
+            }
+        }
+
         public static bool IsChallengeGameSession(RainWorldGame game)
         {
             return game.IsArenaSession && ModManager.MSC && game.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == MoreSlugcatsEnums.GameTypeID.Challenge;

@@ -87,6 +87,8 @@ namespace ArenaPlus.Features
 
         private const string timerText = "Spears respawn in";
 
+        private bool RespawnRifles => FeaturesManager.GetFeature("allJokeRifle").configurable.Value;
+
         private void ArenaGameSession_Update(On.ArenaGameSession.orig_Update orig, ArenaGameSession self)
         {
             spearsCheckTicks++;
@@ -114,6 +116,13 @@ namespace ArenaPlus.Features
                         {
                             //ConsoleWrite($"Visible spear {i} : " + (self.game.cameras[0] as RoomCamera).IsViewedByCameraPosition((self.game.cameras[0] as RoomCamera).currentCameraPosition, obj.firstChunk.pos));
                             if (self.game.cameras[0].IsViewedByCameraPosition(self.game.cameras[0].currentCameraPosition, obj.firstChunk.pos))
+                            {
+                                spearCount++;
+                            }
+                        }
+                        if (RespawnRifles && obj != null && obj is JokeRifle rifle && self.game.cameras[0].IsViewedByCameraPosition(self.game.cameras[0].currentCameraPosition, obj.firstChunk.pos))
+                        {
+                            if (rifle.abstractRifle.currentAmmo() > 0)
                             {
                                 spearCount++;
                             }
@@ -168,8 +177,19 @@ namespace ArenaPlus.Features
                     if (placedObj.data is PlacedObject.MultiplayerItemData && ((placedObj.data as PlacedObject.MultiplayerItemData).type == PlacedObject.MultiplayerItemData.Type.Spear || (placedObj.data as PlacedObject.MultiplayerItemData).type == PlacedObject.MultiplayerItemData.Type.ExplosiveSpear))
                     {
                         //ConsoleWrite("Spawn spear");
-                        AbstractSpear spear = new(room.world, null, room.GetWorldCoordinate(placedObj.pos), room.game.GetNewID(), false);
-                        spear.RealizeInRoom();
+                        if (RespawnRifles)
+                        {
+                            JokeRifle.AbstractRifle.AmmoType ammo = new JokeRifle.AbstractRifle.AmmoType(ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries[Random.Range(0, ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries.Count)]);
+                            JokeRifle.AbstractRifle rifle = new JokeRifle.AbstractRifle(room.world, null, room.GetWorldCoordinate(placedObj.pos), room.game.GetNewID(), ammo);
+                            rifle.setCurrentAmmo((int)Random.Range(5, 40));
+                            room.abstractRoom.AddEntity(rifle);
+                            rifle.RealizeInRoom();
+                        }
+                        else
+                        {
+                            AbstractSpear spear = new(room.world, null, room.GetWorldCoordinate(placedObj.pos), room.game.GetNewID(), false);
+                            spear.RealizeInRoom();
+                        }
                     }
                 }
             }

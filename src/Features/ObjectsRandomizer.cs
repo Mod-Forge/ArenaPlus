@@ -32,7 +32,7 @@ namespace ArenaPlus.Features
         private void Room_Loaded(On.Room.orig_Loaded orig, Room self)
         {
             orig(self);
-            if (self.game != null && GameUtils.IsCompetitiveOrSandboxSession && self.game.session is not SandboxGameSession)
+            if (self.game != null && self.game.IsArenaSession && self.game.session is not SandboxGameSession)
             {
                 List<AbstractPhysicalObject> addObjects = new List<AbstractPhysicalObject>();
                 for (int i = 0; i < self.abstractRoom.entities.Count; i++)
@@ -46,7 +46,7 @@ namespace ArenaPlus.Features
                         if (obj.type == AbstractPhysicalObject.AbstractObjectType.Spear)
                         {
                             float random = Random.value;
-                            //ConsoleWrite("Random value : " + random);
+                            //LogInfo("Random value : " + random);
                             if (Random.value < 0.25 || (obj as AbstractSpear).explosive || (obj as AbstractSpear).electric || (obj as AbstractSpear).hue != 0f)
                             {
                                 if (random < 0.25f)
@@ -63,7 +63,7 @@ namespace ArenaPlus.Features
                                 }
                                 else
                                 {
-                                    //ConsoleWrite("new rifle");
+                                    //LogInfo("new rifle");
                                     JokeRifle.AbstractRifle.AmmoType ammo = new JokeRifle.AbstractRifle.AmmoType(ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries[Random.Range(0, ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries.Count)]);
                                     newObject = new JokeRifle.AbstractRifle(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), ammo);
                                     (newObject as JokeRifle.AbstractRifle).setCurrentAmmo((int)Random.Range(5, 40));
@@ -126,7 +126,7 @@ namespace ArenaPlus.Features
                         {
                             if (destroy)
                             {
-                                ConsoleWrite($"Object {obj.type} destroyed");
+                                LogInfo($"Object {obj.type} destroyed");
                                 obj.Destroy();
                                 self.abstractRoom.entities[i] = newObject;
                             }
@@ -134,8 +134,8 @@ namespace ArenaPlus.Features
                             {
                                 addObjects.Add(newObject);
                             }
-                            ConsoleWrite($"Replace object {obj.type} {i} by {newObject.type}");
-                            ConsoleWrite("======================\n");
+                            LogInfo($"Replace object {obj.type} {i} by {newObject.type}");
+                            LogInfo("======================\n");
                         }
                     }
                 }
@@ -165,7 +165,7 @@ namespace ArenaPlus.Features
                 sum += list[i].chance;
                 if (sum > rand)
                 {
-                    //ConsoleWrite("Type Generated");
+                    //LogInfo("Type Generated");
                     return list[i].type;
                 }
             }

@@ -44,7 +44,7 @@ namespace ArenaPlus.Features.Fun
 
         protected override void Unregister()
         {
-            throw new NotImplementedException();
+            On.ArenaGameSession.ctor -= ArenaGameSession_ctor;
         }
 
         protected override void Register()
