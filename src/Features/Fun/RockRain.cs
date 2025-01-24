@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 using MoreSlugcats;
 using ArenaPlus.Lib;
+using MonoMod.Cil;
 
 namespace ArenaPlus.Features.Fun
 {
     [FeatureInfo(
         id: "rockRain",
-        name: "Rock rain (WIP)",
+        name: "Rock rain",
         category: BuiltInCategory.Fun,
-        description: "Make rock rain instead of water",
+        description: "Make rock rain",
         enabledByDefault: false
     )]
     file class RockRain(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
@@ -27,23 +28,55 @@ namespace ArenaPlus.Features.Fun
 
         protected override void Register()
         {
-            On.ArenaGameSession.ctor += ArenaGameSession_ctor;
+            On.RoomRain.ctor += RoomRain_ctor;
+            On.RoomRain.Update += RoomRain_Update;
         }
 
-        private void ArenaGameSession_ctor(On.ArenaGameSession.orig_ctor orig, ArenaGameSession self, RainWorldGame game)
+        private static void RoomRain_ctor(On.RoomRain.orig_ctor orig, RoomRain self, GlobalRain globalRain, Room rm)
         {
-            orig(self, game);
-            if (self is not SandboxGameSession || self.arenaSitting.sandboxPlayMode)
+            orig.Invoke(self, globalRain, rm);
+            if (GameUtils.IsCompetitiveOrSandboxSession && (self.dangerType == RoomRain.DangerType.FloodAndRain || self.dangerType == RoomRain.DangerType.Rain))
+                self.splashes = 0;
+        }
+
+
+        private static void RoomRain_Update(On.RoomRain.orig_Update orig, RoomRain self, bool eu)
+        {
+            orig.Invoke(self, eu);
+            if (GameUtils.IsCompetitiveOrSandboxSession && self.intensity > 0f && self.room.BeingViewed && (self.dangerType == RoomRain.DangerType.FloodAndRain || self.dangerType == RoomRain.DangerType.Rain))
             {
-                self.AddBehavior(new RockRainBehavior(self));
+                for (int x = 0; x < self.room.Width; x++)
+                {
+                    if (!self.room.GetTile(x, self.room.Height - 1).Solid && Random.Range(0, 100) < Mathf.Lerp(1, 4, self.intensity))
+                    {
+                        AbstractPhysicalObject abstRock = new AbstractPhysicalObject(self.room.world, AbstractPhysicalObject.AbstractObjectType.Rock, null, self.room.GetWorldCoordinate(new IntVector2(x, self.room.Height)), self.room.game.GetNewID());
+                        Rock rock = new TemporaryTock(abstRock, self.room.world);
+                        abstRock.realizedObject = rock;
+                        abstRock.RealizeInRoom();
+                        rock.firstChunk.HardSetPosition(self.room.MiddleOfTile(new IntVector2(x, self.room.Height)));
+                        rock.Shoot(null, rock.firstChunk.pos, Vector2.down, 1f, eu);
+                    }
+                }
             }
         }
     }
 
-    file class RockRainBehavior : ArenaBehaviors.ArenaGameBehavior
+    public class TemporaryTock : Rock
     {
-        public RockRainBehavior(ArenaGameSession gameSession) : base(gameSession)
+        public TemporaryTock(AbstractPhysicalObject abstractPhysicalObject, World world) : base(abstractPhysicalObject, world)
         {
+        }
+
+        public override void Update(bool eu)
+        {
+            base.Update(eu);
+            LogInfo("im a ROCK!");
+        }
+
+        public override void Collide(PhysicalObject otherObject, int myChunk, int otherChunk)
+        {
+            base.Collide(otherObject, myChunk, otherChunk);
+            Destroy();
         }
     }
 }

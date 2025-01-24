@@ -32,7 +32,7 @@ namespace ArenaPlus.Features
         private void Room_Loaded(On.Room.orig_Loaded orig, Room self)
         {
             orig(self);
-            if (self.game != null && self.game.IsArenaSession && self.game.session is not SandboxGameSession)
+            if (self.game != null && self.game.IsArenaSession && self.game.session is not SandboxGameSession && !GameUtils.IsChallengeGameSession(self.game))
             {
                 List<AbstractPhysicalObject> addObjects = new List<AbstractPhysicalObject>();
                 for (int i = 0; i < self.abstractRoom.entities.Count; i++)

@@ -35,7 +35,7 @@ namespace ArenaPlus.Features.Fun
         private void Spear_Update(On.Spear.orig_Update orig, Spear self, bool eu)
         {
             orig(self, eu);
-            if (!self.slatedForDeletetion && self.room != null && self.abstractPhysicalObject.world.game.IsArenaSession && self.abstractPhysicalObject.world.game.session is not SandboxGameSession)
+            if (!self.slatedForDeletetion && self.room != null && GameUtils.IsCompetitiveSession)
             {
                 JokeRifle.AbstractRifle.AmmoType ammo = new JokeRifle.AbstractRifle.AmmoType(ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries[Random.Range(0, ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries.Count)]);
                 JokeRifle.AbstractRifle rifle = new JokeRifle.AbstractRifle(self.abstractPhysicalObject.world, null, self.abstractPhysicalObject.pos, self.abstractPhysicalObject.world.game.GetNewID(), ammo);
@@ -62,7 +62,7 @@ namespace ArenaPlus.Features.Fun
         private void Room_Loaded(On.Room.orig_Loaded orig, Room self)
         {
             orig(self);
-            if (self.game != null && self.game.IsArenaSession && self.game.session is not SandboxGameSession)
+            if (self.game != null && self.game.IsArenaSession && self.game.session is not SandboxGameSession && !GameUtils.IsChallengeGameSession(self.game))
             {
                 for (int i = 0; i < self.abstractRoom.entities.Count; i++)
                 {
