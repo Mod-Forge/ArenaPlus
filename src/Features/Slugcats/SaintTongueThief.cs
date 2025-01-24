@@ -42,7 +42,6 @@ namespace ArenaPlus.Features.Slugcats
             if (GameUtils.IsCompetitiveOrSandboxSession && self.mode == Player.Tongue.Mode.AttachedToObject && self.attachedChunk.owner is Creature creautre && creautre.grasps != null && creautre.grasps.Length > 0 && creautre.grasps.Any(g => g != null && g.grabbed is Weapon))
             {
                 Weapon weapon = creautre.grasps.First(g => g != null && g.grabbed is Weapon).grabbed as Weapon;
-                LogUnity("weapon found", weapon);
                 if (weapon != null)
                 {
                     if (weapon is Spear spear && (spear.mode == Weapon.Mode.StuckInWall || spear.mode == Weapon.Mode.StuckInCreature))
@@ -54,7 +53,6 @@ namespace ArenaPlus.Features.Slugcats
                     weapon.ChangeMode(Weapon.Mode.Free);
                     self.attachedChunk = weapon.firstChunk;
                     self.pos = weapon.firstChunk.pos;
-                    LogUnity("grab weapon");
                 }
             }
         }
@@ -81,11 +79,9 @@ namespace ArenaPlus.Features.Slugcats
             {
                 float d = 230f;
                 Vector2 endPos = self.baseChunk.pos + originalDir * d;
-                LogUnity("raycasting");
                 var result = SharedPhysics.TraceProjectileAgainstBodyChunks(null, self.player.room, self.baseChunk.pos, ref endPos, 50f, 1, self.player, false);
                 if (result.hitSomething)
                 {
-                    LogUnity("hit something", result.obj);
                     return Custom.DirVec(self.baseChunk.pos + self.baseChunk.vel, result.chunk.pos + result.chunk.vel).normalized;
                 }
             }

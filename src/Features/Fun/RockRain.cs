@@ -20,14 +20,30 @@ namespace ArenaPlus.Features.Fun
     )]
     file class RockRain(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
-        protected override void Register()
+        protected override void Unregister()
         {
             throw new NotImplementedException();
         }
 
-        protected override void Unregister()
+        protected override void Register()
         {
-            throw new NotImplementedException();
+            On.ArenaGameSession.ctor += ArenaGameSession_ctor;
+        }
+
+        private void ArenaGameSession_ctor(On.ArenaGameSession.orig_ctor orig, ArenaGameSession self, RainWorldGame game)
+        {
+            orig(self, game);
+            if (self is not SandboxGameSession || self.arenaSitting.sandboxPlayMode)
+            {
+                self.AddBehavior(new RockRainBehavior(self));
+            }
+        }
+    }
+
+    file class RockRainBehavior : ArenaBehaviors.ArenaGameBehavior
+    {
+        public RockRainBehavior(ArenaGameSession gameSession) : base(gameSession)
+        {
         }
     }
 }
