@@ -16,7 +16,6 @@ namespace ArenaPlus.Features.Fun
         name: "Rifle Monkes (WIP)",
         category: BuiltInCategory.Spoilers,
         description: "Arm scavengers with joke rifles (Challenge spoiler)",
-        incompatibilities: ["objectsRandomizer"],
         enabledByDefault: false
     )]
     public class RifleMonkey(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
