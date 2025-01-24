@@ -17,6 +17,29 @@ namespace ArenaPlus.Features.UI
         {
             On.Menu.MultiplayerMenu.Singal += MultiplayerMenu_Singal;
             On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += MultiplayerMenu_InitiateGameTypeSpecificButtons;
+            On.Menu.MultiplayerMenu.ClearGameTypeSpecificButtons += MultiplayerMenu_ClearGameTypeSpecificButtons;
+        }
+
+        private void MultiplayerMenu_ClearGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_ClearGameTypeSpecificButtons orig, MultiplayerMenu self)
+        {
+            if (self.playerClassButtons != null)
+            {
+                MultiplayerMenuData data = self.GetCustomData<MultiplayerMenuData>();
+                foreach (var buttons in data.nextClassButtons)
+                {
+                    buttons.RemoveSprites();
+                    self.pages[0].RemoveSubObject(buttons);
+                }
+                data.nextClassButtons = null;
+
+                foreach (var buttons in data.previousClassButtons)
+                {
+                    buttons.RemoveSprites();
+                    self.pages[0].RemoveSubObject(buttons);
+                }
+                data.previousClassButtons = null;
+            }
+            orig(self);
         }
 
         private void MultiplayerMenu_InitiateGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_InitiateGameTypeSpecificButtons orig, Menu.MultiplayerMenu self)
