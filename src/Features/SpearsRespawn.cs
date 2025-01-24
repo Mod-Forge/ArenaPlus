@@ -123,7 +123,7 @@ namespace ArenaPlus.Features
 
                 if (spearCount <= 0 && spearsRespawnTimer == null)
                 {
-                    Log("Starting spears respawning timer");
+                    LogInfo("Starting spears respawning timer");
                     ConsoleWrite("Start timer", Color.green);
 
                     if (spearsRespawnTimerConfigurable.Value <= 3)
@@ -136,7 +136,7 @@ namespace ArenaPlus.Features
                         spearsRespawnTimer = new Timer(x =>
                         {
                             new Timer(y => RespawnTimerEnd(self.room), null, 3 * 1000, 0);
-                            Log("Starting spears respawning 3s timer 2");
+                            LogInfo("Starting spears respawning 3s timer 2");
                             UI.ArenaTimer.StartTimer("Spears respawn in", DateTime.Now.AddSeconds(3));
                         }, null, (spearsRespawnTimerConfigurable.Value - 3) * 1000, 0);
                     }
@@ -158,7 +158,7 @@ namespace ArenaPlus.Features
             ConsoleWrite("RespawnTimerEnd", Color.green);
             if (room != null)
             {
-                Log("Respawning spears...");
+                LogInfo("Respawning spears...");
 
                 //ConsoleWrite($"Start processe of {room.roomSettings.placedObjects.Count} items");
 

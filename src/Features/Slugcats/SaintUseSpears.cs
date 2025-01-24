@@ -44,7 +44,7 @@ namespace ArenaPlus.Features.Slugcats
                 }
 
 
-                self.slugcatStats.throwingSkill = 2;
+                self.slugcatStats.throwingSkill = 1;
                 (self.grasps[grasp].grabbed as Weapon).Thrown(self, self.firstChunk.pos + intVector.ToVector2() * 10f + new Vector2(0f, 4f), new Vector2?(self.mainBodyChunk.pos - intVector.ToVector2() * 10f), intVector, Mathf.Lerp(1f, 1.5f, self.Adrenaline), eu);
                 return;
             }

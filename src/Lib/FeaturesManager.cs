@@ -78,7 +78,7 @@ namespace ArenaPlus.Lib
 
                         if (baseFeature != null)
                         {
-                            Log($"Registering feature : {baseFeature.Id}");
+                            LogInfo($"Registering feature : {baseFeature.Id}");
 
                             if (baseFeature.configurable.Value)
                             {

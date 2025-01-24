@@ -116,7 +116,7 @@ namespace ArenaPlus.Features
         {
             if (!protection) return;
 
-            Log($"game paused {game.paused} {game.pauseUpdate} {game.GamePaused} {game.pauseMenu != null}");
+            LogInfo($"game paused {game.paused} {game.pauseUpdate} {game.GamePaused} {game.pauseMenu != null}");
             if (game.GamePaused)
             {
                 endTime = DateTime.Now + lastRemaningTime;

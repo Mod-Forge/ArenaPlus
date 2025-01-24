@@ -68,7 +68,7 @@ namespace ArenaPlus.Options.Elements
 
             if (expanded)
             {
-                Log("retracting");
+                LogInfo("retracting");
                 retracting = true;
             }
             else
