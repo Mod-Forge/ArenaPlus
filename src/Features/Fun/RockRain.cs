@@ -30,6 +30,19 @@ namespace ArenaPlus.Features.Fun
         {
             On.RoomRain.ctor += RoomRain_ctor;
             On.RoomRain.Update += RoomRain_Update;
+            On.RoomRain.DrawSprites += RoomRain_DrawSprites;
+        }
+
+        private void RoomRain_DrawSprites(On.RoomRain.orig_DrawSprites orig, RoomRain self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            orig(self, sLeaser, rCam, timeStacker, camPos);
+            if (GameUtils.IsCompetitiveOrSandboxSession && (self.dangerType == RoomRain.DangerType.FloodAndRain || self.dangerType == RoomRain.DangerType.Rain) && !self.slatedForDeletetion)
+            {
+                foreach (var sprite in sLeaser.sprites)
+                {
+                    sprite.isVisible = false;
+                }
+            }
         }
 
         private static void RoomRain_ctor(On.RoomRain.orig_ctor orig, RoomRain self, GlobalRain globalRain, Room rm)
@@ -70,13 +83,18 @@ namespace ArenaPlus.Features.Fun
         public override void Update(bool eu)
         {
             base.Update(eu);
-            LogInfo("im a ROCK!");
         }
 
         public override void Collide(PhysicalObject otherObject, int myChunk, int otherChunk)
         {
             base.Collide(otherObject, myChunk, otherChunk);
             Destroy();
+        }
+
+        public override bool HitSomething(SharedPhysics.CollisionResult result, bool eu)
+        {
+            Destroy();
+            return base.HitSomething(result, eu);
         }
     }
 }
