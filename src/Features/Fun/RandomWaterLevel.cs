@@ -55,7 +55,7 @@ namespace ArenaPlus.Features.Fun
         private void ArenaGameSession_ctor(On.ArenaGameSession.orig_ctor orig, ArenaGameSession self, RainWorldGame game)
         {
             orig(self, game);
-            LogInfo("adding RandomWaterLevelBehavior");
+            LogDebug("adding RandomWaterLevelBehavior");
             self.AddBehavior(new RandomWaterLevelBehavior(self));
         }
     }
@@ -86,7 +86,7 @@ namespace ArenaPlus.Features.Fun
             }
             room.AddWater();
             room.waterObject.WaterIsLethal = false;
-            LogInfo("Random water initiated with level", room.defaultWaterLevel, "/", maxLevel);
+            LogDebug("Random water initiated with level", room.defaultWaterLevel, "/", maxLevel);
         }
     }
 }

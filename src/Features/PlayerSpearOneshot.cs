@@ -54,17 +54,17 @@ namespace ArenaPlus.Features
             double damage = 0;
             if (result.obj != null && result.obj is Player)
             {
-                ConsoleWrite("spear hiting a player");
+                LogDebug("spear hiting a player");
                 damage = (result.obj as Player).playerState.permanentDamageTracking;
             }
 
             bool val = orig(self, result, eu);
-            if (result.obj != null && result.obj is Player) ConsoleWrite("damage taked: " + ((result.obj as Player).playerState.permanentDamageTracking - damage));
+            if (result.obj != null && result.obj is Player) LogDebug("damage taked: " + ((result.obj as Player).playerState.permanentDamageTracking - damage));
 
             self.thrownBy ??= killtags.TryGetValue(self, out var killTag) ? killTag : null;
             if (self.thrownBy != null && self.thrownBy is Player && result.obj != null && result.obj is Player && !exceptions.Contains((self.thrownBy as Player).slugcatStats.name.value) && damage < (result.obj as Player).playerState.permanentDamageTracking)
             {
-                ConsoleWrite("force kill player");
+                LogDebug("force kill player");
                 (result.obj as Player).Die();
             }
             return val;

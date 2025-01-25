@@ -46,7 +46,7 @@ namespace ArenaPlus.Features
                         if (obj.type == AbstractPhysicalObject.AbstractObjectType.Spear)
                         {
                             float random = Random.value;
-                            //LogInfo("Random value : " + random);
+                            //LogDebug("Random value : " + random);
                             if (Random.value < 0.25 || (obj as AbstractSpear).explosive || (obj as AbstractSpear).electric || (obj as AbstractSpear).hue != 0f)
                             {
                                 if (random < 0.25f)
@@ -63,7 +63,7 @@ namespace ArenaPlus.Features
                                 }
                                 else
                                 {
-                                    //LogInfo("new rifle");
+                                    //LogDebug("new rifle");
                                     JokeRifle.AbstractRifle.AmmoType ammo = new JokeRifle.AbstractRifle.AmmoType(ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries[Random.Range(0, ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries.Count)]);
                                     newObject = new JokeRifle.AbstractRifle(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), ammo);
                                     (newObject as JokeRifle.AbstractRifle).setCurrentAmmo((int)Random.Range(5, 40));
@@ -126,7 +126,7 @@ namespace ArenaPlus.Features
                         {
                             if (destroy)
                             {
-                                LogInfo($"Object {obj.type} destroyed");
+                                LogDebug($"Object {obj.type} destroyed");
                                 obj.Destroy();
                                 self.abstractRoom.entities[i] = newObject;
                             }
@@ -134,8 +134,8 @@ namespace ArenaPlus.Features
                             {
                                 addObjects.Add(newObject);
                             }
-                            LogInfo($"Replace object {obj.type} {i} by {newObject.type}");
-                            LogInfo("======================\n");
+                            LogDebug($"Replace object {obj.type} {i} by {newObject.type}");
+                            LogDebug("======================\n");
                         }
                     }
                 }
@@ -165,7 +165,7 @@ namespace ArenaPlus.Features
                 sum += list[i].chance;
                 if (sum > rand)
                 {
-                    //LogInfo("Type Generated");
+                    //LogDebug("Type Generated");
                     return list[i].type;
                 }
             }

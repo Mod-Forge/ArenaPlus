@@ -369,7 +369,7 @@ namespace ArenaPlus.Utils
                         }
                         else
                         {
-                            ConsoleWrite($"Fonction called for {instanceIvoked} instances", Color.gray);
+                            ConsoleWrite($"Function called for {instanceIvoked} instances", Color.gray);
                         }
                         return;
                     }

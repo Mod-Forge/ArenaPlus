@@ -93,7 +93,7 @@ namespace ArenaPlus.Utils
 
             if (showList)
             {
-                ConsoleWrite("List: " + string.Join(",", list.ConvertAll(x => x.value)), Color.white);
+                LogDebug("List: " + string.Join(",", list.ConvertAll(x => x.value)));
                 return null;
             }
 

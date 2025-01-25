@@ -157,7 +157,7 @@ namespace ArenaPlus.Options.Tabs
                     item.Value.Remove(checkBox);
                     if (checkBoxes.TryGetValue(item.Key, out OpCheckBox ownerCB) && ownerCB.GetValueBool())
                     {
-                        LogInfo($"disabling link feature {item.Key.Name}");
+                        LogDebug($"disabling link feature {item.Key.Name}");
                         ownerCB.SetValueBool(false);
                     }
                     //IncompatibilityCheck(item.Key, false);
@@ -173,7 +173,7 @@ namespace ArenaPlus.Options.Tabs
                     {
                         if (checkBoxes.TryGetValue(f, out OpCheckBox linkCB) && linkCB.GetValueBool())
                         {
-                            LogInfo($"disabling link requirement feature {f.Name}");
+                            LogDebug($"disabling link requirement feature {f.Name}");
                             linkCB.SetValueBool(false);
                         }
                     }
@@ -182,7 +182,7 @@ namespace ArenaPlus.Options.Tabs
                     {
                         if (checkBoxes.TryGetValue(f, out OpCheckBox linkCB) && linkCB.GetValueBool())
                         {
-                            LogInfo($"disabling link incompatibility feature {f.Name}");
+                            LogDebug($"disabling link incompatibility feature {f.Name}");
                             linkCB.SetValueBool(false);
                         }
                     }
@@ -193,7 +193,7 @@ namespace ArenaPlus.Options.Tabs
         { 
             if (state)
             {
-                LogInfo("changer related feature " + feature.Name);
+                LogDebug("changer related feature " + feature.Name);
                 if (feature.Requires != null)
                 {
                     foreach (string id in feature.Requires)
@@ -203,7 +203,7 @@ namespace ArenaPlus.Options.Tabs
                             if (!requireCB.GetValueBool())
                             {
                                 requireCB.SetValueBool(true);
-                                LogInfo($"changing require feature {requireFeature.Name}");
+                                LogDebug($"changing require feature {requireFeature.Name}");
                                 if (!changedCheckBoxes.ContainsKey(feature))
                                 {
                                     changedCheckBoxes.Add(feature, new());
@@ -224,7 +224,7 @@ namespace ArenaPlus.Options.Tabs
                             if (incompatibleCB.GetValueBool())
                             {
                                 incompatibleCB.SetValueBool(false);
-                                LogInfo($"changing incomptible feature {incompatibleFeature.Name}");
+                                LogDebug($"changing incomptible feature {incompatibleFeature.Name}");
                                 if (!changedCheckBoxes.ContainsKey(feature))
                                 {
                                     changedCheckBoxes.Add(feature, new());
@@ -239,7 +239,7 @@ namespace ArenaPlus.Options.Tabs
             }
             else if (changedCheckBoxes.ContainsKey(feature))
             {
-                LogInfo("reverting change caused by " + feature.Name);
+                LogDebug("reverting change caused by " + feature.Name);
                 List<OpCheckBox> list = new(changedCheckBoxes[feature]);
                 changedCheckBoxes.Remove(feature);
                 foreach (var checkBox in list)

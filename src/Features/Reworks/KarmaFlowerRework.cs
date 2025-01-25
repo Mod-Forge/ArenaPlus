@@ -24,7 +24,6 @@ namespace ArenaPlus.Features.Reworks
     {
         protected override void Register()
         {
-            LogInfo("Enabling karma flower rework");
             On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;
             On.Player.ClassMechanicsSaint += Player_ClassMechanicsSaint;
             On.KarmaFlower.BitByPlayer += KarmaFlower_BitByPlayer;
@@ -34,7 +33,6 @@ namespace ArenaPlus.Features.Reworks
 
         protected override void Unregister()
         {
-            LogInfo("Disabling karma flower rework");
             On.PlayerGraphics.DrawSprites -= PlayerGraphics_DrawSprites;
             On.Player.ClassMechanicsSaint -= Player_ClassMechanicsSaint;
             On.KarmaFlower.BitByPlayer -= KarmaFlower_BitByPlayer;

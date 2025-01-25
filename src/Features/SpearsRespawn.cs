@@ -94,7 +94,7 @@ namespace ArenaPlus.Features
             spearsCheckTicks++;
             if (!self.initiated && spearsRespawnTimer != null)
             {
-                ConsoleWrite("Stop timer: INIT", Color.red);
+                LogDebug("Stop timer: INIT");
                 UI.ArenaTimer.StopTimer(timerText);
                 spearsRespawnTimer.Dispose();
                 spearsRespawnTimer = null;
@@ -133,7 +133,6 @@ namespace ArenaPlus.Features
                 if (spearCount <= 0 && spearsRespawnTimer == null)
                 {
                     LogInfo("Starting spears respawning timer");
-                    ConsoleWrite("Start timer", Color.green);
 
                     if (spearsRespawnTimerConfigurable.Value <= 3)
                     {
@@ -145,26 +144,26 @@ namespace ArenaPlus.Features
                         spearsRespawnTimer = new Timer(x =>
                         {
                             new Timer(y => RespawnTimerEnd(self.room), null, 3 * 1000, 0);
-                            LogInfo("Starting spears respawning 3s timer 2");
+                            LogDebug("Starting spears respawning 3s timer 2");
                             UI.ArenaTimer.StartTimer("Spears respawn in", DateTime.Now.AddSeconds(3));
                         }, null, (spearsRespawnTimerConfigurable.Value - 3) * 1000, 0);
                     }
                 }
                 else if (spearCount > 0 && spearsRespawnTimer != null)
                 {
-                    ConsoleWrite($"Stop timer: {spearCount} > 0", Color.red);
+                    LogDebug($"Stop timer: {spearCount} > 0", Color.red);
                     spearsRespawnTimer.Dispose();
                     spearsRespawnTimer = null;
                     UI.ArenaTimer.StopTimer(timerText);
                 }
 
-                ConsoleWrite("spearCount : " + spearCount);
+                LogDebug("spearCount : " + spearCount);
             }
         }
 
         private void RespawnTimerEnd(Room room)
         {
-            ConsoleWrite("RespawnTimerEnd", Color.green);
+            LogDebug("RespawnTimerEnd");
             if (room != null)
             {
                 LogInfo("Respawning spears...");

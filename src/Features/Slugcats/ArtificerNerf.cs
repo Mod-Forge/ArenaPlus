@@ -35,10 +35,8 @@ namespace ArenaPlus.Features.Slugcats
             {
                 if (ModManager.MSC && GameUtils.IsCompetitiveOrSandboxSession)
                 {
-                    ConsoleWrite("nerf Artificer");
                     self.pyroJumpCounter += 5;
                     self.Stun(60 * (self.pyroJumpCounter - (Mathf.Max(1, MoreSlugcats.MoreSlugcats.cfgArtificerExplosionCapacity.Value - 3) - 1)));
-                    //orig(self);
                 }
             }
         }
