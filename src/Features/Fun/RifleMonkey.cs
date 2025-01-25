@@ -13,7 +13,7 @@ namespace ArenaPlus.Features.Fun
 {
     [FeatureInfo(
         id: "rifleMonkey",
-        name: "Rifle Monkes (WIP)",
+        name: "Rifle Monkyes (WIP)",
         category: BuiltInCategory.Spoilers,
         description: "Arm scavengers with joke rifles (Challenge spoiler)",
         enabledByDefault: false
