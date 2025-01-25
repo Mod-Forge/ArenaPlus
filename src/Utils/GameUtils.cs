@@ -12,14 +12,35 @@ namespace ArenaPlus.Utils
     internal static class GameUtils
     {
         private static RainWorld rainWorld;
+        private static RainWorldGame rainWorldGame;
+
+        [HookRegister]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051")]
+        private static void Register()
+        {
+            On.RainWorldGame.ctor += RainWorldGame_ctor;
+            On.RainWorldGame.ShutDownProcess += RainWorldGame_ShutDownProcess;
+        }
+
+        private static void RainWorldGame_ShutDownProcess(On.RainWorldGame.orig_ShutDownProcess orig, RainWorldGame self)
+        {
+            rainWorldGame = null;
+            orig(self);
+        }
+
+        private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
+        {
+            rainWorldGame = self;
+            orig(self, manager);
+        }
 
         public static bool IsCompetitiveOrSandboxSession
         {
             get
             {
-                if (RainWorldInstance.processManager.currentMainLoop is RainWorldGame game)
+                if (rainWorldGame != null)
                 {
-                    return game.IsArenaSession && !(ModManager.MSC && game.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == MoreSlugcatsEnums.GameTypeID.Challenge);
+                    return rainWorldGame.IsArenaSession && !(ModManager.MSC && rainWorldGame.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == MoreSlugcatsEnums.GameTypeID.Challenge);
                 }
                 else return false;
             }
@@ -29,9 +50,9 @@ namespace ArenaPlus.Utils
         {
             get
             {
-                if (RainWorldInstance.processManager.currentMainLoop is RainWorldGame game)
+                if (rainWorldGame != null)
                 {
-                    return game.IsArenaSession && game.session is not SandboxGameSession;
+                    return IsCompetitiveOrSandboxSession && rainWorldGame.session is not SandboxGameSession;
                 }
                 else return false;
             }

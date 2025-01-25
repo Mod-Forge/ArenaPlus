@@ -62,7 +62,7 @@ namespace ArenaPlus.Features.Fun
         private void Room_Loaded(On.Room.orig_Loaded orig, Room self)
         {
             orig(self);
-            if (self.game != null && self.game.IsArenaSession && self.game.session is not SandboxGameSession && !GameUtils.IsChallengeGameSession(self.game))
+            if (GameUtils.IsCompetitiveSession)
             {
                 for (int i = 0; i < self.abstractRoom.entities.Count; i++)
                 {
