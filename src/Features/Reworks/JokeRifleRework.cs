@@ -26,6 +26,17 @@ namespace ArenaPlus.Features.Reworks
             On.Scavenger.Throw += Scavenger_Throw;
             On.ScavengerAI.WeaponScore += ScavengerAI_WeaponScore;
             On.ScavengerAI.RealWeapon += ScavengerAI_RealWeapon;
+            On.JokeRifle.MoreSlugcatsUpdate += JokeRifle_MoreSlugcatsUpdate;
+        }
+
+        private void JokeRifle_MoreSlugcatsUpdate(On.JokeRifle.orig_MoreSlugcatsUpdate orig, JokeRifle self, bool eu)
+        {
+            if (self.light == null || self.firstChunk == null)
+            {
+                LogError("MoreSlugcatsUpdate just got fuck up and ", self.light == null, self.firstChunk == null);
+                return;
+            }
+            orig(self, eu);
         }
 
         private bool ScavengerAI_RealWeapon(On.ScavengerAI.orig_RealWeapon orig, ScavengerAI self, PhysicalObject obj)
@@ -59,7 +70,11 @@ namespace ArenaPlus.Features.Reworks
         protected override void Unregister()
         {
             On.JokeRifle.Use -= JokeRifle_Use;
+            On.JokeRifle.Update -= JokeRifle_Update;
             On.MoreSlugcats.AbstractBullet.ctor -= AbstractBullet_ctor;
+            On.Scavenger.Throw -= Scavenger_Throw;
+            On.ScavengerAI.WeaponScore -= ScavengerAI_WeaponScore;
+            On.ScavengerAI.RealWeapon -= ScavengerAI_RealWeapon;
         }
 
         private void AbstractBullet_ctor(On.MoreSlugcats.AbstractBullet.orig_ctor orig, MoreSlugcats.AbstractBullet self, World world, MoreSlugcats.Bullet realizedObject, WorldCoordinate pos, EntityID ID, JokeRifle.AbstractRifle.AmmoType type, int timeToLive)
@@ -86,6 +101,7 @@ namespace ArenaPlus.Features.Reworks
                 }
             }
         }
+
 
         private void JokeRifle_Use(On.JokeRifle.orig_Use orig, JokeRifle self, bool eu)
         {
