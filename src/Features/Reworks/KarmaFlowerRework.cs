@@ -15,7 +15,6 @@ namespace ArenaPlus.Features.Reworks
     [FeatureInfo(
         id: "karmaFlowerRework",
         name: "Saint karma flower (Spoiler)",
-        color: "ffff00",
         category: BuiltInCategory.Spoilers,
         description: "Allow players to ascend (Saint spoiler)",
         enabledByDefault: false
