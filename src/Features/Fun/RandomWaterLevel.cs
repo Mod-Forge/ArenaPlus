@@ -68,10 +68,11 @@ namespace ArenaPlus.Features.Fun
 
         public override void Initiate()
         {
-            room.defaultWaterLevel = (int)(room.Height * ((float)RandomWaterLevel.maxWaterHeightConfigurable.Value / 100f));
+            int maxLevel = (int)(room.Height * ((float)RandomWaterLevel.maxWaterHeightConfigurable.Value / 100f));
+            room.defaultWaterLevel = maxLevel;
             if (game.session is not SandboxGameSession || (game.session as ArenaGameSession).arenaSitting.sandboxPlayMode)
             {
-                room.defaultWaterLevel = (int)Random.Range(1f, Mathf.Max(room.defaultWaterLevel, 1f));
+                room.defaultWaterLevel = (int)Random.Range(0, Mathf.Max(maxLevel, 1));
             }
             room.floatWaterLevel = room.MiddleOfTile(new IntVector2(0, room.defaultWaterLevel)).y;
             if (!room.water)
@@ -85,7 +86,7 @@ namespace ArenaPlus.Features.Fun
             }
             room.AddWater();
             room.waterObject.WaterIsLethal = false;
-            LogInfo("Random water initiated with level", room.defaultWaterLevel, "/", room.Height * (int)(room.Height * ((float)RandomWaterLevel.maxWaterHeightConfigurable.Value / 100f)));
+            LogInfo("Random water initiated with level", room.defaultWaterLevel, "/", maxLevel);
         }
     }
 }

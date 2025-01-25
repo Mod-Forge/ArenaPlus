@@ -23,7 +23,10 @@ namespace ArenaPlus.Features.Fun
     {
         protected override void Unregister()
         {
-            throw new NotImplementedException();
+            On.RoomRain.ctor -= RoomRain_ctor;
+            On.RoomRain.Update -= RoomRain_Update;
+            On.RoomRain.DrawSprites -= RoomRain_DrawSprites;
+            On.Player.Grabability -= Player_Grabability;
         }
 
         protected override void Register()
@@ -31,6 +34,16 @@ namespace ArenaPlus.Features.Fun
             On.RoomRain.ctor += RoomRain_ctor;
             On.RoomRain.Update += RoomRain_Update;
             On.RoomRain.DrawSprites += RoomRain_DrawSprites;
+            On.Player.Grabability += Player_Grabability;
+        }
+
+        private Player.ObjectGrabability Player_Grabability(On.Player.orig_Grabability orig, Player self, PhysicalObject obj)
+        {
+            if (obj is TemporaryTock)
+            {
+                return Player.ObjectGrabability.CantGrab;
+            }
+            return orig(self, obj);
         }
 
         private void RoomRain_DrawSprites(On.RoomRain.orig_DrawSprites orig, RoomRain self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
@@ -93,7 +106,10 @@ namespace ArenaPlus.Features.Fun
 
         public override bool HitSomething(SharedPhysics.CollisionResult result, bool eu)
         {
-            Destroy();
+            if (result.hitSomething)
+            {
+                Destroy();
+            }
             return base.HitSomething(result, eu);
         }
     }
