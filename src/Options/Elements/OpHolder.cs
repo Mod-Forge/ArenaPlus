@@ -12,7 +12,7 @@ namespace ArenaPlus.Options.Elements
     {
         protected readonly HashSet<UIelement> items = [];
 
-        public T AddItem<T>(T item) where T : UIelement
+        public virtual T AddItem<T>(T item) where T : UIelement
         {
             items.Add(item);
             item.pos += pos;

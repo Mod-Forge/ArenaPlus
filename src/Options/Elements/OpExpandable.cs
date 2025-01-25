@@ -28,7 +28,7 @@ namespace ArenaPlus.Options.Elements
             this.animationDuration = animationDuration;
         }
 
-        public new T AddItem<T>(T item) where T : UIelement
+        public override T AddItem<T>(T item)
         {
             var addedItem = base.AddItem(item);
 
