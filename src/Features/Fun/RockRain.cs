@@ -93,7 +93,10 @@ namespace ArenaPlus.Features.Fun
 
         public override bool HitSomething(SharedPhysics.CollisionResult result, bool eu)
         {
-            Destroy();
+            if (result.hitSomething)
+            {
+                Destroy();
+            }
             return base.HitSomething(result, eu);
         }
     }
