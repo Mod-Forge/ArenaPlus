@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace ArenaPlus
 {
-    [BepInPlugin(MOD_ID, "ArenaPlus", "0.1.0")]
+    [BepInPlugin(MOD_ID, "ArenaPlus", "2.0.0")]
     class Plugin : BaseUnityPlugin
     {
         private const string MOD_ID = "modforge.ArenaPlus";
