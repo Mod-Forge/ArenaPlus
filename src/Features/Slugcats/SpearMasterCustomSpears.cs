@@ -20,6 +20,7 @@ namespace ArenaPlus.Features.Slugcats
     {
         protected override void Unregister()
         {
+            On.AbstractSpear.ctor_World_Spear_WorldCoordinate_EntityID_bool -= AbstractSpear_ctor_World_Spear_WorldCoordinate_EntityID_bool;
         }
 
         protected override void Register()
