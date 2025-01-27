@@ -36,7 +36,7 @@ namespace ArenaPlus
         public static void LogMessage(params object[] data) => log.LogMessage(string.Join(" ", data));
         public static void LogError(params object[] data) => log.LogError(string.Join(" ", data));
         public static void LogFatal(params object[] data) => log.LogFatal(string.Join(" ", data));
-        public static void Assert(bool check, string message) { if (!check) LogError(message); }
+        public static void Assert(bool check, string message) { if (!check) throw new Exception(message); }
 
 
         // Add hooks
