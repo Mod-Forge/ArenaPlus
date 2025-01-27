@@ -24,7 +24,7 @@ namespace ArenaPlus
         private const string MOD_ID = "modforge.ArenaPlus";
 
         public static ManualLogSource log = BepInEx.Logging.Logger.CreateLogSource("ArenaPlus");
-        public static void LogUnity(params object[] data) => UnityEngine.Debug.Log($"[{MOD_ID}]" + string.Join(" ", data));
+        public static void LogUnity(params object[] data) => UnityEngine.Debug.Log($"[{MOD_ID}] " + string.Join(" ", data));
         public static void LogInfo(params object[] data) => log.LogInfo(string.Join(" ", data));
         public static void LogDebug(params object[] data)
         {
