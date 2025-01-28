@@ -134,6 +134,7 @@ namespace ArenaPlus.Utils
         }
     }
 
+
     public class SlugcatObject
     {
         public static List<SlugcatObject> slugcats = [];
@@ -150,8 +151,18 @@ namespace ArenaPlus.Utils
             this.nameObject = new SlugcatStats.Name(name, register: false);
             this.name = SlugcatStats.getSlugcatName(nameObject);
             this.color = PlayerGraphics.DefaultSlugcatColor(nameObject);
-            this.configurable = OptionsInterface.instance.config.Bind($"enable{this.codeName}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
+            this.configurable = OptionsInterface.instance.config.Bind($"enable_{GetValidSlugcatName()}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
             slugcats.Add(this);
+        }
+
+        public string GetValidSlugcatName()
+        {
+            return GetValidSlugcatName(codeName);
+        }
+
+        public static string GetValidSlugcatName(string slugcatName)
+        {
+            return slugcatName.Replace(' ', '_');
         }
     }
 }
