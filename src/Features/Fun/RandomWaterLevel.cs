@@ -68,25 +68,39 @@ namespace ArenaPlus.Features.Fun
 
         public override void Initiate()
         {
-            int maxLevel = (int)(room.Height * ((float)RandomWaterLevel.maxWaterHeightConfigurable.Value / 100f));
-            room.defaultWaterLevel = maxLevel;
-            if (game.session is not SandboxGameSession || (game.session as ArenaGameSession).arenaSitting.sandboxPlayMode)
+            if (Random.value < 0.16)
             {
-                room.defaultWaterLevel = (int)Random.Range(0, Mathf.Max(maxLevel, 1));
-            }
-            room.floatWaterLevel = room.MiddleOfTile(new IntVector2(0, room.defaultWaterLevel)).y;
-            if (!room.water)
-            {
-                room.waterInFrontOfTerrain = true;
+                if (room.water)
+                {
+                    room.waterObject.Destroy();
+                    room.waterObject = null;
+                }
+                LogDebug("Random water initiated with no water");
+
             }
             else
             {
-                room.waterObject.Destroy();
-                room.waterObject = null;
+                int maxLevel = (int)(room.Height * ((float)RandomWaterLevel.maxWaterHeightConfigurable.Value / 100f));
+                room.defaultWaterLevel = maxLevel;
+                if (game.session is not SandboxGameSession || (game.session as ArenaGameSession).arenaSitting.sandboxPlayMode)
+                {
+                    room.defaultWaterLevel = (int)Random.Range(1, Mathf.Max(maxLevel, 1));
+                }
+                room.floatWaterLevel = room.MiddleOfTile(new IntVector2(0, room.defaultWaterLevel)).y;
+                if (!room.water)
+                {
+                    room.waterInFrontOfTerrain = true;
+                }
+                else
+                {
+                    room.waterObject.Destroy();
+                    room.waterObject = null;
+                }
+                room.AddWater();
+                room.waterObject.WaterIsLethal = false;
+                LogDebug("Random water initiated with level", room.defaultWaterLevel, "/", maxLevel);
             }
-            room.AddWater();
-            room.waterObject.WaterIsLethal = false;
-            LogDebug("Random water initiated with level", room.defaultWaterLevel, "/", maxLevel);
+
         }
     }
 }
