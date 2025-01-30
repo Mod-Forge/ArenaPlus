@@ -1,0 +1,18 @@
+{
+  "Title": "Arena\u002B",
+  "Description": "A mod that adds many optional features/tweaks to the arena mode.",
+  "ID": "modforge.ArenaPlus",
+  "Version": "2.0.0",
+  "TargetGameVersion": "v1.9.06",
+  "Requirements": "moreslugcats",
+  "RequirementNames": "More Slugcats Expansion",
+  "Authors": "modforge",
+  "Visibility": "Public",
+  "Tags": [
+    "Arenas",
+    "Game Mechanics"
+  ],
+  "WorkshopID": 2945515690,
+  "UploadFilesOnly": true,
+  "UploadThumbnail": false
+}
