@@ -26,6 +26,7 @@ namespace ArenaPlus.Features
         private readonly Configurable<int> spearsRespawnTimerConfigurable = OptionsInterface.instance.config.Bind("spearsRespawnTimer", 30, new ConfigurableInfo("The time in seconds before the spears respawn", new ConfigAcceptableRange<int>(0, 100), "", []));
         private Timer spearsRespawnTimer;
         private int spearsCheckTicks;
+        public int lastSpearCount = 0;
 
         public SpearsRespawn(FeatureInfoAttribute featureInfo) : base(featureInfo)
         {
@@ -158,6 +159,7 @@ namespace ArenaPlus.Features
                 }
 
                 LogDebug("spearCount : " + spearCount);
+                lastSpearCount = spearCount;
             }
         }
 
@@ -196,6 +198,33 @@ namespace ArenaPlus.Features
             if (UI.ArenaTimer.Text == "Spears respawn in")
             {
                 UI.ArenaTimer.StopTimer(timerText);
+            }
+        }
+
+        [MyCommand("getspearcount")]
+        private static void WriteSpearCount()
+        {
+            if (FeaturesManager.TryGetFeature("spearsRespawn", out var feature) && GameUtils.IsCompetitiveSession && feature.configurable.Value && feature is SpearsRespawn spearRespawn)
+            {
+                ConsoleWrite($"count: {spearRespawn.lastSpearCount}");
+                return;
+            }
+
+            if (feature == null)
+            {
+                ConsoleWrite("SpearRespawn not found", Color.red);
+            }
+            else if (!feature.configurable.Value)
+            {
+                ConsoleWrite("SpearRespawn not enabled", Color.red);
+            }
+            else if (!GameUtils.IsCompetitiveSession)
+            {
+                ConsoleWrite("SpearRespawn is not enabled in this game mode", Color.red);
+            }
+            else
+            {
+                ConsoleWrite("SpearRespawn error", Color.red);
             }
         }
     }

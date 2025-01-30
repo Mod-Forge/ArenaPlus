@@ -390,7 +390,6 @@ namespace ArenaPlus.Utils
             }
         }
 
-        [MyCommand("consolewrite")]
         public static void ConsoleWrite(string message = "", Color? color = null)
         {
             try
@@ -398,24 +397,6 @@ namespace ArenaPlus.Utils
                 GameConsoleWriteLine(message, color ?? Color.white);
             }
             catch { }
-        }
-
-        [MyCommand("killplayer")]
-        public static void KillPlayer(Player player)
-        {
-            player.Die();
-        }
-
-        [MyCommand("beatgame")]
-        public static void BeatGame(this RainWorldGame game)
-        {
-            RainWorldGame.BeatGameMode(game, true);
-        }
-
-        [MyCommand("teleport_player")]
-        public static void TeleportPlayer(Room room, Player player, IntVector2 vector)
-        {
-            ConsoleWrite($"Imagine that i teleport '{player}' in room '{room.abstractRoom.name}' at '{vector}'");
         }
 
         public class CommandData
@@ -446,7 +427,6 @@ namespace ArenaPlus.Utils
         public class MyCommandAttribute : Attribute
         {
             public readonly string name;
-            public int count;
             public MyCommandAttribute(string name)
             {
                 this.name = name;

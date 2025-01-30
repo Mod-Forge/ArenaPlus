@@ -77,9 +77,10 @@ namespace ArenaPlus.Features.Fun
                     {
                         AbstractPhysicalObject abstRock = new AbstractPhysicalObject(self.room.world, AbstractPhysicalObject.AbstractObjectType.Rock, null, self.room.GetWorldCoordinate(new IntVector2(x, self.room.Height)), self.room.game.GetNewID());
                         Rock rock = new TemporaryTock(abstRock, self.room.world);
+                        rock.firstChunk.HardSetPosition(self.room.MiddleOfTile(new IntVector2(x, self.room.Height)));
+                        rock.tailPos = rock.firstChunk.pos;
                         abstRock.realizedObject = rock;
                         abstRock.RealizeInRoom();
-                        rock.firstChunk.HardSetPosition(self.room.MiddleOfTile(new IntVector2(x, self.room.Height)));
                         rock.Shoot(null, rock.firstChunk.pos, Vector2.down, 1f, eu);
                     }
                 }
