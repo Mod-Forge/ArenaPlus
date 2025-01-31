@@ -42,7 +42,7 @@ namespace ArenaPlus.Features.Slugcats
                     if (player != null && absPlayer.realizedCreature.room.GetWorldCoordinate(absPlayer.realizedCreature.mainBodyChunk.pos) == pos && needleCheck)
                     {
                         LogDebug("needle created in arena");
-                        if (Random.value < 0.25f)
+                        if (Random.value < (1f/3f))
                         {
                             LogDebug("spawning custom spear");
                             int spearType = Random.Range(0, 3);
