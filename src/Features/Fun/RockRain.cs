@@ -73,7 +73,7 @@ namespace ArenaPlus.Features.Fun
             {
                 for (int x = 0; x < self.room.Width; x++)
                 {
-                    if (!self.room.GetTile(x, self.room.Height - 1).Solid && Random.Range(0, 100) < Mathf.Lerp(1, 4, self.intensity))
+                    if (!self.room.GetTile(x, self.room.Height - 1).Solid && Random.value < (self.intensity / 30))
                     {
                         AbstractPhysicalObject abstRock = new AbstractPhysicalObject(self.room.world, AbstractPhysicalObject.AbstractObjectType.Rock, null, self.room.GetWorldCoordinate(new IntVector2(x, self.room.Height)), self.room.game.GetNewID());
                         Rock rock = new TemporaryTock(abstRock, self.room.world);
@@ -90,13 +90,20 @@ namespace ArenaPlus.Features.Fun
 
     public class TemporaryTock : Rock
     {
+        int lifeTime;
         public TemporaryTock(AbstractPhysicalObject abstractPhysicalObject, World world) : base(abstractPhysicalObject, world)
         {
+            lifeTime = 40;
         }
 
         public override void Update(bool eu)
         {
             base.Update(eu);
+            lifeTime--;
+            if (lifeTime <= 0)
+            {
+                Destroy();
+            }
         }
 
         public override void Collide(PhysicalObject otherObject, int myChunk, int otherChunk)
