@@ -15,6 +15,12 @@ using ArenaPlus.Lib;
 using System.Reflection;
 using UnityEngine.Assertions;
 using System.Linq;
+using System.Security.Permissions;
+
+// Allows access to private members
+#pragma warning disable CS0618
+[assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
+#pragma warning restore CS0618
 
 namespace ArenaPlus
 {
@@ -38,6 +44,8 @@ namespace ArenaPlus
         public static void LogFatal(params object[] data) => log.LogFatal(string.Join(" ", data));
         public static void Assert(bool check, string message) { if (!check) throw new Exception(message); }
 
+        private void RainWorldGameOnShutDownProcess(On.RainWorldGame.orig_ShutDownProcess orig, RainWorldGame self) { orig(self); ClearGameMemory(); }
+        private void GameSessionOnctor(On.GameSession.orig_ctor orig, GameSession self, RainWorldGame game) { ClearGameMemory(); orig(self, game); }
 
         // Add hooks
         public void OnEnable()
@@ -46,6 +54,7 @@ namespace ArenaPlus
             try { RegisterUtils.RegisterAllUtils(); } catch (Exception e) { Plugin.LogError(e); }
         }
 
+
         // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
         {
@@ -53,6 +62,16 @@ namespace ArenaPlus
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
             FeaturesManager.LoadFeatures();
         }
+
+        private void ClearGameMemory()
+        {
+            //If you have any collections (lists, dictionaries, etc.)
+            //Clear them here to prevent a memory leak
+            //YourList.Clear();
+            OnGameMemoryClear?.Invoke();
+        }
+
+        internal static event Action OnGameMemoryClear;
 
         public void FixedUpdate()
         {
