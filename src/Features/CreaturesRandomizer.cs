@@ -15,7 +15,7 @@ namespace ArenaPlus.Features;
 
 [FeatureInfo(
     id: "creaturesRandomizer",
-    name: "Creatures Randomizer",
+    name: "Creatures randomizer",
     description: "Randomize creature spawned",
     enabledByDefault: false
 )]
@@ -167,13 +167,13 @@ file class CreaturesRandomizer : Feature
         if (GameUtils.IsCompetitiveSession && abstractCreature != null)
         {
             // replace the creature by something that give the same amout of points
-            return OverrideCreature(abstractCreature);
+            return OverrideCreature(abstractCreature, world.game.GetArenaGameSession.arenaSitting.multiplayerUnlocks);
 
         }
         return abstractCreature;
     }
 
-    private AbstractCreature OverrideCreature(AbstractCreature abstractCreature)
+    private AbstractCreature OverrideCreature(AbstractCreature abstractCreature, MultiplayerUnlocks unlocks)
     {
         int origScore;
         try
@@ -194,7 +194,7 @@ file class CreaturesRandomizer : Feature
             int score = defaultKillScores[i];
             if (score != 0 && Mathf.Abs(score - origScore) <= randomizerTolerance.Value)
             {
-                if (ExtEnum<CreatureTemplate.Type>.values.entries.Contains(unlockName) && !exceptions.Contains(unlockName))
+                if (ExtEnum<CreatureTemplate.Type>.values.entries.Contains(unlockName) && unlocks.IsCreatureUnlockedForLevelSpawn(new CreatureTemplate.Type(unlockName, false)) && !exceptions.Contains(unlockName))
                 {
                     LogDebug("adding", unlockName, "to possible creature overrides");
                     possibleOverrides.Add(new CreatureTemplate.Type(unlockName, false));
