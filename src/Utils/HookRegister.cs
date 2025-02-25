@@ -4,50 +4,37 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static ArenaPlus.Utils.AssemblyUtils;
 
-namespace ArenaPlus.Utils
+namespace ArenaPlus.Utils;
+internal static class HookRegister
 {
-    internal static class HookRegister
+    public static void RegisterAllHooks()
     {
-        public static void RegisterAllHooks()
+        Type[] types = GetLocalAssebly().GetTypesSafe();
+
+        foreach (Type type in types)
         {
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies)
+            MethodInfo[] methodes = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
+
+            foreach (MethodInfo methode in methodes)
             {
-                Type[] types;
-                try
+                if (methode.CustomAttributes.Count() > 0)
                 {
-                    types = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException e)
-                {
-                    types = e.Types;
-                }
+                    HookRegisterAttribute attribute = methode.GetCustomAttribute<HookRegisterAttribute>();
 
-                foreach (Type type in types.Where(t => t != null))
-                {
-                    MethodInfo[] methodes = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-
-
-                    foreach (MethodInfo methode in methodes)
+                    if (methode.GetCustomAttribute<HookRegisterAttribute>() != null)
                     {
-                        if (methode.CustomAttributes.Count() > 0)
-                        {
-                            HookRegisterAttribute attribute = methode.GetCustomAttribute<HookRegisterAttribute>();
-
-                            if (methode.GetCustomAttribute<HookRegisterAttribute>() != null)
-                            {
-                                methode.Invoke(null, null);
-                            }
-                        }
+                        methode.Invoke(null, null);
                     }
                 }
             }
         }
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
-    internal class HookRegisterAttribute : Attribute
-    {
-    }
+}
+[AttributeUsage(AttributeTargets.Method)]
+public class HookRegisterAttribute : Attribute
+{
 }

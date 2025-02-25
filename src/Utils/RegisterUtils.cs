@@ -10,7 +10,7 @@ namespace ArenaPlus.Utils
     {
         internal static void RegisterAllUtils()
         {
-            try { MyDevConsole.RegisterCommands(); } catch { }
+            try { Utils.MyDevConsole.Register(); } catch { }
             HookRegister.RegisterAllHooks();
         }
     }

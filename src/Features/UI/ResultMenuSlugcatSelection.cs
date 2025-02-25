@@ -112,7 +112,7 @@ namespace ArenaPlus.Features.UI
                 cooldowns[player.playerNumber] = 20;
                 //randomSeeds[player.playerNumber] = (int)(Random.value * 100);
             }
-            catch (Exception e) { logSource.LogError(e); }
+            catch (Exception e) { LogError(e); }
         }
 
         private void PlayerResultBox_Update(On.Menu.PlayerResultBox.orig_Update orig, PlayerResultBox self)
@@ -129,7 +129,7 @@ namespace ArenaPlus.Features.UI
                 if (!self.player.readyForNextRound && cooldowns[self.player.playerNumber] <= 0)
                 {
                     Player.InputPackage inputPackage = RWInput.PlayerInput(self.player.playerNumber);
-                    //logSource.LogDebug($"input y: {inputPackage.y}");
+                    //LogDebug($"input y: {inputPackage.y}");
                     if (inputPackage.y != 0 && lastInput[self.player.playerNumber].y == 0)
                     {
 
@@ -138,14 +138,14 @@ namespace ArenaPlus.Features.UI
                         if (nameList[self.player.playerNumber].Contains(self.player.playerClass))
                         {
                             index = nameList[self.player.playerNumber].IndexOf(self.player.playerClass);
-                            logSource.LogDebug($"found index of {self.player.playerClass}: " + index);
+                            LogDebug($"found index of {self.player.playerClass}: " + index);
                         }
                         index += inputPackage.y;
                         if (index >= nameList[self.player.playerNumber].Count())
                             index = 0;
                         if (index < 0)
                             index = nameList[self.player.playerNumber].Count() - 1;
-                        logSource.LogDebug("index: " + index);
+                        LogDebug("index: " + index);
 
 
                         SlugcatStats.Name newName = nameList[self.player.playerNumber][index];

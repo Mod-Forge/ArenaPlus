@@ -6,7 +6,7 @@
     "Rain World": {
       "commandName": "Executable",
       "executablePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Rain World\\RainWorld.exe",
-      "commandLineArgs": "--debug"
+      "commandLineArgs": "--debug ArenaPlus"
     }
   }
 }

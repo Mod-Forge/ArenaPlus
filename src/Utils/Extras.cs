@@ -34,7 +34,7 @@ internal static class Extras
             }
             catch (Exception e)
             {
-                Debug.LogException(e);
+                LogError(e);
             }
         };
     }

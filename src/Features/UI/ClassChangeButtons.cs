@@ -95,17 +95,17 @@ namespace ArenaPlus.Features.UI
             SlugcatStats.Name name;
             if (curClass == null)
             {
-                //Plugin.logSource.LogDebug(data: $"go from random to last({ExtEnum<SlugcatStats.Name>.values.Count - 1})");
+                //LogDebug(data: $"go from random to last({ExtEnum<SlugcatStats.Name>.values.Count - 1})");
                 name = new SlugcatStats.Name(ExtEnum<SlugcatStats.Name>.values.GetEntry(ExtEnum<SlugcatStats.Name>.values.Count - 1), false);
             }
             else
             {
                 if (curClass.Index < 1)
                 {
-                    //Plugin.logSource.LogDebug($"go from first({curClass.Index}) to random");
+                    //LogDebug($"go from first({curClass.Index}) to random");
                     return null;
                 }
-                //Plugin.logSource.LogDebug($"go from {curClass.Index} to {curClass.Index - 1}");
+                //LogDebug($"go from {curClass.Index} to {curClass.Index - 1}");
                 name = new SlugcatStats.Name(ExtEnum<SlugcatStats.Name>.values.GetEntry(curClass.Index - 1), false);
             }
 
