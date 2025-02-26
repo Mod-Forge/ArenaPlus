@@ -43,7 +43,7 @@ namespace ArenaPlus.Features.Reworks
         {
             if (GameUtils.IsCompetitiveOrSandboxSession && self.SlugCatClass != MoreSlugcatsEnums.SlugcatStatsName.Saint && !self.HasAttachedFeatureType<KarmaFlowerPowerVisual>())
             {
-                self.AddAttachedFeature(new KarmaFlowerPowerVisual(self));
+                self.AddAttachedFeature(new KarmaFlowerPowerVisual());
             }
             orig(self);
         }
@@ -248,7 +248,7 @@ namespace ArenaPlus.Features.Reworks
         }
     }
 
-    public class KarmaFlowerPowerVisual(Player player) : PlayerAttachedFeature(player), IDrawable
+    public class KarmaFlowerPowerVisual() : PlayerAttachedFeature(), IDrawable
     {
         public RoomCamera.SpriteLeaser sLeaser;
         public const int numGodPips = 12;
@@ -265,11 +265,11 @@ namespace ArenaPlus.Features.Reworks
         {
             get
             {
-                if (owner.room != null && owner.room.game.setupValues.arenaDefaultColors)
+                if (player.room != null && player.room.game.setupValues.arenaDefaultColors)
                 {
-                    return owner.SlugCatClass;
+                    return player.SlugCatClass;
                 }
-                return owner.playerState.slugcatCharacter;
+                return player.playerState.slugcatCharacter;
             }
         }
 
@@ -277,7 +277,7 @@ namespace ArenaPlus.Features.Reworks
         {
             base.Update(eu);
 
-            if (owner.slatedForDeletetion || owner.dead || owner.godTimer <= 0)
+            if (owner.slatedForDeletetion || player.dead || player.godTimer <= 0)
             {
                 Destroy();
                 return;

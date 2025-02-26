@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace ArenaPlus.Lib
 {
@@ -17,6 +18,7 @@ namespace ArenaPlus.Lib
             bool succes = playerData.attachedFeatures.Add(feature);
             if (succes)
             {
+                feature.owner = obj;
                 obj.room.AddObject(feature);
             }
             return succes;
@@ -50,21 +52,60 @@ namespace ArenaPlus.Lib
         }
     }
 
-    public class AttachedFeature(PhysicalObject obj) : UpdatableAndDeletable
+    public class AttachedFeature() : UpdatableAndDeletable
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006")]
-        public PhysicalObject owner => obj;
+        public PhysicalObject owner;
 
         public override void Destroy()
         {
             base.Destroy();
-            obj.RemoveAttachedFeature(this);
+            owner?.RemoveAttachedFeature(this);
         }
     }
 
-    public class PlayerAttachedFeature(Player obj) : AttachedFeature(obj)
+    public class PlayerAttachedFeature() : AttachedFeature()
     {
-        public new Player owner => obj;
-        public Player player => owner;
+        public Player player => owner as Player;
+    }
+
+    public class PlayerCosmeticFeature() : PlayerAttachedFeature(), IDrawable
+    {
+        public virtual void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+        }
+
+        public virtual void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            if (!sLeaser.deleteMeNextFrame && (base.slatedForDeletetion || this.room != rCam.room))
+            {
+                sLeaser.CleanSpritesAndRemove();
+            }
+        }
+
+        public virtual void PausedDrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            if (!sLeaser.deleteMeNextFrame && (base.slatedForDeletetion || this.room != rCam.room))
+            {
+                sLeaser.CleanSpritesAndRemove();
+            }
+        }
+
+        public virtual void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+        }
+
+        public virtual void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+        {
+            if (newContatiner == null)
+            {
+                newContatiner = rCam.ReturnFContainer("Midground");
+            }
+            foreach (FSprite fsprite in sLeaser.sprites)
+            {
+                fsprite.RemoveFromContainer();
+                newContatiner.AddChild(fsprite);
+            }
+        }
     }
 }

@@ -142,4 +142,11 @@ namespace ArenaPlus.Features
             endTime = default;
         }
     }
+
+    file class SpawnProtectionMessage : AttachedFeature
+    {
+        public SpawnProtectionMessage() : base()
+        {
+        }
+    }
 }

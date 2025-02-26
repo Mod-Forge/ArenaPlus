@@ -43,10 +43,6 @@ namespace ArenaPlus.Utils
 
     internal class CreatureCustomData : CustomData
     {
-        // legacy karma flower
-        public int customSpriteIndex;
-        public bool initFinish = false;
-
         // attached features
         internal HashSet<AttachedFeature> attachedFeatures = new HashSet<AttachedFeature>();
 
