@@ -97,10 +97,8 @@ namespace ArenaPlus.Features
 
     file class SpawnProtectionTimerBehavior : ArenaGameBehavior
     {
-        private static DateTime endTime;
         private const string timerText = "Figth start in";
-        public static bool protection => endTime > DateTime.Now;
-        public TimeSpan lastRemaningTime;
+        public static bool protection => !UI.ArenaTimer.IsTimerDone(timerText);
 
         public SpawnProtectionTimerBehavior(ArenaGameSession gameSession) : base(gameSession)
         {
@@ -108,24 +106,12 @@ namespace ArenaPlus.Features
 
         public override void Initiate()
         {
-            endTime = DateTime.Now.AddSeconds(SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value + 1);
-            UI.ArenaTimer.StartTimer(timerText, endTime);
+            UI.ArenaTimer.StartTimer(timerText, DateTime.Now.AddSeconds(SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value + 1), true);
         }
 
         public override void Update()
         {
             if (!protection) return;
-
-            //LogDebug($"game paused {game.paused} {game.pauseUpdate} {game.GamePaused} {game.pauseMenu != null}");
-            if (game.GamePaused)
-            {
-                endTime = DateTime.Now + lastRemaningTime;
-                UI.ArenaTimer.StartTimer(timerText, endTime);
-            }
-            else
-            {
-                lastRemaningTime = (endTime - DateTime.Now);
-            }
 
             foreach (var shortCut in game.shortcuts.transportVessels)
             {
@@ -139,7 +125,6 @@ namespace ArenaPlus.Features
         public override void Destroy()
         {
             base.Destroy();
-            endTime = default;
         }
     }
 

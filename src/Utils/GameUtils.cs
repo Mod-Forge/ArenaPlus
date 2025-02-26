@@ -11,8 +11,8 @@ namespace ArenaPlus.Utils
 {
     internal static class GameUtils
     {
-        private static RainWorld rainWorld;
-        private static RainWorldGame rainWorldGame;
+        public static RainWorld rainWorld { get; private set; }
+        public static RainWorldGame rainWorldGame { get; private set; }
 
         [HookRegister]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051")]

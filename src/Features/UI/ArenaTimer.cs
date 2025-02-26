@@ -28,10 +28,12 @@ namespace ArenaPlus.Features.UI
             self.AddPart(new ArenaTimerHUD(self));
         }
 
-        public static void StartTimer(string text, DateTime endTime)
+        public static void StartTimer(string text, DateTime endTime, bool pause = false)
         {
+            Assert(!Active || text == ArenaTimerHUD.text, "Only one timer can by active at the time");
             ArenaTimerHUD.time = endTime;
             ArenaTimerHUD.text = text;
+            ArenaTimerHUD.pause = pause;
         }
 
         public static bool StopTimer(string text)
@@ -50,13 +52,22 @@ namespace ArenaPlus.Features.UI
             ArenaTimerHUD.text = "None";
         }
 
+        public static bool IsTimerDone(string text)
+        {
+            return ArenaTimerHUD.text != text || !Active;
+        }
+
         public static bool Active => DateTime.Now < ArenaTimerHUD.time;
         public static string Text { get => ArenaTimerHUD.text; }
+        public static DateTime endTime { get => ArenaTimerHUD.time; }
 
         private class ArenaTimerHUD : HudPart
         {
             internal static DateTime time;
+            internal static TimeSpan remaningTime;
             internal static string text = "None";
+            internal static bool pause;
+            internal static bool paused;
             internal FLabel fLabel;
             public ArenaTimerHUD(HUD.HUD hud) : base(hud)
             {
@@ -72,13 +83,31 @@ namespace ArenaPlus.Features.UI
             {
                 base.Update();
                 fLabel.isVisible = DateTime.Now < time;
-                if (DateTime.Now < time)
+
+                if (GameUtils.rainWorldGame.GamePaused != paused && pause)
                 {
-                    fLabel.text = text + " " + ((time - DateTime.Now).ToString(@"ss\:ff"));
+                    paused = GameUtils.rainWorldGame.GamePaused;
+
+                    if (paused)
+                    {
+                        remaningTime = (endTime - DateTime.Now);
+                    }
+                }
+
+                if (paused)
+                {
+                    time = DateTime.Now + remaningTime;
                 }
                 else
                 {
-                    text = "None";
+                    if (DateTime.Now <= time)
+                    {
+                        fLabel.text = text + " " + ((time - DateTime.Now).ToString(@"ss\:ff"));
+                    }
+                    else
+                    {
+                        text = "None";
+                    }
                 }
             }
         }
