@@ -7,69 +7,48 @@ using System.Threading.Tasks;
 using ArenaPlus.Features;
 using ArenaPlus.Features.UI;
 using ArenaPlus.Lib;
+using IL.Menu;
 
 namespace ArenaPlus.Utils
 {
     public static class CustomDataManager
     {
-        public static readonly ConditionalWeakTable<object, CustomData> customData = new ConditionalWeakTable<object, CustomData>();
+        public static readonly ConditionalWeakTable<object, object> customData = new ConditionalWeakTable<object, object>();
         public static T GetCustomData<T>(this object obj) where T : CustomData, new()
         {
             return (T)customData.GetValue(obj, _ => new T { owner = obj });
         }
-
     }
 
     public class CustomData
     {
         public object owner;
-        public CustomData(object obj)
-        {
-
-            owner = obj;
-        }
     }
 
     internal class RoomCustomData : CustomData
     {
         public HashSet<Spear> spearsRespawnExecption = new HashSet<Spear>();
-
-        // Constructeur par défaut
-        public RoomCustomData() : base(null) { }
-
-        // Autres constructeurs si nécessaire
-        public RoomCustomData(object obj) : base(obj) { }
     }
 
-    internal class CreatureCustomData : CustomData
+
+    internal class PhysicalObjectCustomData : CustomData
     {
         // attached features
         internal HashSet<AttachedFeature> attachedFeatures = new HashSet<AttachedFeature>();
 
-        // Constructeur par défaut
-        public CreatureCustomData() : base(null) { }
+    }
 
-        // Autres constructeurs si nécessaire
-        public CreatureCustomData(object obj) : base(obj) { }
+    internal class CreatureCustomData : CustomData
+    {
     }
 
     internal class PlayerCustomData : CustomData
     {
-        // Constructeur par défaut
-        public PlayerCustomData() : base(null) { }
-
-        // Autres constructeurs si nécessaire
-        public PlayerCustomData(object obj) : base(obj) { }
     }
 
     internal class PlayerResultBoxCustomData : CustomData
     {
         public VisualScrollButton scrollUpButton;
         public VisualScrollButton scrollDownButton;
-        // Constructeur par défaut
-        public PlayerResultBoxCustomData() : base(null) { }
-
-        // Autres constructeurs si nécessaire
-        public PlayerResultBoxCustomData(object obj) : base(obj) { }
     }
 }

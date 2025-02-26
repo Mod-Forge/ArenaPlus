@@ -126,11 +126,5 @@ namespace ArenaPlus.Features.UI
     {
         public SymbolButton[] nextClassButtons;
         public SymbolButton[] previousClassButtons;
-
-        // Constructeur par défaut
-        public MultiplayerMenuData() : base(null) { }
-
-        // Autres constructeurs si nécessaire
-        public MultiplayerMenuData(object obj) : base(obj) { }
     }
 }

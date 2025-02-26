@@ -14,11 +14,14 @@ namespace ArenaPlus.Lib
         public static bool AddAttachedFeature(this PhysicalObject obj, AttachedFeature feature)
         {
             if (obj.room == null) return false;
-            CreatureCustomData playerData = obj.GetCustomData<CreatureCustomData>();
+            CustomDataManager.GetCustomData<PhysicalObjectCustomData>(obj);
+
+            PhysicalObjectCustomData playerData = obj.GetCustomData<PhysicalObjectCustomData>();
             bool succes = playerData.attachedFeatures.Add(feature);
             if (succes)
             {
                 feature.owner = obj;
+                feature.room = obj.room;
                 obj.room.AddObject(feature);
             }
             return succes;
@@ -26,7 +29,7 @@ namespace ArenaPlus.Lib
 
         public static bool RemoveAttachedFeature(this PhysicalObject obj, AttachedFeature feature)
         {
-            CreatureCustomData playerData = obj.GetCustomData<CreatureCustomData>();
+            PhysicalObjectCustomData playerData = obj.GetCustomData<PhysicalObjectCustomData>();
             if (playerData.attachedFeatures.Contains(feature))
             {
                 playerData.attachedFeatures.Remove(feature);
@@ -41,14 +44,20 @@ namespace ArenaPlus.Lib
 
         public static T GetAttachedFeatureType<T>(this PhysicalObject obj) where T : AttachedFeature
         {
-            CreatureCustomData playerData = obj.GetCustomData<CreatureCustomData>();
+            PhysicalObjectCustomData playerData = obj.GetCustomData<PhysicalObjectCustomData>();
             return (playerData.attachedFeatures.Any(f => f is T) ? playerData.attachedFeatures.First(f => f is T) : null) as T;
         }
 
         public static bool HasAttachedFeatureType<T>(this PhysicalObject obj)
         {
-            CreatureCustomData playerData = obj.GetCustomData<CreatureCustomData>();
+            PhysicalObjectCustomData playerData = obj.GetCustomData<PhysicalObjectCustomData>();
             return playerData.attachedFeatures.Any(f => f is T);
+        }
+
+        public static bool TryGetAttachedFeatureType<T>(this PhysicalObject obj, out T feature) where T : AttachedFeature
+        {
+            feature = obj.GetAttachedFeatureType<T>();
+            return feature != null;
         }
     }
 
@@ -56,6 +65,13 @@ namespace ArenaPlus.Lib
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006")]
         public PhysicalObject owner;
+
+        public override void Update(bool eu)
+        {
+            base.Update(eu);
+            if (!slatedForDeletetion && owner.slatedForDeletetion)
+                Destroy();
+        }
 
         public override void Destroy()
         {

@@ -2,7 +2,9 @@
 using ArenaPlus.Lib;
 using ArenaPlus.Options;
 using ArenaPlus.Options.Tabs;
+using ArenaPlus.Utils;
 using Menu.Remix.MixedUI;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,9 +62,13 @@ namespace ArenaPlus.Features
         private Player.InputPackage RWInput_PlayerInputLogic_int_int(On.RWInput.orig_PlayerInputLogic_int_int orig, int categoryID, int playerNumber)
         {
             var input = orig(categoryID, playerNumber);
-            if (SpawnProtectionTimerBehavior.protection)
+            if (SpawnProtectionTimerBehavior.protection && input.thrw)
             {
                 input.thrw = false;
+                if (GameUtils.rainWorldGame.Players[playerNumber].realizedCreature is Player player && player.TryGetAttachedFeatureType<SpawnProtectionMessage>(out var feature))
+                {
+                    feature.Throw();
+                }
             }
             return input;
         }
@@ -107,6 +113,14 @@ namespace ArenaPlus.Features
         public override void Initiate()
         {
             UI.ArenaTimer.StartTimer(timerText, DateTime.Now.AddSeconds(SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value + 1), true);
+            foreach (var abstPlayer in game.Players)
+            {
+                LogInfo("player", abstPlayer.realizedCreature);
+                if (abstPlayer.realizedCreature is Player player)
+                {
+                    player.AddAttachedFeature(new SpawnProtectionMessage());
+                }
+            }
         }
 
         public override void Update()
@@ -128,10 +142,52 @@ namespace ArenaPlus.Features
         }
     }
 
-    file class SpawnProtectionMessage : AttachedFeature
+    file class SpawnProtectionMessage : PlayerCosmeticFeature
     {
+        private static string[] messages = ["Nuh hh", "Nope", "Try again", "Try later", "Skill issue", "Can't do that"];
+        public int showCountdown;
+        public FLabel label = new FLabel(Custom.GetFont(), "some message");
+        public Vector2 pos;
         public SpawnProtectionMessage() : base()
         {
+        }
+
+        public void Throw()
+        {
+            if (showCountdown > 0) return;
+            label.text = messages[Random.Range(0, messages.Length)];
+            pos = player.mainBodyChunk.pos + new Vector2(0, 20);
+            showCountdown = 40;
+        }
+
+        public override void Update(bool eu)
+        {
+            if (showCountdown > 0) showCountdown--;
+            if (!SpawnProtectionTimerBehavior.protection)
+            {
+                Destroy();
+                return;
+            }
+            base.Update(eu);
+        }
+
+        public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            sLeaser.sprites = new FSprite[0];
+            rCam.ReturnFContainer("HUD").AddChild(label);
+            AddToContainer(sLeaser, rCam, null);
+        }
+
+        public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            label.SetPosition(pos - camPos);
+            label.alpha = Mathf.Clamp01(showCountdown / 20f);
+
+            if (!sLeaser.deleteMeNextFrame && (base.slatedForDeletetion || this.room != rCam.room))
+            {
+                label.RemoveFromContainer();
+            }
+            base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
         }
     }
 }
