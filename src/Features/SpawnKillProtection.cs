@@ -64,11 +64,16 @@ namespace ArenaPlus.Features
             var input = orig(categoryID, playerNumber);
             if (SpawnProtectionTimerBehavior.protection && input.thrw)
             {
-                input.thrw = false;
-                if (GameUtils.rainWorldGame.Players[playerNumber].realizedCreature is Player player && player.TryGetAttachedFeatureType<SpawnProtectionMessage>(out var feature))
+                foreach (var abstPlayer in GameUtils.rainWorldGame.Players)
                 {
-                    feature.Throw();
+                    if (abstPlayer.realizedCreature is Player player && player.playerState.playerNumber == playerNumber && player.TryGetAttachedFeatureType<SpawnProtectionMessage>(out var feature))
+                    {
+                        feature.Throw();
+
+                    }
                 }
+
+                input.thrw = false;
             }
             return input;
         }
