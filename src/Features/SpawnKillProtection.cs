@@ -163,6 +163,7 @@ namespace ArenaPlus.Features
             label.text = messages[Random.Range(0, messages.Length)];
             pos = player.mainBodyChunk.pos + new Vector2(0, 20);
             showCountdown = 40;
+            room.PlaySound(SoundID.MENU_Error_Ping, pos, 5f, Random.Range(0.7f, 1.25f));
         }
 
         public override void Update(bool eu)
