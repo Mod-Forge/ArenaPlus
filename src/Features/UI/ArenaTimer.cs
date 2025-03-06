@@ -72,7 +72,6 @@ namespace ArenaPlus.Features.UI
             public ArenaTimerHUD(HUD.HUD hud) : base(hud)
             {
                 fLabel = new FLabel(Custom.GetFont(), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas a turpis tortor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin non mauris elit. Curabitur viverra suscipit elit vitae elementum. Donec in fringilla nunc, vel efficitur ipsum. Ut congue felis in neque lobortis, vitae scelerisque diam egestas. Aenean congue lectus ut orci consectetur pulvinar.");
-                time = default;
                 hud.fContainers[1].AddChild(fLabel);
                 fLabel.scale = 2.5f;
                 fLabel.anchorX = 0f;
@@ -110,6 +109,12 @@ namespace ArenaPlus.Features.UI
                         text = "None";
                     }
                 }
+            }
+
+            public override void ClearSprites()
+            {
+                base.ClearSprites();
+                time = default;
             }
         }
     }
