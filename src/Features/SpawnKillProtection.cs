@@ -49,6 +49,7 @@ namespace ArenaPlus.Features
             On.Player.Die += Player_Die;
             On.Player.Destroy += Player_Destroy;
             On.RWInput.PlayerInputLogic_int_int += RWInput_PlayerInputLogic_int_int;
+            On.Player.ThrowObject += Player_ThrowObject;
         }
 
         protected override void Unregister()
@@ -57,6 +58,16 @@ namespace ArenaPlus.Features
             On.Player.Die -= Player_Die;
             On.Player.Destroy -= Player_Destroy;
             On.RWInput.PlayerInputLogic_int_int -= RWInput_PlayerInputLogic_int_int;
+            On.Player.ThrowObject -= Player_ThrowObject;
+        }
+
+        private void Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
+        {
+            if (SpawnProtectionTimerBehavior.protection)
+            {
+                return;
+            }
+            orig(self, grasp, eu);
         }
 
         private Player.InputPackage RWInput_PlayerInputLogic_int_int(On.RWInput.orig_PlayerInputLogic_int_int orig, int categoryID, int playerNumber)
