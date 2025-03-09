@@ -49,6 +49,12 @@ namespace ArenaPlus
             FeaturesManager.LoadFeatures();
         }
 
+        [MyCommand("log_players")]
+        private static void CheckPlayers()
+        {
+            ConsoleWrite("players: " + string.Join(", ", GameUtils.rainWorldGame.Players.ConvertAll(p => p.realizedCreature is Player player ? player.SlugCatClass.value : "null")));
+        }
+
         private void ClearGameMemory()
         {
             //If you have any collections (lists, dictionaries, etc.)

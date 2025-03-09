@@ -16,7 +16,7 @@ namespace ArenaPlus.Features
     )]
     file class PlayerSpearOneshot(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
-        private readonly string[] exceptions = ["Gourmand"];
+        private readonly string[] exceptions = ["Gourmand", "PsyCat"];
 
         private readonly ConditionalWeakTable<Weapon, Creature> killtags = new();
 
