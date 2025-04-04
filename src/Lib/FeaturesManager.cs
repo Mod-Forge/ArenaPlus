@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.IO;
 using SlugBase.Features;
 using Newtonsoft.Json;
+using DevConsole;
+using System.Text.RegularExpressions;
 
 namespace ArenaPlus.Lib
 {
@@ -15,6 +17,7 @@ namespace ArenaPlus.Lib
     {
         internal static List<Category> categories = [];
         internal static List<SlugcatFeature> slugcatFeatures = [];
+        internal static string[] disabledImutables = [];
 
         internal static void AddFeature(Feature feature)
         {
@@ -60,11 +63,13 @@ namespace ArenaPlus.Lib
                             baseFeature = feature;
 
                             AddFeature(feature);
+                            //LogInfo($"Registering feature : {baseFeature.Id}");
                         }
-                        else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null)
+                        else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null && !disabledImutables.Contains(ParseImutableName(type.Name)))
                         {
                             Assert(type.GetConstructors().Length > 0, message: $"Missing constructor in immutable feature {nameof(type)}");
                             type.GetConstructors()[0].Invoke([]);
+                            LogInfo($"Registering imutable feature : {ParseImutableName(type.Name)}");
                         }
                         else if (type.GetCustomAttribute<SlugcatFeatureInfoAttribute>() is SlugcatFeatureInfoAttribute slugcatFeatureInfo)
                         {
@@ -74,11 +79,12 @@ namespace ArenaPlus.Lib
                             baseFeature = feature;
 
                             slugcatFeatures.Add(feature);
+                            //LogInfo($"Registering slugcat feature : {baseFeature.Id}");
                         }
 
                         if (baseFeature != null)
                         {
-                            LogInfo($"Registering feature : {baseFeature.Id}");
+                            //LogInfo($"Registering {typeName} : {baseFeature.Id}");
 
                             if (baseFeature.configurable.Value)
                             {
@@ -135,6 +141,23 @@ namespace ArenaPlus.Lib
                 }
             }
             throw new Exception($"{id} feature does not exist");
+        }
+
+        private static string ParseImutableName(string name)
+        {
+            try
+            {
+                if (name.StartsWith("<"))
+                {
+                    return Regex.Split(name, "__").Last();
+                }
+            }
+            catch (Exception e)
+            {
+                LogError(e);
+                return "Failed to parse name";
+            }
+            return name;
         }
     }
 }

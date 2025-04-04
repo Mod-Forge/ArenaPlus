@@ -29,6 +29,7 @@ namespace ArenaPlus.Features.Reworks
             On.JokeRifle.MoreSlugcatsUpdate += JokeRifle_MoreSlugcatsUpdate;
         }
 
+
         private void JokeRifle_MoreSlugcatsUpdate(On.JokeRifle.orig_MoreSlugcatsUpdate orig, JokeRifle self, bool eu)
         {
             if (self.light == null || self.firstChunk == null)
@@ -44,13 +45,13 @@ namespace ArenaPlus.Features.Reworks
             return orig(self, obj) || obj is JokeRifle;
         }
 
-        private int ScavengerAI_WeaponScore(On.ScavengerAI.orig_WeaponScore orig, ScavengerAI self, PhysicalObject obj, bool pickupDropInsteadOfWeaponSelection)
+        private int ScavengerAI_WeaponScore(On.ScavengerAI.orig_WeaponScore orig, ScavengerAI self, PhysicalObject obj, bool pickupDropInsteadOfWeaponSelection, bool reallyWantsSpear)
         {
             if (obj is JokeRifle)
             {
                 return (obj as JokeRifle).abstractRifle.currentAmmo() > 0 ? 10 : 0;
             }
-            return orig(self, obj, pickupDropInsteadOfWeaponSelection);
+            return orig(self, obj, pickupDropInsteadOfWeaponSelection, reallyWantsSpear);
         }
 
         private void Scavenger_Throw(On.Scavenger.orig_Throw orig, Scavenger self, Vector2 throwDir)

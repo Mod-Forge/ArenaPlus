@@ -111,7 +111,7 @@ namespace ArenaPlus.Features
                                 //new randomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.MoonCloak, 5), // don't work
                                 new RandomObject(MoreSlugcatsEnums.AbstractObjectType.EnergyCell, 5),
                                 new RandomObject(AbstractPhysicalObject.AbstractObjectType.KarmaFlower, 5),
-                                new RandomObject(MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, 1),
+                                new RandomObject(DLCSharedEnums.AbstractObjectType.SingularityBomb, 1),
                             };
 
                             newObject = MakeAbstractPhysicalObject(GetRandomObject(objectsList), self, obj.pos);

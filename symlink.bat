@@ -5,6 +5,7 @@ if %errorlevel% NEQ 0 (
     exit /b
 )
 
-set /p path_input=Rain World mods folder: 
-mklink /d "%path_input%\ArenaPlus" "%~dp0mod"
+set /p path_input=Rain World game folder: 
+mklink /d "%~dp0\lib\Managed" "%path_input%\RainWorld_Data\RainWorldManaged"
+mklink /d "%path_input%\RainWorld_Data\StreamingAssets\mods\ArenaPlus" "%~dp0mod"
 pause
