@@ -45,4 +45,11 @@ namespace ArenaPlus.Lib
         internal const string Fun = "Fun";
         internal const string Spoilers = "Spoilers";
     }
+
+    internal class DLCIdentifiers
+    {
+        internal const string MSC = "moreslugcats";
+        internal const string Watcher = "watcher";
+        internal const string Any = "any";
+    }
 }

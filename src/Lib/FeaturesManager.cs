@@ -57,6 +57,13 @@ namespace ArenaPlus.Lib
                         BaseFeature baseFeature = null;
                         if (type.GetCustomAttribute<FeatureInfoAttribute>() is FeatureInfoAttribute featureInfo)
                         {
+                            if (!ModManager.MSC && featureInfo.requireDLC?.Contains(DLCIdentifiers.MSC) is true)
+                                continue;
+                            if (!ModManager.Watcher && featureInfo.requireDLC?.Contains(DLCIdentifiers.Watcher) is true)
+                                continue;
+                            if (!ModManager.DLCShared && featureInfo.requireDLC?.Contains(DLCIdentifiers.Any) is true)
+                                continue;
+
                             Assert(type.GetConstructors().Length > 0, $"Missing constructor in feature {featureInfo.name}");
                             Feature feature = type.GetConstructors()[0].Invoke([featureInfo]) as Feature;
 
