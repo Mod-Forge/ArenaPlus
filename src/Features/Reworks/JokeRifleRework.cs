@@ -14,6 +14,7 @@ namespace ArenaPlus.Features.Reworks
         name: "Joke rifle rework",
         category: BuiltInCategory.Spoilers,
         description: "Wheter Scavengers can use the Joke Rifle (Challenge spoiler)",
+        requireDLC: [DLCIdentifiers.MSC],
         enabledByDefault: true
     )]
     file class JokeRifleRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

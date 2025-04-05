@@ -61,7 +61,7 @@ namespace ArenaPlus.Features
                                 {
                                     newObject = new AbstractSpear(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), false, Mathf.Lerp(0.35f, 0.6f, Custom.ClampedRandomVariation(0.5f, 0.5f, 2f)));
                                 }
-                                else
+                                else if (ModManager.MSC)
                                 {
                                     //LogDebug("new rifle");
                                     JokeRifle.AbstractRifle.AmmoType ammo = new JokeRifle.AbstractRifle.AmmoType(ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries[Random.Range(0, ExtEnum<JokeRifle.AbstractRifle.AmmoType>.values.entries.Count)]);
@@ -75,7 +75,7 @@ namespace ArenaPlus.Features
                                 {
                                     newObject = new AbstractSpear(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), true, false);
                                 }
-                                else if (random < 0.5f)
+                                else if (ModManager.MSC && random < 0.5f)
                                 {
                                     newObject = new AbstractSpear(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), false, true);
                                 }
@@ -107,12 +107,25 @@ namespace ArenaPlus.Features
                                 // VultureGrub 10
                                 new RandomObject(AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, 10),
                                 new RandomObject(AbstractPhysicalObject.AbstractObjectType.VultureMask, 10),
-                                new RandomObject(MoreSlugcatsEnums.AbstractObjectType.FireEgg, 5),
-                                //new randomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.MoonCloak, 5), // don't work
-                                new RandomObject(MoreSlugcatsEnums.AbstractObjectType.EnergyCell, 5),
-                                new RandomObject(AbstractPhysicalObject.AbstractObjectType.KarmaFlower, 5),
-                                new RandomObject(DLCSharedEnums.AbstractObjectType.SingularityBomb, 1),
                             };
+
+                            if (ModManager.MSC)
+                            {
+                                objectsList.AddRange([
+                                    new RandomObject(MoreSlugcatsEnums.AbstractObjectType.FireEgg, 5),
+                                    //new randomObject(MoreSlugcats.MoreSlugcatsEnums.AbstractObjectType.MoonCloak, 5), // don't work
+                                    new RandomObject(MoreSlugcatsEnums.AbstractObjectType.EnergyCell, 5),
+                                    new RandomObject(AbstractPhysicalObject.AbstractObjectType.KarmaFlower, 5),
+                                ]);
+                            }
+
+                            if (ModManager.MSC || ModManager.Watcher)
+                            {
+                                objectsList.AddRange([
+                                    new RandomObject(DLCSharedEnums.AbstractObjectType.SingularityBomb, 1),
+                                    new RandomObject(AbstractPhysicalObject.AbstractObjectType.KarmaFlower, 5),
+                                ]);
+                            }
 
                             newObject = MakeAbstractPhysicalObject(GetRandomObject(objectsList), self, obj.pos);
 

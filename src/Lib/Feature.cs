@@ -34,6 +34,40 @@ namespace ArenaPlus.Lib
 
         internal Action<OpExpandable, Vector2> complementaryElementAction;
 
+        public bool HasRequiredDLC()
+        {
+            if (!ModManager.MSC && RequireDLC?.Contains(DLCIdentifiers.MSC) is true)
+                return false;
+            if (!ModManager.Watcher && RequireDLC?.Contains(DLCIdentifiers.Watcher) is true)
+                return false;
+            if (!ModManager.DLCShared && RequireDLC?.Contains(DLCIdentifiers.DLCShared) is true)
+                return false;
+            return true;
+        }
+
+        public override void Enable()
+        {
+            if (!HasRequiredDLC())
+            {
+                return;
+            }
+            base.Enable();
+        }
+
+        public void ForceRegister()
+        {
+            if (registered) return;
+            registered = true;
+            Register();
+        }
+
+        public void ForceUngister()
+        {
+            if (!registered) return;
+            registered = false;
+            Unregister();
+        }
+
         internal void SetComplementaryElement(Action<OpExpandable, Vector2> func)
         {
             complementaryElementAction = func;

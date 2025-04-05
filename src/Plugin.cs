@@ -36,10 +36,9 @@ namespace ArenaPlus
         // Add hooks
         public void OnEnable()
         {
-            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources, OnModInit);
             try { RegisterUtils.RegisterAllUtils(); } catch (Exception e) { LogError(e); }
         }
-
 
         // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
@@ -47,6 +46,11 @@ namespace ArenaPlus
             Futile.atlasManager.LoadAtlas("atlases/huntersprites");
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
             FeaturesManager.LoadFeatures();
+        }
+
+        private void OnModInit(RainWorld rainWorld)
+        {
+            FeaturesManager.EnableFeatures();
         }
 
         [MyCommand("log_players")]

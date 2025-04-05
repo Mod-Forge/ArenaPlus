@@ -17,6 +17,7 @@ namespace ArenaPlus.Features.Fun
         category: BuiltInCategory.Spoilers,
         description: "Replacer every spears with Joke Rifles (Challenge spoiler)",
         incompatibilities: ["objectsRandomizer"],
+        requireDLC: [DLCIdentifiers.MSC],
         enabledByDefault: false
     )]
     public class AllJokeRifle(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

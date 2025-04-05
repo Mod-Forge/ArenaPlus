@@ -11,7 +11,7 @@ namespace ArenaPlus.Utils
 {
     internal static class GameUtils
     {
-        public static RainWorld rainWorld { get; private set; }
+        private static RainWorld rainWorld;
         public static RainWorldGame rainWorldGame { get; private set; }
 
         [HookRegister]

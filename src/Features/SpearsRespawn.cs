@@ -88,7 +88,7 @@ namespace ArenaPlus.Features
 
         private const string timerText = "Spears respawn in";
 
-        private bool RespawnRifles => FeaturesManager.GetFeature("allJokeRifle").configurable.Value;
+        private bool RespawnRifles => ModManager.MSC && FeaturesManager.GetFeature("allJokeRifle").configurable.Value;
 
         private void ArenaGameSession_Update(On.ArenaGameSession.orig_Update orig, ArenaGameSession self)
         {

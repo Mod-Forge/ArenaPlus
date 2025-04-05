@@ -50,6 +50,6 @@ namespace ArenaPlus.Lib
     {
         internal const string MSC = "moreslugcats";
         internal const string Watcher = "watcher";
-        internal const string Any = "any";
+        internal const string DLCShared = "moreslugcats|watcher";
     }
 }

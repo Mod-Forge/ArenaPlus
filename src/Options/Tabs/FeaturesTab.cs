@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using ArenaPlus.Lib;
 using ArenaPlus.Options.Elements;
@@ -137,7 +136,18 @@ namespace ArenaPlus.Options.Tabs
                         label.color = color;
                     }
 
-                    feature.complementaryElementAction?.Invoke(expandable, new Vector2(xPos + CHECKBOX_SIZE + MARGIN + label.GetDisplaySize().x + MARGIN, lastPos));
+                    if (!feature.HasRequiredDLC())
+                    {
+                        checkBox.greyedOut = true;
+                        checkBox.colorEdge *= 2f;
+                        checkBox.description = $"Require: {string.Join(",", feature.RequireDLC)}";
+                        label.color = checkBox.bumpBehav.GetColor(checkBox.colorEdge);
+                        label.text = "Require a DLC!";
+                    }
+                    else
+                    {
+                        feature.complementaryElementAction?.Invoke(expandable, new Vector2(xPos + CHECKBOX_SIZE + MARGIN + label.GetDisplaySize().x + MARGIN, lastPos));
+                    }
 
                     if (index++ % 2 == 1)
                     {

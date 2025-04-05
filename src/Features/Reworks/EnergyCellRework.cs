@@ -16,6 +16,7 @@ namespace ArenaPlus.Features.Reworks
         name: "Energy cell rework",
         category: BuiltInCategory.Spoilers,
         description: "Make the energy cell float, remove gravity in it's action field and more (Rivulet spoiler)",
+        requireDLC: [DLCIdentifiers.MSC],
         enabledByDefault: false
     )]
     file class EnergyCellRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

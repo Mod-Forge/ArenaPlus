@@ -24,7 +24,7 @@ namespace ArenaPlus.Lib
 
         internal bool registered = false;
 
-        public void Enable()
+        public virtual void Enable()
         {
             if (registered) return;
 
@@ -35,7 +35,7 @@ namespace ArenaPlus.Lib
             Register();
         }
 
-        public void Disable()
+        public virtual void Disable()
         {
             if (!registered) return;
 

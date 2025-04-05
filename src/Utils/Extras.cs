@@ -18,7 +18,7 @@ internal static class Extras
     private static bool _initialized;
 
     // Ensure resources are only loaded once and that failing to load them will not break other mods
-    public static On.RainWorld.hook_OnModsInit WrapInit(Action<RainWorld> loadResources)
+    public static On.RainWorld.hook_OnModsInit WrapInit(Action<RainWorld> loadResources, Action<RainWorld> onModInit = null)
     {
         return (orig, self) =>
         {
@@ -31,6 +31,7 @@ internal static class Extras
                     _initialized = true;
                     loadResources(self);
                 }
+                onModInit.Invoke(self);
             }
             catch (Exception e)
             {

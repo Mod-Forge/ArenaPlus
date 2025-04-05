@@ -4,7 +4,7 @@
 	"version": "2.0.1",
 	"authors": "modforge",
 	"description": "A mod that adds many optional features/tweaks to the arena mode.",
-	"requirements": ["moreslugcats"],
-	"requirements_names": ["More Slugcats Expansion"],
+	"requirements": [],
+	"requirements_names": [],
 	"tags": ["Arenas", "Game Mechanics"]
 }

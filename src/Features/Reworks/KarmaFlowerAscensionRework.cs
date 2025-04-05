@@ -13,13 +13,14 @@ using static ArenaPlus.Lib.PlayerAttachedFeature;
 namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
-        id: "karmaFlowerRework",
+        id: "karmaFlowerAscensionRework",
         name: "Saint karma flower (Spoiler)",
         category: BuiltInCategory.Spoilers,
         description: "Allow players to ascend (Saint spoiler)",
+        requireDLC: [DLCIdentifiers.MSC],
         enabledByDefault: false
     )]
-    file class KarmaFlowerRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
+    file class KarmaFlowerAscensionRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         protected override void Register()
         {
