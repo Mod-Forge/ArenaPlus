@@ -1,6 +1,7 @@
 ﻿using ArenaPlus.Lib;
 using ArenaPlus.Utils;
 using Menu;
+using MonoMod.RuntimeDetour;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,29 +16,45 @@ namespace ArenaPlus.Features.UI
     {
         protected override void Register()
         {
+            // break evrythin, I don't want to be near any of that
+            //new Hook(typeof(ModManager).GetProperty(nameof(ModManager.NewSlugcatsModule)).GetGetMethod(), ModManager_NewSlugcatsModule);
             On.Menu.MultiplayerMenu.Singal += MultiplayerMenu_Singal;
             On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += MultiplayerMenu_InitiateGameTypeSpecificButtons;
             On.Menu.MultiplayerMenu.ClearGameTypeSpecificButtons += MultiplayerMenu_ClearGameTypeSpecificButtons;
         }
 
+        private bool ModManager_NewSlugcatsModule(Func<bool> orig)
+        {
+            orig();
+            LogInfo("NewSlugcatsModule_get");
+            return true;
+        }
+
         private void MultiplayerMenu_ClearGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_ClearGameTypeSpecificButtons orig, MultiplayerMenu self)
         {
-            if (self.playerClassButtons != null)
+            try
             {
-                MultiplayerMenuData data = self.GetCustomData<MultiplayerMenuData>();
-                foreach (var buttons in data.nextClassButtons)
+                if (self.playerClassButtons != null)
                 {
-                    buttons.RemoveSprites();
-                    self.pages[0].RemoveSubObject(buttons);
-                }
-                data.nextClassButtons = null;
+                    MultiplayerMenuData data = self.GetCustomData<MultiplayerMenuData>();
+                    foreach (var buttons in data.nextClassButtons)
+                    {
+                        buttons.RemoveSprites();
+                        self.pages[0].RemoveSubObject(buttons);
+                    }
+                    data.nextClassButtons = null;
 
-                foreach (var buttons in data.previousClassButtons)
-                {
-                    buttons.RemoveSprites();
-                    self.pages[0].RemoveSubObject(buttons);
+                    foreach (var buttons in data.previousClassButtons)
+                    {
+                        buttons.RemoveSprites();
+                        self.pages[0].RemoveSubObject(buttons);
+                    }
+                    data.previousClassButtons = null;
                 }
-                data.previousClassButtons = null;
+            }
+            catch (Exception e)
+            {
+                LogError(e);
             }
             orig(self);
         }
@@ -72,20 +89,27 @@ namespace ArenaPlus.Features.UI
 
         private void MultiplayerMenu_Singal(On.Menu.MultiplayerMenu.orig_Singal orig, Menu.MultiplayerMenu self, Menu.MenuObject sender, string message)
         {
-            if (message != null && self.currentGameType == ArenaSetup.GameTypeID.Competitive || self.currentGameType == ArenaSetup.GameTypeID.Sandbox)
+            try
             {
-                for (int num6 = 0; num6 < self.playerClassButtons.Length; num6++)
+                if (message != null && self.currentGameType == ArenaSetup.GameTypeID.Competitive || self.currentGameType == ArenaSetup.GameTypeID.Sandbox)
                 {
-                    if (message == "PREVIOUSCLASS" + num6.ToString())
+                    for (int num6 = 0; num6 < self.playerClassButtons.Length; num6++)
                     {
-                        self.GetArenaSetup.playerClass[num6] = PreviousClass(self, self.GetArenaSetup.playerClass[num6]);
-                        self.playerClassButtons[num6].menuLabel.text = self.Translate(SlugcatStats.getSlugcatName(self.GetArenaSetup.playerClass[num6]));
-                        self.playerJoinButtons[num6].portrait.fileName = self.ArenaImage(self.GetArenaSetup.playerClass[num6], num6);
-                        self.playerJoinButtons[num6].portrait.LoadFile();
-                        self.playerJoinButtons[num6].portrait.sprite.SetElementByName(self.playerJoinButtons[num6].portrait.fileName);
-                        self.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
+                        if (message == "PREVIOUSCLASS" + num6.ToString())
+                        {
+                            self.GetArenaSetup.playerClass[num6] = PreviousClass(self, self.GetArenaSetup.playerClass[num6]);
+                            self.playerClassButtons[num6].menuLabel.text = self.Translate(SlugcatStats.getSlugcatName(self.GetArenaSetup.playerClass[num6]));
+                            self.playerJoinButtons[num6].portrait.fileName = self.ArenaImage(self.GetArenaSetup.playerClass[num6], num6);
+                            self.playerJoinButtons[num6].portrait.LoadFile();
+                            self.playerJoinButtons[num6].portrait.sprite.SetElementByName(self.playerJoinButtons[num6].portrait.fileName);
+                            self.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                LogError(e);
             }
             orig(self, sender, message);
         }
