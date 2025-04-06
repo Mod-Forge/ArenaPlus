@@ -10,7 +10,9 @@ namespace ArenaPlus.Utils
     {
         internal static void RegisterAllUtils()
         {
-            try { Utils.MyDevConsole.Register(); } catch { }
+            // Uncomment when DevConsole is fixed
+            //try { Utils.MyDevConsole.Register(); } catch { }
+            LogWarning("ArenaPlus commands are temporarily removed until Dev Console is fixed");
             HookRegister.RegisterAllHooks();
         }
     }
