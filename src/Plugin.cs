@@ -17,6 +17,9 @@ using System.Reflection;
 using UnityEngine.Assertions;
 using System.Linq;
 using System.Security.Permissions;
+using Mono.Mozilla;
+using System.Runtime.CompilerServices;
+using Microsoft.Internal.Collections;
 
 // Allows access to private members
 #pragma warning disable CS0618

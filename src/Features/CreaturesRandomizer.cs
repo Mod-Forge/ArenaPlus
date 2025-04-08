@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Menu.Remix.MixedUI;
 using RWCustom;
+using ArenaPlus.Features.Fun;
 
 namespace ArenaPlus.Features;
 
@@ -21,25 +22,48 @@ namespace ArenaPlus.Features;
 )]
 file class CreaturesRandomizer : Feature
 {
-    public static readonly Configurable<int> randomizerTolerance = OptionsInterface.instance.config.Bind("randomizerTolerance", 0, new ConfigurableInfo("The maximum point difference allowed for a creature to override", new ConfigAcceptableRange<int>(0, 25), "", []));
-
+    public static readonly Configurable<int> randomizerTolerance = OptionsInterface.instance.config.Bind("randomizerTolerance", 0, new ConfigurableInfo("The maximum point difference allowed for a creature to override", new ConfigAcceptableRange<int>(0, 26), "", []));
+    public static bool NoTolerance => randomizerTolerance.Value >= (randomizerTolerance.info.acceptable as ConfigAcceptableRange<int>).MaxValue;
+    public static bool TotalChaos => NoTolerance && FeaturesManager.GetFeature("unlockAllCreatureForSpawn").configurable.Value;
+    private static Color specialColor => FeaturesManager.GetFeature("unlockAllCreatureForSpawn").configurable.Value ? Color.red : Color.yellow;
 
     public CreaturesRandomizer(FeatureInfoAttribute featureInfo) : base(featureInfo)
     {
         SetComplementaryElement((expandable, startPos) =>
         {
+            
             OpUpdown updown = expandable.AddItem(
                 new OpUpdown(randomizerTolerance, startPos, 60f)
             );
             updown.pos -= new Vector2(0, (updown.size.y - FeaturesTab.CHECKBOX_SIZE) / 2);
-            updown.description = randomizerTolerance.info.description;
+            updown.description = GetDescription(NoTolerance);
 
-            if (HexColor != "None" && ColorUtility.TryParseHtmlString("#" + HexColor, out Color color))
+            Color baseColor = Menu.MenuColorEffect.rgbMediumGrey;
+            if (HexColor != "None" && ColorUtility.TryParseHtmlString("#" + HexColor, out baseColor)) { }
+
+            updown.colorEdge = NoTolerance ? specialColor : baseColor;
+            updown.OnUpdate += () =>
             {
-                updown.colorEdge = color;
-            }
+                bool noTolerance = (updown.valueInt >= (randomizerTolerance.info.acceptable as ConfigAcceptableRange<int>).MaxValue);
+                updown.colorEdge = noTolerance ? specialColor : baseColor;
+                updown.description = GetDescription(noTolerance);
+            };
         });
     }
+
+    private string GetDescription(bool noTolerance)
+    {
+        if (noTolerance)
+        {
+            if (FeaturesManager.GetFeature("unlockAllCreatureForSpawn").configurable.Value)
+            {
+                return "TOTAL CHAOS";
+            }
+            return "No restrictions for a creature to override";
+        }
+        return randomizerTolerance.info.description;
+    }
+
 
     private static int[] defaultKillScores = new int[ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count];
     private static List<string> exceptions = ["BigEel", "StowawayBug", "Slugcat", "SlugNPC", "Fly"];
@@ -188,19 +212,41 @@ file class CreaturesRandomizer : Feature
         if (origScore == 0) return abstractCreature;
 
         List<CreatureTemplate.Type> possibleOverrides = new List<CreatureTemplate.Type>();
-        for (global::System.Int32 i = 0; i < ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count; i++)
+        if (TotalChaos)
         {
-            string unlockName = ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.GetEntry(i);
-            int score = defaultKillScores[i];
-            if (score != 0 && Mathf.Abs(score - origScore) <= randomizerTolerance.Value)
+            foreach (var name in ExtEnum<CreatureTemplate.Type>.values.entries)
             {
-                if (ExtEnum<CreatureTemplate.Type>.values.entries.Contains(unlockName) && unlocks.IsCreatureUnlockedForLevelSpawn(new CreatureTemplate.Type(unlockName, false)) && !exceptions.Contains(unlockName))
+                if (!exceptions.Contains(name))
                 {
-                    LogDebug("adding", unlockName, "to possible creature overrides");
-                    possibleOverrides.Add(new CreatureTemplate.Type(unlockName, false));
+                    possibleOverrides.Add(new CreatureTemplate.Type(name, false));
                 }
             }
         }
+        else
+        {
+            for (global::System.Int32 i = 0; i < ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count; i++)
+            {
+                string unlockName = ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.GetEntry(i);
+                int score = defaultKillScores[i];
+                if (NoTolerance || (score != 0 && Mathf.Abs(score - origScore) <= randomizerTolerance.Value))
+                {
+                    if (ExtEnum<CreatureTemplate.Type>.values.entries.Contains(unlockName) && unlocks.IsCreatureUnlockedForLevelSpawn(new CreatureTemplate.Type(unlockName, false)) && !exceptions.Contains(unlockName))
+                    {
+                        LogDebug("adding", unlockName, "to possible creature overrides");
+                        possibleOverrides.Add(new CreatureTemplate.Type(unlockName, false));
+                    }
+                    else
+                    {
+                        LogDebug("skipping", unlockName, "from creature overrides");
+                    }
+                }
+                else
+                {
+                    LogDebug("skipping invalid score", unlockName);
+                }
+            }
+        }
+
 
         if (possibleOverrides.Count == 0) return abstractCreature;
 
@@ -215,7 +261,7 @@ file class CreaturesRandomizer : Feature
 
         try
         {
-            int newScore = defaultKillScores[GetAbstractCreatureScoreIndex(newAbstCreature)];
+            int newScore = TotalChaos ? -1 : defaultKillScores[GetAbstractCreatureScoreIndex(newAbstCreature)];
             LogDebug("[CreaturesRandomizer] overriding", abstractCreature.creatureTemplate.name, "by", newAbstCreature.creatureTemplate.name, "with a diference of", Mathf.Abs(newScore - origScore), "/", randomizerTolerance.Value);
         } catch (Exception e)
         {

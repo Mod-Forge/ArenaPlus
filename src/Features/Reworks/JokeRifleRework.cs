@@ -13,12 +13,22 @@ namespace ArenaPlus.Features.Reworks
         id: "jokeRifleRework",
         name: "Joke rifle rework",
         category: BuiltInCategory.Spoilers,
-        description: "Wheter Scavengers can use the Joke Rifle (Challenge spoiler)",
+        description: "Allow Scavengers to use the Joke Rifle with some other things (Challenge spoiler)",
         requireDLC: [DLCIdentifiers.MSC],
         enabledByDefault: true
     )]
     file class JokeRifleRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
+
+        protected override void Unregister()
+        {
+            On.JokeRifle.Use -= JokeRifle_Use;
+            On.JokeRifle.Update -= JokeRifle_Update;
+            On.MoreSlugcats.AbstractBullet.ctor -= AbstractBullet_ctor;
+            On.Scavenger.Throw -= Scavenger_Throw;
+            On.ScavengerAI.WeaponScore -= ScavengerAI_WeaponScore;
+            On.ScavengerAI.RealWeapon -= ScavengerAI_RealWeapon;
+        }
         protected override void Register()
         {
             On.JokeRifle.Use += JokeRifle_Use;
@@ -50,7 +60,7 @@ namespace ArenaPlus.Features.Reworks
         {
             if (obj is JokeRifle)
             {
-                return (obj as JokeRifle).abstractRifle.currentAmmo() > 0 ? 10 : 0;
+                return (obj as JokeRifle).abstractRifle.currentAmmo() > 0 ? 99 : 0;
             }
             return orig(self, obj, pickupDropInsteadOfWeaponSelection, reallyWantsSpear);
         }
@@ -67,16 +77,6 @@ namespace ArenaPlus.Features.Reworks
             {
                 orig(self, throwDir);
             }
-        }
-
-        protected override void Unregister()
-        {
-            On.JokeRifle.Use -= JokeRifle_Use;
-            On.JokeRifle.Update -= JokeRifle_Update;
-            On.MoreSlugcats.AbstractBullet.ctor -= AbstractBullet_ctor;
-            On.Scavenger.Throw -= Scavenger_Throw;
-            On.ScavengerAI.WeaponScore -= ScavengerAI_WeaponScore;
-            On.ScavengerAI.RealWeapon -= ScavengerAI_RealWeapon;
         }
 
         private void AbstractBullet_ctor(On.MoreSlugcats.AbstractBullet.orig_ctor orig, MoreSlugcats.AbstractBullet self, World world, MoreSlugcats.Bullet realizedObject, WorldCoordinate pos, EntityID ID, JokeRifle.AbstractRifle.AmmoType type, int timeToLive)

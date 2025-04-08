@@ -171,6 +171,11 @@ namespace ArenaPlus.Utils
             this.name = SlugcatStats.getSlugcatName(nameObject);
             this.color = PlayerGraphics.DefaultSlugcatColor(nameObject);
             this.configurable = OptionsInterface.instance.config.Bind($"enable_{GetValidSlugcatName()}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
+            
+            if (name == "Watcher")
+                color = new Color(0.22f, 0.192f, 0.929f);
+
+            
             slugcats.Add(this);
         }
 
