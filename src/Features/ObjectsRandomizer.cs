@@ -122,6 +122,13 @@ namespace ArenaPlus.Features
                                 ]);
                             }
 
+                            if (ModManager.Watcher)
+                            {
+                                objectsList.AddRange([
+                                    new RandomObject(Watcher.WatcherEnums.AbstractObjectType.Boomerang, 20),
+                                ]);
+                            }
+
                             if (ModManager.MSC || ModManager.Watcher)
                             {
                                 objectsList.AddRange([
