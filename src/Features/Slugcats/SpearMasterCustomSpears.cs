@@ -45,7 +45,7 @@ namespace ArenaPlus.Features.Slugcats
                         if (Random.value < (1f/3f))
                         {
                             LogDebug("spawning custom spear");
-                            int spearType = Random.Range(0, 3);
+                            int spearType = Random.Range(0, ModManager.Watcher ? 4 : 3);
                             switch (spearType)
                             {
                                 case 0:
@@ -57,7 +57,14 @@ namespace ArenaPlus.Features.Slugcats
                                     break;
                                 case 2:
                                     self.hue = Mathf.Lerp(0.35f, 0.6f, Custom.ClampedRandomVariation(0.5f, 0.5f, 2f));
-                                break;
+                                    break;
+                                case 3:
+                                    if (ModManager.Watcher)
+                                    {
+                                        self.poison = 3f;
+                                        self.poisonHue = 0.3f + UnityEngine.Random.value * 0.6f;
+                                    }
+                                    break;
                             }
                         }
                     }

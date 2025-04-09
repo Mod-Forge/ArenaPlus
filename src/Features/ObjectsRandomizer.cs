@@ -82,10 +82,13 @@ namespace ArenaPlus.Features
                                 else
                                 {
                                     newObject = new AbstractSpear(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), false, false);
+                                    if (ModManager.Watcher && random < 0.5f)
+                                    {
+                                        (newObject as AbstractSpear).poison = 1.7f;
+                                        (newObject as AbstractSpear).poisonHue = 0.3f + UnityEngine.Random.value * 0.6f;
+                                    }
                                 }
                             }
-
-                            //newObject = new AbstractSpear(self.world, null, self.abstractRoom.entities[i].pos, self.game.GetNewID(), false, false);
 
                             if (Random.value < 0.5f) // 1/2
                             {
