@@ -1,10 +1,10 @@
 {
 	"id": "modforge.ArenaPlus",
 	"name": "Arena+",
-	"version": "2.0.1",
+	"version": "2.1.0",
 	"authors": "modforge",
 	"description": "A mod that adds many optional features/tweaks to the arena mode.",
 	"requirements": [],
 	"requirements_names": [],
-	"tags": ["Arenas", "Game Mechanics"]
+	"tags": [ "Arenas", "Game Mechanics" ]
 }

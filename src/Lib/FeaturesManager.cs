@@ -88,7 +88,7 @@ namespace ArenaPlus.Lib
                             baseFeature = feature;
 
                             AddFeature(feature);
-                            //LogInfo($"Registering feature : {baseFeature.Id}");
+                            LogInfo($"Registering feature : {baseFeature.Id}");
                         }
                         else if (type.GetCustomAttribute<ImmutableFeatureAttribute>() is not null && !disabledImutables.Contains(ParseImutableName(type.Name)))
                         {
@@ -104,7 +104,7 @@ namespace ArenaPlus.Lib
                             baseFeature = feature;
 
                             slugcatFeatures.Add(feature);
-                            //LogInfo($"Registering slugcat feature : {baseFeature.Id}");
+                            LogInfo($"Registering slugcat feature : {baseFeature.Id}");
                         }
 
                         if (baseFeature != null)
