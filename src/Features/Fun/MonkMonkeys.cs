@@ -13,7 +13,7 @@ namespace ArenaPlus.Features.Fun
 {
     [FeatureInfo(
         id: "monkMonkeys",
-        name: "Monk Monkeys (WIP)",
+        name: "Monk Monkeys",
         category: BuiltInCategory.Spoilers,
         description: "Make all scavengers believe in karma (Watcher spoiler)",
         requireDLC: [DLCIdentifiers.Watcher],

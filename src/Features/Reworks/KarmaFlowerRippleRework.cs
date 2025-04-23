@@ -14,9 +14,9 @@ namespace ArenaPlus.Features.Reworks
 {
     [FeatureInfo(
         id: "karmaFlowerRippleRework",
-        name: "Watcher karma flower (Spoiler)",
+        name: "Watcher karma flower (Spoiler) (WIP)",
         category: BuiltInCategory.Spoilers,
-        description: "The Watcher allow beings from other places to enter (Watcher spoiler)",
+        description: "The Watcher allow beings from the ripples to feast on your enemies (Watcher spoiler)",
         requireDLC: [DLCIdentifiers.MSC],
         enabledByDefault: false
     )]

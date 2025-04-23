@@ -13,7 +13,7 @@ namespace ArenaPlus.Features.Slugcats
     [SlugcatFeatureInfo(
         id: "watcherPowers",
         name: "Watcher powers (WIP)",
-        description: "Give the watcher some powers (NightCat spoiler).",
+        description: "Give the watcher some powers (NightCat spoiler) (do nothing for now).",
         slugcat: "Watcher"
     )]
     file class SpearMasterCustomSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)

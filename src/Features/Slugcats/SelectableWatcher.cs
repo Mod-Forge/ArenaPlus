@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ArenaPlus.Features
 {
     // Remove if the watcher get in arena
-    [ImmutableFeature]
+    //[ImmutableFeature]
     file class SelectableWatcher : ImmutableFeature
     {
         internal bool WatcherUnlocked => GameUtils.ProgressionData.beaten_Watcher_SpinningTop;
