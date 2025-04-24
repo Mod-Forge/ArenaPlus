@@ -48,7 +48,7 @@ namespace ArenaPlus
         {
             Futile.atlasManager.LoadAtlas("atlases/huntersprites");
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
-            FeaturesManager.LoadFeatures();
+            try { RegisterUtils.RegisterAllUtilsPostInit(); } catch (Exception e) { LogError(e); }
         }
 
         private void OnModInit(RainWorld rainWorld)

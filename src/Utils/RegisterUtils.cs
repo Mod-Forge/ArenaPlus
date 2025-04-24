@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArenaPlus.Lib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,14 @@ namespace ArenaPlus.Utils
     {
         internal static void RegisterAllUtils()
         {
-            // Uncomment when DevConsole is fixed
-            //try { Utils.MyDevConsole.Register(); } catch { }
-            LogWarning("ArenaPlus commands are temporarily removed until Dev Console is fixed");
             HookRegister.RegisterAllHooks();
+        }
+
+        internal static void RegisterAllUtilsPostInit()
+        {
+            try { Utils.MyDevConsole.Register(); } catch { }
+            HookRegister.RegisterAllHooks();
+            FeaturesManager.LoadFeatures();
         }
     }
 }

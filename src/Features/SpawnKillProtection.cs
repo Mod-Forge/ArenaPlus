@@ -120,7 +120,8 @@ namespace ArenaPlus.Features
     file class SpawnProtectionTimerBehavior : ArenaGameBehavior
     {
         private const string timerText = "Figth start in";
-        public static bool protection => !UI.ArenaTimer.IsTimerDone(timerText);
+        private static UI.ArenaTimer.Timer timer;
+        public static bool protection => timer != null && !timer.Done;
 
         public SpawnProtectionTimerBehavior(ArenaGameSession gameSession) : base(gameSession)
         {
@@ -128,10 +129,10 @@ namespace ArenaPlus.Features
 
         public override void Initiate()
         {
-            UI.ArenaTimer.StartTimer(timerText, DateTime.Now.AddSeconds(SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value + 1), true);
+            timer = UI.ArenaTimer.StartTimer(timerText, (SpawnKillProtection.spawnKillProtectionTimerConfigurable.Value + 1) * 40, true);
             foreach (var abstPlayer in game.Players)
             {
-                LogInfo("player", abstPlayer.realizedCreature);
+                //LogInfo("player", abstPlayer.realizedCreature);
                 if (abstPlayer.realizedCreature is Player player)
                 {
                     player.AddAttachedFeature(new SpawnProtectionMessage());

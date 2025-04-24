@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace ArenaPlus.Features.UI
 {
@@ -28,46 +29,36 @@ namespace ArenaPlus.Features.UI
             self.AddPart(new ArenaTimerHUD(self));
         }
 
-        public static void StartTimer(string text, DateTime endTime, bool pause = false)
+        static HashSet<Timer> timers = new HashSet<Timer>();
+        public static Timer StartTimer(string text, int ticks, bool pause = true)
         {
-            Assert(!Active || text == ArenaTimerHUD.text, "Only one timer can by active at the time");
-            ArenaTimerHUD.time = endTime;
-            ArenaTimerHUD.text = text;
-            ArenaTimerHUD.pause = pause;
+            LogDebug($"starting timer \"{text}\"");
+            var timer = new Timer(text, ticks, pause);
+            timers.Add(timer);
+            return timer;
         }
 
-        public static bool StopTimer(string text)
+        private static void StopTimer(Timer timer)
         {
-            if (text == Text)
-            {
-                StopTimer();
-                return true;
-            }
-            return false;
+            if (!timers.Contains(timer)) return;
+            timer.life = 0;
+            timers.Remove(timer);
         }
 
-        public static void StopTimer()
-        {
-            ArenaTimerHUD.time = default;
-            ArenaTimerHUD.text = "None";
-        }
 
-        public static bool IsTimerDone(string text)
+        public class Timer(string text, int ticks, bool pause)
         {
-            return ArenaTimerHUD.text != text || !Active;
+            public string text = text;
+            public float life = ticks;
+            public bool Done => life <= 0;
+            public bool pause = pause;
+            public bool Paused => GameUtils.rainWorldGame.GamePaused && pause;
+            public void Dispose() => StopTimer(this);
+            public Action<Timer> onTimerEnd;
         }
-
-        public static bool Active => DateTime.Now < ArenaTimerHUD.time;
-        public static string Text { get => ArenaTimerHUD.text; }
-        public static DateTime endTime { get => ArenaTimerHUD.time; }
 
         private class ArenaTimerHUD : HudPart
         {
-            internal static DateTime time;
-            internal static TimeSpan remaningTime;
-            internal static string text = "None";
-            internal static bool pause;
-            internal static bool paused;
             internal FLabel fLabel;
             public ArenaTimerHUD(HUD.HUD hud) : base(hud)
             {
@@ -82,39 +73,39 @@ namespace ArenaPlus.Features.UI
             public override void Update()
             {
                 base.Update();
-                fLabel.isVisible = DateTime.Now < time;
+                string text = string.Empty;
+                HashSet<Timer> removeQue = new HashSet<Timer>();
 
-                if (GameUtils.rainWorldGame.GamePaused != paused && pause)
+                foreach (var timer in timers)
                 {
-                    paused = GameUtils.rainWorldGame.GamePaused;
+                    if (!timer.Paused)
+                        timer.life -= 40f / (float)GameUtils.rainWorldGame.framesPerSecond;
 
-                    if (paused)
+                    if (timer.Done)
                     {
-                        remaningTime = (endTime - DateTime.Now);
-                    }
-                }
-
-                if (paused)
-                {
-                    time = DateTime.Now + remaningTime;
-                }
-                else
-                {
-                    if (DateTime.Now <= time)
-                    {
-                        fLabel.text = text + " " + ((time - DateTime.Now).ToString(@"ss\:ff"));
+                        removeQue.Add(timer);
                     }
                     else
                     {
-                        text = "None";
+                        DateTime endTime = DateTime.Now.AddSeconds((timer.life + (timer.Paused ? 0f : GameUtils.rainWorldGame.myTimeStacker)) / 40f);
+                        text += $"\n{timer.text} {(endTime - DateTime.Now).ToString(@"mm\:ss\:ff")}";
                     }
                 }
+
+                foreach (var timer in removeQue)
+                {
+                    timers.Remove(timer);
+                    timer.onTimerEnd?.Invoke(timer);
+                }
+
+                fLabel.isVisible = text.Length > 0;
+                fLabel.text = text;
             }
 
             public override void ClearSprites()
             {
                 base.ClearSprites();
-                time = default;
+                timers.Clear();
             }
         }
     }
