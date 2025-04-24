@@ -32,6 +32,11 @@ namespace ArenaPlus.Features.UI
 
         private void MultiplayerMenu_ClearGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_ClearGameTypeSpecificButtons orig, MultiplayerMenu self)
         {
+            if (!ModManager.NewSlugcatsModule)
+            {
+                orig(self);
+                return;
+            }
             try
             {
                 if (self.playerClassButtons != null)
@@ -62,6 +67,7 @@ namespace ArenaPlus.Features.UI
         private void MultiplayerMenu_InitiateGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_InitiateGameTypeSpecificButtons orig, Menu.MultiplayerMenu self)
         {
             orig(self);
+            if (!ModManager.NewSlugcatsModule) return;
 
             if (self.playerClassButtons == null) return;
 
@@ -89,6 +95,11 @@ namespace ArenaPlus.Features.UI
 
         private void MultiplayerMenu_Singal(On.Menu.MultiplayerMenu.orig_Singal orig, Menu.MultiplayerMenu self, Menu.MenuObject sender, string message)
         {
+            if (!ModManager.NewSlugcatsModule)
+            {
+                orig(self, sender, message);
+                return;
+            }
             try
             {
                 if (message != null && self.currentGameType == ArenaSetup.GameTypeID.Competitive || self.currentGameType == ArenaSetup.GameTypeID.Sandbox)
