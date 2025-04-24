@@ -1,6 +1,6 @@
 {
   "Title": "Arena\u002B",
-  "Description": "Arena\u002B is a mod for enhancing the overall experience in competitive mode by adding new features, reworks and tweaks.\r\n\r\nWe rebuilt the mod from scratch to make it easier to add new features, which means more updates! (unless a DLC comes and breaks everything)\r\n\r\n[h1]Main features : [/h1]\r\n[list]\r\n    [*] Random slugcat every round\r\n    [*] Objects randomizer\r\n    [*] Improved config UI since last version\r\n    [*] Optional slugcats buff/balance\r\n    [*] Objects buffs and reworks\r\n    [*] Funny gameplay features\r\n[/list]\r\n\r\nGitHub link : https://github.com/Mod-Forge/ArenaPlus",
+  "Description": "Arena\u002B is a mod for enhancing the overall experience in competitive mode by adding new features, reworks and tweaks.\r\n\r\nWe rebuilt the mod from scratch to make it easier to add new features, which means more updates! (unless a DLC comes and breaks everything)\r\n\r\n[h1]Main features : [/h1]\r\n[list]\r\n    [*] Random slugcat every round\r\n    [*] Objects randomizer\r\n    [*] Improved config UI since last version\r\n    [*] Optional slugcats buff/balance\r\n    [*] Objects buffs and reworks\r\n    [*] Funny gameplay features\r\n[/list]\r\n\r\nThe mod no longer requires more slugcat and you can play it with any dlc, but needed to have a dlc.\r\nDon\u0027t ask me why this is what Videocult chose to do.\r\n\r\nGitHub link : https://github.com/Mod-Forge/ArenaPlus",
   "ID": "modforge.ArenaPlus",
   "Version": "2.1.0",
   "TargetGameVersion": "v1.9.06",

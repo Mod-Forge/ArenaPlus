@@ -15,7 +15,7 @@ namespace ArenaPlus.Features.Fun
         id: "unlockAllCreatureForSpawn",
         name: "Unlock all creatures spawn (Cheat)",
         category: BuiltInCategory.Spoilers,
-        description: "Unlock all creatures spawn in arena (Spoiler for evrything)",
+        description: "Unlock all creatures spawn in arena (Spoiler for everything)",
         color: "FF0000",
         enabledByDefault: false
     )]
