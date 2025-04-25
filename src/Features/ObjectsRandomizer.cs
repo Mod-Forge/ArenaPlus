@@ -335,7 +335,7 @@ namespace ArenaPlus.Features
 
             public override string ToString()
             {
-                return $"{this.GetType().Name} Rifle bullet:{(bulletType != null ? bulletType : "rand")}({(bulletAmount.HasValue ? bulletAmount.value : "rand")}) chance:{chance} rare:{rare}";
+                return $"{this.GetType().Name} Rifle bullet:{(bulletType != null ? bulletType : "rand")}({(bulletAmount.HasValue ? bulletAmount.Value : "rand")}) chance:{chance} rare:{rare}";
             }
         }
 
