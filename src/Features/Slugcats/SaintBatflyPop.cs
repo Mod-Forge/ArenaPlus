@@ -41,7 +41,6 @@ namespace ArenaPlus.Features.Slugcats
 
             if (!tossBy.TryGetValue(fly, out var player)) return;
 
-            LogUnity("tossed batfly collide");
             if (self.grabbedBy.Count == 0 && self.Stunned)
             {
                 self.room.PlaySound(SoundID.Snail_Pop, self.mainBodyChunk, false, 1f, 1.5f + UnityEngine.Random.value);
@@ -68,13 +67,10 @@ namespace ArenaPlus.Features.Slugcats
         private void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
         {
             orig(self, grasp, eu);
-            LogUnity("tossed object");
             if (GameUtils.IsCompetitiveOrSandboxSession && self.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Saint && self.grasps[grasp].grabbed is Fly fly)
             {
-                LogUnity("tossed batfly");
                 if (!tossBy.TryGetValue(fly, out _))
                 {
-                    LogUnity("tossed batfly saved");
                     tossBy.Add(fly, self);
                     fly.Stun(100);
                 }
