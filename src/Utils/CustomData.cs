@@ -44,6 +44,9 @@ namespace ArenaPlus.Utils
 
     internal class PlayerCustomData : CustomData
     {
+
+        // SaintTongueThief
+        public PlayerCarryableItem tongueGrabbedItem;
     }
 
     internal class PlayerResultBoxCustomData : CustomData

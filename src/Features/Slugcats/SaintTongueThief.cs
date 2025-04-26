@@ -59,35 +59,88 @@ namespace ArenaPlus.Features.Slugcats
 
         private void Tongue_Update(On.Player.Tongue.orig_Update orig, Player.Tongue self)
         {
-            if (GameUtils.IsCompetitiveOrSandboxSession && self.mode == Player.Tongue.Mode.AttachedToObject && self.attachedChunk.owner.TotalMass < 0.2f)
+            if (!GameUtils.IsCompetitiveOrSandboxSession)
             {
-                BodyChunk attachedChunk = self.attachedChunk;
-                self.Release();
-                attachedChunk.vel = Custom.DirVec(attachedChunk.pos, self.baseChunk.pos) * 10;
-                if (self.player.FreeHand() != -1 && self.player.Grabability(attachedChunk.owner) != Player.ObjectGrabability.CantGrab)
-                {
-                    self.player.SlugcatGrab(attachedChunk.owner, self.player.FreeHand());
-                }
-                self.player.wantToJump = 0;
+                orig(self);
+                return;
             }
+
+            PlayerCustomData pData = self.GetCustomData<PlayerCustomData>();
+
+            if (self.mode == Player.Tongue.Mode.ShootingOut)
+            {
+                Vector2 vector2 = self.pos + self.vel;
+                SharedPhysics.CollisionResult collisionResult = SharedPhysics.TraceProjectileAgainstBodyChunks(null, self.player.room, self.pos, ref vector2, 4f, 2, self.baseChunk.owner, false);
+                if (collisionResult.chunk != null && collisionResult.chunk.owner is PlayerCarryableItem obj && !obj.grabbedBy.Any(cg => cg.grabber == self.player))
+                {
+                    self.AttachToChunk(collisionResult.chunk);
+                }
+            }
+            else if (self.mode == Player.Tongue.Mode.AttachedToObject && self.attachedChunk.owner is PlayerCarryableItem obj)
+            {
+                if (pData.tongueGrabbedItem != null)
+                {
+                    self.Release();
+                    if (obj is ScavengerBomb bomb && (bomb.ignited || bomb.burn > 0f))
+                    {
+                        bomb.ignited = false;
+                        bomb.burn = 0f;
+                        bomb.ChangeMode(Weapon.Mode.Free);
+                    }
+                }
+                else
+                {
+                    pData.tongueGrabbedItem = obj;
+                }
+                // TODO: do the same with singularity bombs and cherry bombs
+            }
+            else if (pData.tongueGrabbedItem != null)
+            {
+                if (self.mode == Player.Tongue.Mode.Retracting)
+                {
+                    pData.tongueGrabbedItem.firstChunk.HardSetPosition(self.pos);
+                    pData.tongueGrabbedItem.firstChunk.vel = self.vel;
+                }
+                else
+                {
+                    if (self.player.FreeHand() != -1 && self.player.Grabability(pData.tongueGrabbedItem) != Player.ObjectGrabability.CantGrab)
+                    {
+                        self.player.SlugcatGrab(pData.tongueGrabbedItem, self.player.FreeHand());
+                    }
+                    pData.tongueGrabbedItem = null;
+                }
+            }
+
             orig(self);
         }
 
+        // aim for objects
         private Vector2 Tongue_AutoAim(On.Player.Tongue.orig_AutoAim orig, Player.Tongue self, Vector2 originalDir)
         {
             if (GameUtils.IsCompetitiveOrSandboxSession && self.player.input[0].y <= 0)
             {
                 float d = 230f;
                 Vector2 endPos = self.baseChunk.pos + originalDir * d;
-                var result = SharedPhysics.TraceProjectileAgainstBodyChunks(null, self.player.room, self.baseChunk.pos, ref endPos, 50f, 1, self.player, false);
-                if (result.hitSomething)
+
+                // item check
+                var iResult = SharedPhysics.TraceProjectileAgainstBodyChunks(null, self.player.room, self.baseChunk.pos, ref endPos, 50f, 2, self.player, false);
+                if (iResult.hitSomething)
                 {
-                    return Custom.DirVec(self.baseChunk.pos + self.baseChunk.vel, result.chunk.pos + result.chunk.vel).normalized;
+                    return Custom.DirVec(self.baseChunk.pos + self.baseChunk.vel, iResult.chunk.pos + iResult.chunk.vel).normalized;
                 }
+
+                // object check
+                var oResult = SharedPhysics.TraceProjectileAgainstBodyChunks(null, self.player.room, self.baseChunk.pos, ref endPos, 50f, 1, self.player, false);
+                if (oResult.hitSomething)
+                {
+                    return Custom.DirVec(self.baseChunk.pos + self.baseChunk.vel, oResult.chunk.pos + oResult.chunk.vel).normalized;
+                }
+
             }
             return orig(self, originalDir);
         }
 
+        // throw horizontal
         private void Tongue_Shoot(On.Player.Tongue.orig_Shoot orig, Player.Tongue self, Vector2 dir)
         {
             if (!GameUtils.IsCompetitiveOrSandboxSession)
