@@ -28,7 +28,7 @@ using Microsoft.Internal.Collections;
 
 namespace ArenaPlus
 {
-    [BepInPlugin(MOD_ID, "ArenaPlus", "2.1.0")]
+    [BepInPlugin(MOD_ID, "ArenaPlus", "2.1.1")]
     class Plugin : BaseUnityPlugin
     {
         internal const string MOD_ID = "modforge.ArenaPlus";
