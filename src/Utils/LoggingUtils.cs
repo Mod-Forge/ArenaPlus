@@ -15,7 +15,7 @@ internal static class LoggingUtils
     public static ManualLogSource log = BepInEx.Logging.Logger.CreateLogSource("ArenaPlus");
     private static bool _debugChecked;
     private static bool _debugEnabled;
-    private static bool DebugEnabled {
+    public static bool DebugEnabled {
         get
         {
             if (!_debugChecked)

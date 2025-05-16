@@ -16,18 +16,9 @@ namespace ArenaPlus.Features.UI
     {
         protected override void Register()
         {
-            // break evrythin, I don't want to be near any of that
-            //new Hook(typeof(ModManager).GetProperty(nameof(ModManager.NewSlugcatsModule)).GetGetMethod(), ModManager_NewSlugcatsModule);
             On.Menu.MultiplayerMenu.Singal += MultiplayerMenu_Singal;
             On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += MultiplayerMenu_InitiateGameTypeSpecificButtons;
             On.Menu.MultiplayerMenu.ClearGameTypeSpecificButtons += MultiplayerMenu_ClearGameTypeSpecificButtons;
-        }
-
-        private bool ModManager_NewSlugcatsModule(Func<bool> orig)
-        {
-            orig();
-            LogInfo("NewSlugcatsModule_get");
-            return true;
         }
 
         private void MultiplayerMenu_ClearGameTypeSpecificButtons(On.Menu.MultiplayerMenu.orig_ClearGameTypeSpecificButtons orig, MultiplayerMenu self)
