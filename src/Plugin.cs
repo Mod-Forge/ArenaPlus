@@ -20,6 +20,7 @@ using System.Security.Permissions;
 using Mono.Mozilla;
 using System.Runtime.CompilerServices;
 using Microsoft.Internal.Collections;
+using ArenaPlus.Features;
 
 // Allows access to private members
 #pragma warning disable CS0618
@@ -46,9 +47,10 @@ namespace ArenaPlus
         // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
         {
-            Futile.atlasManager.LoadAtlas("atlases/huntersprites");
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
             try { RegisterUtils.RegisterAllUtilsPostInit(); } catch (Exception e) { LogError(e); }
+
+            Futile.atlasManager.LoadAtlas("atlases/huntersprites");
         }
 
         private void OnModInit(RainWorld rainWorld)

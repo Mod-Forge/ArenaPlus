@@ -11,6 +11,7 @@ using UnityEngine;
 using Menu.Remix.MixedUI;
 using RWCustom;
 using ArenaPlus.Features.Fun;
+using UnityEngine.SocialPlatforms.Impl;
 
 namespace ArenaPlus.Features;
 
@@ -65,8 +66,7 @@ file class CreaturesRandomizer : Feature
     }
 
 
-    private static int[] defaultKillScores = new int[ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count];
-    private static List<string> exceptions = ["BigEel", "StowawayBug", "Slugcat", "SlugNPC", "Fly"];
+    private static List<string> exceptions = ["BigEel", "StowawayBug", "Slugcat", "SlugNPC", "Fly", "Rattler"];
     private static HashSet<string> spawnedCreatures = new();
     protected override void Unregister()
     {
@@ -75,7 +75,6 @@ file class CreaturesRandomizer : Feature
 
     protected override void Register()
     {
-        Menu.SandboxSettingsInterface.DefaultKillScores(ref defaultKillScores);
         On.ArenaCreatureSpawner.CreateAbstractCreature += ArenaCreatureSpawner_CreateAbstractCreature;
         // test / debug
         On.ArenaCreatureSpawner.SpawnArenaCreatures += ArenaCreatureSpawner_SpawnArenaCreatures;
@@ -178,17 +177,13 @@ file class CreaturesRandomizer : Feature
     {
         spawnedCreatures.Clear();
         orig(game, wildLifeSetting, ref availableCreatures, ref unlocks);
-        //orig(game, wildLifeSetting, ref availableCreatures, ref unlocks);
-        //orig(game, wildLifeSetting, ref availableCreatures, ref unlocks);
-        //orig(game, wildLifeSetting, ref availableCreatures, ref unlocks);
-        //orig(game, wildLifeSetting, ref availableCreatures, ref unlocks);
         LogDebug("[CreaturesRandomizer] spawned creatures", spawnedCreatures.FormatEnumarableRecursive());
     }
 
     private AbstractCreature ArenaCreatureSpawner_CreateAbstractCreature(On.ArenaCreatureSpawner.orig_CreateAbstractCreature orig, World world, CreatureTemplate.Type critType, WorldCoordinate pos, ref List<AbstractCreature> availableCreatures)
     {
         AbstractCreature abstractCreature = orig(world, critType, pos, ref availableCreatures);
-        if (GameUtils.IsCompetitiveSession && abstractCreature != null)
+        if (GameUtils.IsCompetitiveSession && abstractCreature != null && Random.value >= 0.25f)
         {
             // replace the creature by something that give the same amout of points
             return OverrideCreature(abstractCreature, world.game.GetArenaGameSession.arenaSitting.multiplayerUnlocks);
@@ -197,12 +192,13 @@ file class CreaturesRandomizer : Feature
         return abstractCreature;
     }
 
+
     private AbstractCreature OverrideCreature(AbstractCreature abstractCreature, MultiplayerUnlocks unlocks)
     {
         int origScore;
         try
         {
-            origScore = defaultKillScores[GetAbstractCreatureScoreIndex(abstractCreature)];
+            origScore = GetAbstractCreatureScore(abstractCreature);
         } catch (Exception e)
         {
             LogError("[CreaturesRandomizer] failed to get creature points", e);
@@ -227,7 +223,17 @@ file class CreaturesRandomizer : Feature
             for (global::System.Int32 i = 0; i < ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count; i++)
             {
                 string unlockName = ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.GetEntry(i);
-                int score = defaultKillScores[i];
+                int score = 0;
+
+                if (i >= ScoreForEveryone.defaultKillScores.Length)
+                {
+                    score = ScoreForEveryone.GetProceduralScore(unlockName);
+                }
+                else
+                {
+                    score = ScoreForEveryone.defaultKillScores[i];
+                }
+
                 if (NoTolerance || (score != 0 && Mathf.Abs(score - origScore) <= randomizerTolerance.Value))
                 {
                     if (ExtEnum<CreatureTemplate.Type>.values.entries.Contains(unlockName) && unlocks.IsCreatureUnlockedForLevelSpawn(new CreatureTemplate.Type(unlockName, false)) && !exceptions.Contains(unlockName))
@@ -261,7 +267,7 @@ file class CreaturesRandomizer : Feature
 
         try
         {
-            int newScore = TotalChaos ? -1 : defaultKillScores[GetAbstractCreatureScoreIndex(newAbstCreature)];
+            int newScore = TotalChaos ? -1 : GetAbstractCreatureScore(newAbstCreature);
             LogDebug("[CreaturesRandomizer] overriding", abstractCreature.creatureTemplate.name, "by", newAbstCreature.creatureTemplate.name, "with a diference of", Mathf.Abs(newScore - origScore), "/", randomizerTolerance.Value);
         } catch (Exception e)
         {
@@ -282,6 +288,20 @@ file class CreaturesRandomizer : Feature
             {
                abstractRoom.MoveEntityToDen(new AbstractCreature(abstractCreature.world, abstractCreature.creatureTemplate, null, abstractCreature.pos, abstractCreature.world.game.GetNewID()));
             }
+        }
+    }
+
+
+    private int GetAbstractCreatureScore(AbstractCreature abstractCreature)
+    {
+        int index = GetAbstractCreatureScoreIndex(abstractCreature);
+        if (index >= ScoreForEveryone.defaultKillScores.Length)
+        {
+            return ScoreForEveryone.GetProceduralScore(abstractCreature.creatureTemplate.name);
+        }
+        else
+        {
+            return ScoreForEveryone.defaultKillScores[index];
         }
     }
 
