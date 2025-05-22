@@ -66,7 +66,7 @@ file class CreaturesRandomizer : Feature
     }
 
 
-    private static List<string> exceptions = ["BigEel", "StowawayBug", "Slugcat", "SlugNPC", "Fly", "Rattler"];
+    private static List<string> exceptions = ["BigEel", "StowawayBug", "Slugcat", "SlugNPC", "Fly", "Rattler", "BasiliskLizard"];
     private static HashSet<string> spawnedCreatures = new();
     protected override void Unregister()
     {
