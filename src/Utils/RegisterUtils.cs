@@ -17,7 +17,6 @@ namespace ArenaPlus.Utils
         internal static void RegisterAllUtilsPostInit()
         {
             try { Utils.MyDevConsole.Register(); } catch { }
-            HookRegister.RegisterAllHooks();
             FeaturesManager.LoadFeatures();
         }
     }
