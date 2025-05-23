@@ -10,7 +10,15 @@
             <Private>false</Private>
         </Reference>
 
-		<Reference Include="../lib/RainWorldManaged/*.dll" Publicize="true">
+		<Reference Include="..\lib\RainWorldManaged\Assembly-CSharp.dll" Publicize="true">
+			<Private>false</Private>
+		</Reference>
+
+		<Reference Include="..\lib\RainWorldManaged\Unity*.dll" Publicize="true">
+			<Private>false</Private>
+		</Reference>
+
+		<Reference Include="..\lib\RainWorldManaged\Mono*.dll" Publicize="true">
 			<Private>false</Private>
 		</Reference>
     </ItemGroup>

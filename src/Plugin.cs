@@ -17,9 +17,7 @@ using System.Reflection;
 using UnityEngine.Assertions;
 using System.Linq;
 using System.Security.Permissions;
-using Mono.Mozilla;
 using System.Runtime.CompilerServices;
-using Microsoft.Internal.Collections;
 using ArenaPlus.Features;
 
 // Allows access to private members
