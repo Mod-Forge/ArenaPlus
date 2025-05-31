@@ -86,13 +86,13 @@ namespace ArenaPlus.Features.Slugcats
                         bomb.ignited = false;
                         bomb.burn = 0f;
                         bomb.ChangeMode(Weapon.Mode.Free);
+                    // TODO: do the same with singularity bombs and cherry bombs
                     }
                 }
                 else
                 {
                     pData.tongueGrabbedItem = obj;
                 }
-                // TODO: do the same with singularity bombs and cherry bombs
             }
             else if (pData.tongueGrabbedItem != null)
             {
