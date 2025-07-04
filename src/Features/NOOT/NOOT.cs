@@ -18,34 +18,41 @@ namespace ArenaPlus.Features.NOOT
         name: "N O O T",
         description: "NOOT NOOT",
         enabledByDefault: false,
-        category: BuiltInCategory.Fun
+        category: BuiltInCategory.Reworks
     )]
 
 
-    // TODO: NOOT
     file class NOOT(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
         private bool skipMovement;
         protected override void Unregister()
         {
+            JoustingNoot.Unregister();
             On.SmallNeedleWorm.BitByPlayer -= SmallNeedleWorm_BitByPlayer;
             On.NeedleWormGraphics.DrawSprites -= NeedleWormGraphics_DrawSprites;
             On.Player.checkInput -= Player_checkInput;
             On.Player.ThrowObject -= Player_ThrowObject;
+            On.PlayerGraphics.Update -= PlayerGraphics_Update;
         }
 
         protected override void Register()
         {
+            JoustingNoot.Register();
             On.SmallNeedleWorm.BitByPlayer += SmallNeedleWorm_BitByPlayer;
             On.NeedleWormGraphics.DrawSprites += NeedleWormGraphics_DrawSprites;
             On.Player.checkInput += Player_checkInput;
             On.Player.ThrowObject += Player_ThrowObject;
+            On.PlayerGraphics.Update += PlayerGraphics_Update;
 
-            On.PlayerGraphics.RippleTrailUpdate += PlayerGraphics_RippleTrailUpdate;
         }
 
-        private void PlayerGraphics_RippleTrailUpdate(On.PlayerGraphics.orig_RippleTrailUpdate orig, PlayerGraphics self)
+        private void PlayerGraphics_Update(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
+            if (self.player.GetAttachedFeatureType<MusicNoot>() is MusicNoot musicNoot)
+            {
+                musicNoot.playerColor = PlayerGraphics.SlugcatColor(self.CharacterForColor);
+            }
+            orig(self);
         }
 
         private void Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
@@ -158,7 +165,7 @@ namespace ArenaPlus.Features.NOOT
 
                 if (!IsPlaying)
                 {
-                    player.RemoveAttachedFeature(this);
+                    Destroy();
                 }
             }
 
@@ -182,7 +189,7 @@ namespace ArenaPlus.Features.NOOT
                     smallNoot.Mother.BigAI.BigRespondCry();
                 }
 
-                smallNoot.room.AddObject(new MusicNote(player, smallNoot.mainBodyChunk.pos, Custom.DegToVec(note * 45f + 90f) * 1f));
+                smallNoot.room.AddObject(new MusicNote(player, smallNoot.mainBodyChunk.pos, Custom.DegToVec(note * 45f + 90f) * 5f, nootColor * 1.5f));
 
                 PlayMusic(note);
             }
@@ -228,7 +235,7 @@ namespace ArenaPlus.Features.NOOT
             List<int> playedNote = new List<int>();
             public void PlayMusic(int note)
             {
-                LogInfo("note played", note);
+                //LogInfo("note played", note);
 
                 playedNote.Add(note);
 
@@ -238,7 +245,7 @@ namespace ArenaPlus.Features.NOOT
                         continue;
 
                     bool musicMatched = true;
-                    LogInfo("checking music", music.notes.FormatEnumarable(), playedNote.FormatEnumarable());
+                    //LogInfo("checking music", music.notes.FormatEnumarable(), playedNote.FormatEnumarable());
                     for (global::System.Int32 i = 0; i < music.notes.Length; i++)
                     {
                         //LogInfo("coparing", music.notes[music.notes.Length - 1 - i], playedNote[playedNote.Count - 1 - i]);
@@ -248,7 +255,7 @@ namespace ArenaPlus.Features.NOOT
 
                     if (musicMatched)
                     {
-                        LogInfo("music match for music", music.notes);
+                        //LogInfo("music match for music", music.notes);
                         music.action(this);
                         playedNote.Clear();
                         return;
@@ -273,7 +280,6 @@ namespace ArenaPlus.Features.NOOT
                 sLeaser.sprites[0] = new FSprite("Futile_White", true)
                 {
                     scale = 0.5f,
-                    color = playerColor
                 };
 
                 sLeaser.sprites[1] = new FSprite("Futile_White", true)
@@ -291,6 +297,7 @@ namespace ArenaPlus.Features.NOOT
 
                 sLeaser.sprites[0].isVisible = visible;
                 sLeaser.sprites[0].SetPosition((pPos + MusicInputVec.normalized * 40f) - camPos);
+                sLeaser.sprites[0].color = playerColor;
 
                 sLeaser.sprites[1].isVisible = visible;
                 var notePos = pPos + Custom.DegToVec(lastNote * 45f + 90f) * 30f;
@@ -304,12 +311,14 @@ namespace ArenaPlus.Features.NOOT
         public class MusicNote : CosmeticSprite
         {
             public Player player;
-            public int maxLife = 40 * 10;
+            public Color color;
+            public int maxLife = 40;
             public int life;
 
-            public MusicNote(Player noteOwner, Vector2 pos, Vector2 vel)
+            public MusicNote(Player noteOwner, Vector2 pos, Vector2 vel, Color color)
             {
                 player = noteOwner;
+                this.color = color;
                 this.pos = pos;
                 this.lastPos = pos;
                 this.vel = vel;
@@ -319,7 +328,18 @@ namespace ArenaPlus.Features.NOOT
             public override void Update(bool eu)
             {
                 base.Update(eu);
-                UpdateMask();
+
+                var result = SharedPhysics.TraceProjectileAgainstBodyChunks(null, room, lastPos - vel, ref pos, 20f, 1, player, false);
+                if (result.obj is Creature creature)
+                {
+                    creature.Stun(40);
+                    room.AddObject(new CreatureSpasmer(creature, false, 40));
+                }
+                else if (result.obj is PhysicalObject obj)
+                {
+                    obj.firstChunk.vel += vel / obj.firstChunk.mass;
+                }
+
                 life--;
                 if (life <= 0)
                 {
@@ -330,68 +350,42 @@ namespace ArenaPlus.Features.NOOT
             public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
             {
                 sLeaser.sprites = new FSprite[1];
-                sLeaser.sprites[0] = new FSprite("Futile_White", true)
+                sLeaser.sprites[0] = new FSprite("musicSymbol", true)
                 {
-                    scale = 100f,
-                    shader = Custom.rainWorld.Shaders["WarpTear"]
+                    scale = 1f,
+                    color = color
                 };
 
-
-                sLeaser.maskSources = new MaskSource[1];
-                mesh ??= this.CreateMesh();
-                mask ??= MaskMaker.MakeSource("WarpTearGrab", "WarpTearMask", false, this.mesh, this.pos, Vector3.back, Vector2.one * 40f);
-                sLeaser.maskSources[0] = mask;
-                mask.SetProperty(0, 1f);
-                mask.SetProperty(2, 1f);
-                mask.SetPos(this.pos, true);
-                mask.SetScale(Vector2.one * 40f, true);
-                mask.SetRotation(Vector3.back, true);
-
-
-                AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("WarpPoint"));
+                AddToContainer(sLeaser, rCam, rCam.ReturnFContainer(FContainerLayer.HUD));
             }
 
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
             {
-                sLeaser.sprites[0].SetPosition(Vector2.Lerp(lastPos, pos, timeStacker) - camPos);
+                var positon = Vector2.Lerp(lastPos, pos, timeStacker);
+                positon += Custom.PerpendicularVector(vel.normalized) * (vel.magnitude / 2f) * (life % 5f / 4f) * (1f + Random.value);
+
+                sLeaser.sprites[0].SetPosition(positon - camPos);
 
                 if (life <= 10)
                 {
                     sLeaser.sprites[0].alpha = Mathf.InverseLerp(0, 10, life);
                 }
-
-                mask?.SetProperty(1, Random.value);
-                mask?.DrawUpdate(timeStacker, rCam, camPos);
-
                 base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
             }
 
-            private Mesh CreateMesh()
-            {
-                Mesh quad = MaskSource.Quad;
-                quad.vertices = quad.vertices.Select((Vector3 v) => v + Vector3.up * 0.3f).ToArray<Vector3>();
-                quad.RecalculateBounds();
-                return quad;
-            }
 
-            private Mesh mesh;
-            private MaskSource mask;
-            private void UpdateMask()
-            {
-                if (mask == null || mask.beingDeleted)
-                    return;
+        }
+    }
 
-                mask.SetPos(this.pos, false);
-                mask.SetScale(Vector2.one * 40f, false);
-                mask.SetRotation(Vector3.zero, false);
+    // TODO: JoustingNoot
+    file static class JoustingNoot
+    {
+        internal static void Unregister()
+        {
+        }
 
-                //tail.SetPos(pos, false);
-                //tail.SetScale(Vector3.one * 40f, false);
-
-                //tail.SetPos(this.player.mainBodyChunk.pos, false);
-                //tail.SetScale(Vector3.one * 70f, false);
-            }
-
+        internal static void Register()
+        {
         }
     }
 }

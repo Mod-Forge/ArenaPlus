@@ -77,4 +77,23 @@ namespace ArenaPlus.Utils
             get => RainWorldInstance.progression.miscProgressionData;
         }
     }
+
+    public static class FContainerLayer
+    {
+        public const string Shadows = "Shadows";
+		public const string BackgroundShortcuts = "BackgroundShortcuts";
+		public const string Background = "Background";
+		public const string Midground = "Midground";
+		public const string Items = "Items";
+		public const string Foreground = "Foreground";
+		public const string Sand = "Sand";
+		public const string ForegroundLights = "ForegroundLights";
+		public const string Shortcuts = "Shortcuts";
+		public const string Water = "Water";
+		public const string GrabShaders = "GrabShaders";
+		public const string Bloom = "Bloom";
+		public const string WarpPoint = "WarpPoint";
+		public const string HUD = "HUD";
+		public const string HUD2 = "HUD2";
+    }
 }
