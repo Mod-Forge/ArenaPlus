@@ -110,6 +110,8 @@ namespace ArenaPlus.Features
         private void ArenaGameSession_ctor(On.ArenaGameSession.orig_ctor orig, ArenaGameSession self, RainWorldGame game)
         {
             orig(self, game);
+            SpawnProtectionTimerBehavior.timer?.Dispose();
+            SpawnProtectionTimerBehavior.timer = null;
             if (self is not SandboxGameSession) // || self.arenaSitting.sandboxPlayMode
             {
                 self.AddBehavior(new SpawnProtectionTimerBehavior(self));
@@ -120,7 +122,7 @@ namespace ArenaPlus.Features
     file class SpawnProtectionTimerBehavior : ArenaGameBehavior
     {
         private const string timerText = "Figth start in";
-        private static UI.ArenaTimer.Timer timer;
+        internal static UI.ArenaTimer.Timer timer;
         public static bool protection => timer != null && !timer.Done;
 
         public SpawnProtectionTimerBehavior(ArenaGameSession gameSession) : base(gameSession)
