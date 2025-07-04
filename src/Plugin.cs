@@ -47,6 +47,7 @@ namespace ArenaPlus
         {
             MachineConnector.SetRegisteredOI("modforge.ArenaPlus", OptionsInterface.instance);
             try { RegisterUtils.RegisterAllUtilsPostInit(); } catch (Exception e) { LogError(e); }
+            Sounds.Initialize();
 
             Futile.atlasManager.LoadAtlas("atlases/huntersprites");
         }
