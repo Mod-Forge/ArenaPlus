@@ -38,7 +38,7 @@ namespace ArenaPlus.Utils
 
     }
 
-    internal class CreatureCustomData : CustomData
+    internal class NootCustomData : CustomData
     {
     }
 

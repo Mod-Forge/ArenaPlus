@@ -1,6 +1,6 @@
 ﻿using ArenaPlus.Lib;
 using ArenaPlus.Options;
-
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,33 @@ namespace ArenaPlus.Utils
 {
     internal static class SlugcatsUtils
     {
+        public static IntVector2 ThrowDirection(this Player player)
+        {
+            IntVector2 intVector = new IntVector2(player.ThrowDirection, 0);
+            bool flag = player.input[0].y < 0;
+            if (ModManager.MMF && MoreSlugcats.MMF.cfgUpwardsSpearThrow.Value)
+            {
+                flag = player.input[0].y != 0;
+            }
+            if (player.animation == Player.AnimationIndex.Flip && flag && player.input[0].x == 0)
+            {
+                intVector = new IntVector2(0, (ModManager.MMF && MoreSlugcats.MMF.cfgUpwardsSpearThrow.Value) ? player.input[0].y : (-1));
+            }
+            if (ModManager.MMF && player.bodyMode == Player.BodyModeIndex.ZeroG && MoreSlugcats.MMF.cfgUpwardsSpearThrow.Value)
+            {
+                int y = player.input[0].y;
+                if (y != 0)
+                {
+                    intVector = new IntVector2(0, y);
+                }
+                else
+                {
+                    intVector = new IntVector2(player.ThrowDirection, 0);
+                }
+            }
+            return intVector;
+        }
+
         public static SlugcatObject[] GetSlugcats()
         {
             string[] exceptions = [

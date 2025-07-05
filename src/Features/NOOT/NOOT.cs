@@ -27,7 +27,7 @@ namespace ArenaPlus.Features.NOOT
         private bool skipMovement;
         protected override void Unregister()
         {
-            JoustingNoot.Unregister();
+            JavlinNoot.Unregister();
             On.SmallNeedleWorm.BitByPlayer -= SmallNeedleWorm_BitByPlayer;
             On.NeedleWormGraphics.DrawSprites -= NeedleWormGraphics_DrawSprites;
             On.Player.checkInput -= Player_checkInput;
@@ -37,7 +37,7 @@ namespace ArenaPlus.Features.NOOT
 
         protected override void Register()
         {
-            JoustingNoot.Register();
+            JavlinNoot.Register();
             On.SmallNeedleWorm.BitByPlayer += SmallNeedleWorm_BitByPlayer;
             On.NeedleWormGraphics.DrawSprites += NeedleWormGraphics_DrawSprites;
             On.Player.checkInput += Player_checkInput;
@@ -89,8 +89,8 @@ namespace ArenaPlus.Features.NOOT
 
         private void SmallNeedleWorm_BitByPlayer(On.SmallNeedleWorm.orig_BitByPlayer orig, SmallNeedleWorm self, Creature.Grasp grasp, bool eu)
         {
-            //if (!GameUtils.IsCompetitiveOrSandboxSession)
-                //orig(self, grasp, eu);
+            if (!GameUtils.IsCompetitiveOrSandboxSession)
+                orig(self, grasp, eu);
 
             Player player = grasp.grabber as Player;
             if (player.GetAttachedFeatureType<MusicNoot>() is not MusicNoot musicNoot)
@@ -377,15 +377,91 @@ namespace ArenaPlus.Features.NOOT
         }
     }
 
-    // TODO: JoustingNoot
-    file static class JoustingNoot
+    file static class JavlinNoot
     {
         internal static void Unregister()
         {
+            On.Player.GrabUpdate -= Player_GrabUpdate;
+            On.Player.SlugcatGrab -= Player_SlugcatGrab;
+            On.Player.ThrowObject -= Player_ThrowObject;
+            On.BigNeedleWorm.Update -= BigNeedleWorm_Update;
+
         }
 
         internal static void Register()
         {
+            On.Player.GrabUpdate += Player_GrabUpdate;
+            On.Player.SlugcatGrab += Player_SlugcatGrab;
+            On.Player.ThrowObject += Player_ThrowObject;
+            On.BigNeedleWorm.Update += BigNeedleWorm_Update;
+        }
+
+        private static void BigNeedleWorm_Update(On.BigNeedleWorm.orig_Update orig, BigNeedleWorm self, bool eu)
+        {
+            orig(self, eu);
+
+            if (!GameUtils.IsCompetitiveOrSandboxSession)
+                return;
+
+
+
+            if (self.grabbedBy.Count > 0 && self.grabbedBy[0].grabber is Player)
+            {
+                if (self.attackReady > 0f && !self.attackRefresh)
+                {
+                    self.attackReady = Custom.LerpAndTick(self.attackReady, 1f, 0f, 0.0375f);
+                    if (self.chargingAttack < 0.1f)
+                    {
+                        self.chargingAttack = 0.1f;
+                    }
+                }
+            }
+        }
+
+        private static void Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
+        {
+            BigNeedleWorm bigNoot = self.grasps[grasp]?.grabbed as BigNeedleWorm;
+
+            orig(self, grasp, eu);
+
+            if (bigNoot != null && bigNoot.grabbedBy.Count == 0 && GameUtils.IsCompetitiveOrSandboxSession)
+            {
+                bigNoot.chargingAttack = 0f;
+                bigNoot.swishDir = self.ThrowDirection().ToVector2().normalized;
+                bigNoot.swishCounter = 6;
+                bigNoot.room.PlaySound(SoundID.Big_Needle_Worm_Attack, bigNoot.mainBodyChunk);
+                bigNoot.attackRefresh = true;
+            }
+        }
+
+        private static void Player_SlugcatGrab(On.Player.orig_SlugcatGrab orig, Player self, PhysicalObject obj, int graspUsed)
+        {
+            orig(self, obj, graspUsed);
+            if (self.grasps[graspUsed]?.grabbed == obj && obj is BigNeedleWorm bigNoot && GameUtils.IsCompetitiveOrSandboxSession)
+            {
+                if (bigNoot.attackReady < 0.05f)
+                {
+                    bigNoot.attackReady = 0.05f;
+                    bigNoot.controlledCharge = Vector2.zero;
+                }
+            }
+        }
+
+        private static void Player_GrabUpdate(On.Player.orig_GrabUpdate orig, Player self, bool eu)
+        {
+            orig(self, eu);
+
+            if (self.grasps[0]?.grabbed is not BigNeedleWorm bigNoot || !GameUtils.IsCompetitiveOrSandboxSession)
+                return;
+
+            if (bigNoot.attackReady > 0f && !bigNoot.attackRefresh)
+            {
+                bigNoot.attackReady = Custom.LerpAndTick(bigNoot.attackReady, 1f, 0f, 0.0375f);
+                if (bigNoot.chargingAttack < 0.1f)
+                {
+                    bigNoot.chargingAttack = 0.1f;
+                }
+            }
         }
     }
 }
