@@ -9,6 +9,9 @@ using UnityEngine;
 using RWCustom;
 using SlugBase.DataTypes;
 using Watcher;
+using System.Timers;
+using static ArenaPlus.Features.NOOT.NOOT.MusicNoot;
+using ArenaPlus.Features.Fun;
 
 namespace ArenaPlus.Features.NOOT
 {
@@ -45,6 +48,7 @@ namespace ArenaPlus.Features.NOOT
             On.PlayerGraphics.Update += PlayerGraphics_Update;
 
         }
+
 
         private void PlayerGraphics_Update(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
@@ -97,14 +101,17 @@ namespace ArenaPlus.Features.NOOT
             {
                 musicNoot = new MusicNoot();
                 player.AddAttachedFeature(musicNoot);
+            
             }
+
+            musicNoot.noot = self;
 
             player.checkInput();
             musicNoot.lastPlayingInput = musicNoot.playingInput;
             musicNoot.playingInput = player.input[0];
             Vector2 vecInput = player.input[0].IntVec.ToVector2();
 
-            var note = -1;
+            var note = 0;
             var usingAnalogue = player.input[0].analogueDir.magnitude > 0f;
             if (player.input[0].analogueDir.magnitude > 0.6f || (usingAnalogue && vecInput.magnitude > 0f))
             {
@@ -117,7 +124,7 @@ namespace ArenaPlus.Features.NOOT
                 while (angle < 0)
                     angle += 360;
 
-                note = (int)(angle / 45);
+                note = (int)(angle / 45) + 1;
             }
 
             // play note
@@ -127,7 +134,7 @@ namespace ArenaPlus.Features.NOOT
 
 
 
-                if (musicNoot.playingInput.pckp && note > -1)
+                if (musicNoot.playingInput.pckp && note > 0)
                 {
                     musicNoot.ScreemMusic(self, note);
                 }
@@ -148,7 +155,7 @@ namespace ArenaPlus.Features.NOOT
             public Color playerColor = Color.white;
             public Color nootColor = Color.magenta;
 
-            public int lastNote = -1;
+            public int lastNote = 0;
             public bool lockInput;
             public bool _playing;
             private bool wasPlaying;
@@ -157,10 +164,13 @@ namespace ArenaPlus.Features.NOOT
             public Player.InputPackage playingInput = new Player.InputPackage() { pckp = true };
             public Vector2 MusicInputVec => playingInput.analogueDir.magnitude > 0f ? playingInput.analogueDir.normalized : playingInput.IntVec.ToVector2().normalized;
 
+            public SmallNeedleWorm noot;
+
             public override void Update(bool eu)
             {
                 wasPlaying = _playing;
                 base.Update(eu);
+                DebugNoteUpdate();
                 _playing = false;
 
                 if (!IsPlaying)
@@ -177,11 +187,11 @@ namespace ArenaPlus.Features.NOOT
                 // 0.475
                 if (playingInput.mp)
                 {
-                    smallNoot.room.PlaySound(SoundID.Small_Needle_Worm_Intense_Trumpet_Scream, smallNoot.mainBodyChunk.pos, 1f, Mathf.Lerp(0.475f, 0.95f, (float)note / 7f) * 0.714285f);
+                    smallNoot.room.PlaySound(SoundID.Small_Needle_Worm_Intense_Trumpet_Scream, smallNoot.mainBodyChunk.pos, 1f, Mathf.Lerp(0.475f, 0.95f, (float)(note - 1) / 7f) * 0.714285f);
                 }
                 else
                 {
-                    smallNoot.room.PlaySound(SoundID.Small_Needle_Worm_Intense_Trumpet_Scream, smallNoot.mainBodyChunk.pos, 1f, Mathf.Lerp(0.95f, 1.9f, (float)note / 7f) * 0.714285f);
+                    smallNoot.room.PlaySound(SoundID.Small_Needle_Worm_Intense_Trumpet_Scream, smallNoot.mainBodyChunk.pos, 1f, Mathf.Lerp(0.95f, 1.9f, (float)(note - 1) / 7f) * 0.714285f);
                 }
                 smallNoot.hasScreamed = true;
                 if (smallNoot.Mother != null)
@@ -189,88 +199,384 @@ namespace ArenaPlus.Features.NOOT
                     smallNoot.Mother.BigAI.BigRespondCry();
                 }
 
-                smallNoot.room.AddObject(new MusicNote(player, smallNoot.mainBodyChunk.pos, Custom.DegToVec(note * 45f + 90f) * 5f, nootColor * 1.5f));
+                smallNoot.room.AddObject(new MusicNote(player, smallNoot.mainBodyChunk.pos, Custom.DegToVec((note - 1) * 45f + 90f) * 5f, nootColor * 1.5f));
 
-                PlayMusic(note);
+                PlayMusic(playingInput.mp ? -note : note, smallNoot);
             }
 
             #region sercet music
-            List<Music> musics = [
-                new Music( // den warp
-                    [0, 0, 4, 4, 2, 2, 6, 6],
+
+            private void ExplodePlayer()
+            {
+                for (global::System.Int32 i = 0; i < player.grasps.Length; i++)
+                {
+                    AbstractPhysicalObject abstBomb = new AbstractPhysicalObject(player.abstractCreature.world, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, null, player.abstractCreature.pos, player.abstractCreature.world.game.GetNewID());
+                    player.abstractCreature.Room.AddEntity(abstBomb);
+                    abstBomb.RealizeInRoom();
+
+                    var grabbed = player.grasps[i]?.grabbed;
+                    player.ReleaseGrasp(i);
+                    grabbed?.Destroy();
+
+                    player.SlugcatGrab(abstBomb.realizedObject, i);
+                    (abstBomb.realizedObject as ScavengerBomb).ignited = true;
+                }
+
+                for (global::System.Int32 i = 0; i < 3; i++)
+                {
+                    AbstractPhysicalObject abstBBomb = new AbstractPhysicalObject(player.abstractCreature.world, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, null, player.abstractCreature.pos, player.abstractCreature.world.game.GetNewID());
+                    player.abstractCreature.Room.AddEntity(abstBBomb);
+                    abstBBomb.RealizeInRoom();
+                }
+            }
+
+
+            [MyCommand("snow")]
+            // TODO: fix the crash
+            private void AddSnow()
+            {
+                if (!ModManager.DLCShared || room.roomSettings.DangerType == DLCSharedEnums.RoomRainDangerType.Blizzard)
+                    return;
+
+                room.roomSettings.DangerType = DLCSharedEnums.RoomRainDangerType.Blizzard;
+                if (!room.updateList.Any(ud => ud is MoreSlugcats.ColdRoom))
+                {
+                    room.AddObject(new MoreSlugcats.ColdRoom(room));
+                }
+
+                if (room.roomRain != null)
+                {
+                    room.roomRain.Destroy();
+                    room.RemoveObject(room.roomRain);
+                    room.game.cameras.SelectMany(c => c.spriteLeasers).First(sl => sl.drawableObject == room.roomRain).CleanSpritesAndRemove();
+                    room.roomRain = null;
+                }
+
+                room.AddSnow();
+
+                MoreSlugcats.SnowSource snowSource = new MoreSlugcats.SnowSource(player.mainBodyChunk.pos);
+                room.AddObject(snowSource);
+                snowSource.rad = 1000000f;
+                snowSource.intensity = 0.5f;
+            }
+
+            static List<Music> musics = [
+                new Music(
+                    "warp",
+                    [1, 1, 5, 5, 3, 3, 7, 7],
                     mn => {
                         mn.player.SuperHardSetPosition(mn.player.room.MiddleOfTile(mn.player.room.LocalCoordinateOfNode(Random.Range(0, mn.player.room.abstractRoom.nodes.Length)).Tile));
                         mn.player.room.PlaySound(Sounds.Noot_Warp, mn.player.mainBodyChunk.pos, 0.75f, 1f);
-
+                        return false;
                     }
                 ),
-                new Music( // MEGALOVANIA
-                    [0, 0, 7, 4],
+                new Music(
+                    "sus",
+                    [1, 3, 4, 5, 4, 3, 2, 1, 3, 2],
                     mn => {
+                        mn.player.ObjectEaten(mn.noot);
+                        return true;
+                    }
+                ),
+                new Music(
+                    "💀",
+                    [1, 1, 8, 5],
+                    mn => {
+                        mn.ExplodePlayer();
+                        return true;
+                    }
+                ),
+                new Music(
+                    "💀2",
+                    [-5, -5, 5, 2],
+                    mn => {
+                        mn.ExplodePlayer();
+                        return true;
+                    }
+                ),
+                new Music(
+                    "blind song",
+                    [2, 3, 4, 6, 4, 6, 4, 6],
+                    mn => {
+                        AbstractConsumable abstractConsumable = new AbstractConsumable(mn.player.abstractCreature.world, AbstractPhysicalObject.AbstractObjectType.FlareBomb, null, mn.player.abstractCreature.pos, mn.player.abstractCreature.world.game.GetNewID(), -1, -1, null);
+                        mn.player.abstractCreature.Room.AddEntity(abstractConsumable);
+                        abstractConsumable.RealizeInRoom();
+                        (abstractConsumable.realizedObject as FlareBomb).StartBurn();
+                        return false;
+                    }
+                ),
+                new Music(
+                    "bad noot",
+                    [2, 5, 5, 4, 5, 2],
+                    mn => {
+                        mn.noot.Destroy();
+                        for (global::System.Int32 i = 0; i < mn.player.grasps.Length; i++) { mn.player.ReleaseGrasp(i); }
 
-                        for (global::System.Int32 i = 0; i < mn.player.grasps.Length; i++)
+                        var world = mn.player.abstractCreature.world; var pos = mn.player.abstractCreature.pos; var id = mn.noot.abstractCreature.ID; // var id = mn.player.abstractCreature.world.game.GetNewID();
+                        AbstractCreature abstractCreature = new AbstractCreature(world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.BigNeedleWorm), null, pos, id);
+                        mn.player.abstractCreature.Room.AddEntity(abstractCreature);
+                        abstractCreature.RealizeInRoom();
+                        abstractCreature.realizedCreature.Die();
+
+                        mn.player.SlugcatGrab(abstractCreature.realizedCreature, 0);
+                        return true;
+                    }
+                ),
+                new Music(
+                    "water song",
+                    [7, 5, 3, 1, 3, 5, 7, 5, 3, 1, 3, 5, 7, 5, 3, 1, 3, 5, 7, 5, 3, 1, 3, 5, 7, 4, 2],
+                    mn => {
+                        var room = mn.player.room;
+
+                        int maxLevel = room.Height;
+                        room.defaultWaterLevel = maxLevel;
+                        room.floatWaterLevel = room.MiddleOfTile(new IntVector2(0, room.defaultWaterLevel)).y;
+                        if (!room.water)
                         {
-                            AbstractPhysicalObject abstBomb = new AbstractPhysicalObject(mn.player.abstractCreature.world, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, null, mn.player.abstractCreature.pos, mn.player.abstractCreature.world.game.GetNewID());
-                            mn.player.abstractCreature.Room.AddEntity(abstBomb);
-                            abstBomb.RealizeInRoom();
-
-                            var grabbed = mn.player.grasps[i]?.grabbed;
-                            mn.player.ReleaseGrasp(i);
-                            grabbed?.Destroy();
-
-                            mn.player.SlugcatGrab(abstBomb.realizedObject, i);
-                            (abstBomb.realizedObject as ScavengerBomb).ignited = true;
+                            room.waterInFrontOfTerrain = true;
                         }
+                        else
+                        {
+                            room.waterObject.Destroy();
+                            room.waterObject = null;
+                        }
+                        room.AddWater();
+                        room.waterObject.WaterIsLethal = false;
 
+                        // TODO: flood the screen
+                        return true;
+                    }
+                ),
+                new Music(
+                    "picture of the past",
+                    [6, 4, 6, 4, 6, 4, 6, 4, 5, 3, 5, 3, 5, 3, 5, 3],
+                    mn => {
+                        // TODO: randomize your class
+                        return true;
+                    }
+                ),
+                new Music(
+                    "monkey city",
+                    [3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7],
+                    mn => {
+                        // TODO: spawn scavengers
+                        var world = mn.player.abstractCreature.world; var pos = mn.player.abstractCreature.pos;
                         for (global::System.Int32 i = 0; i < 3; i++)
                         {
-                            AbstractPhysicalObject abstBBomb = new AbstractPhysicalObject(mn.player.abstractCreature.world, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, null, mn.player.abstractCreature.pos, mn.player.abstractCreature.world.game.GetNewID());
-                            mn.player.abstractCreature.Room.AddEntity(abstBBomb);
-                            abstBBomb.RealizeInRoom();
-                        }
-                    }
-                )
+                            var id = mn.player.abstractCreature.world.game.GetNewID();
+                            AbstractCreature abstractScav = new AbstractCreature(world, StaticWorld.GetCreatureTemplate(ModManager.DLCShared ? DLCSharedEnums.CreatureTemplateType.ScavengerElite : CreatureTemplate.Type.Scavenger), null, pos, id);
+                            mn.room.abstractRoom.AddEntity(abstractScav);
+                            (abstractScav.abstractAI as ScavengerAbstractAI).InitGearUp();
+                            abstractScav.RealizeInRoom();
 
+                        }
+                        return false;
+                    }
+                ),
+                new Music(
+                    "old memory",
+                    [-1, -5, 1, 2, 3, 2, 1, -5, -1, -5, 1, 2, 3],
+                    mn => {
+                        mn.AddSnow();
+                        return true;
+                    },
+                    octave: true
+                ),
+                new Music(
+                    "lost moon",
+                    [-3, -5, -6, 2, 6, 7, 4, 2, 5, -6, -7, 4, -6, -7],
+                    mn => {
+                        mn.AddSnow();
+                        return true;
+                    },
+                    octave: true
+                ),
+                new Music(
+                    "lack of drug",
+                    [3, 3, 1, 1, -6, -6, -3, -3],
+                    mn => {
+                        mn.player.mushroomCounter += 320;
+                        return true;
+                    },
+                    octave: true
+                ),
+                new Music(
+                    "open sky",
+                    [-1, 1, 2, 3, 5, -1, 1, 2, 3, -1, 1, 2, 3, 5, -1, 1, 2, 3],
+                    mn => {
+                        // TODO: spawn a king vulture from the sky
+                        return true;
+                    },
+                    octave: true
+                ),
+                new Music(
+                    "last dream",
+                    [1, -6, 3, -6, 1, -6, 1, 2, 3, -7, -5, 3, -5, -7, -5, -7, 1, 2, -6, -4, 1, -4, -6],
+                    mn => {
+                        int grasp = mn.noot.grabbedBy[0].graspUsed;
+                        mn.player.ReleaseGrasp(grasp);
+
+
+                        AbstractConsumable abstractConsumable = new AbstractConsumable(mn.player.abstractCreature.world, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, null, mn.player.abstractCreature.pos, mn.player.abstractCreature.world.game.GetNewID(), -1, -1, null);
+                        mn.player.abstractCreature.Room.AddEntity(abstractConsumable);
+                        abstractConsumable.RealizeInRoom();
+                        mn.player.SlugcatGrab(abstractConsumable.realizedObject, grasp);
+
+                        return true;
+                    },
+                    octave: true
+                ),
+                new Music(
+                    "last minute",
+                    [0],
+                    mn => {
+                        // TODO: end the round
+                        return true;
+                    },
+                    octave: true
+                ),
+                new Music(
+                    "travelers",
+                    [-1, -5, -7, -5, 1, -7, -6, -5, -6, -7, -5, -2, -5, -7, -5, 1, -7, -6, -5, -6, -7, 2, -7, -3, -5, -7, -5, 1, -7, -6, -5, -6, -7, -5],
+                    mn => {
+                        // TODO: create a singluarity explosion
+                        return true;
+                    },
+                    octave: true
+                ),
             ];
-            List<int> playedNote = new List<int>();
-            public void PlayMusic(int note)
+
+
+            List<int> playedNotes = new List<int>();
+            public void PlayMusic(int note, SmallNeedleWorm instrument)
             {
                 //LogInfo("note played", note);
 
-                playedNote.Add(note);
+                playedNotes.Add(note);
 
                 foreach (var music in musics)
                 {
-                    if (music.notes.Length > playedNote.Count)
+                    if (music.notes.Length > playedNotes.Count)
                         continue;
 
                     bool musicMatched = true;
-                    //LogInfo("checking music", music.notes.FormatEnumarable(), playedNote.FormatEnumarable());
+                    //LogInfo("checking music", music.notes.FormatEnumarable(), playedNotes.FormatEnumarable());
                     for (global::System.Int32 i = 0; i < music.notes.Length; i++)
                     {
-                        //LogInfo("coparing", music.notes[music.notes.Length - 1 - i], playedNote[playedNote.Count - 1 - i]);
-                        musicMatched &= playedNote[playedNote.Count - 1 - i] == music.notes[music.notes.Length - 1 - i];
+                        int musicNote = music.notes[music.notes.Length - 1 - i];
+                        int playedNote = playedNotes[playedNotes.Count - 1 - i];
+                        if (!music.octave)
+                        {
+                            musicNote = Mathf.Abs(musicNote);
+                            playedNote = Mathf.Abs(playedNote);
+                        }
+                        else
+                        {
+                            if (playedNote == -8)
+                                playedNote = 1;
+                        }
+                        //LogInfo("coparing", musicNote, playedNote);
+
+                        musicMatched &= playedNote == musicNote;
      
                     }
 
                     if (musicMatched)
                     {
                         //LogInfo("music match for music", music.notes);
-                        music.action(this);
-                        playedNote.Clear();
+                        bool removeNoot = music.action(this);
+                        LogUnity("Played", FormatObject(music.name));
+                        if (removeNoot)
+                        {
+                            instrument.Destroy();
+                            LogUnity("Noot removed");
+                        }
+                        playedNotes.Clear();
                         return;
                     }
                 }
 
                 var maxValue = 64;
-                if (playedNote.Count > maxValue)
-                    playedNote.RemoveRange(0, playedNote.Count - maxValue);
+                if (playedNotes.Count > maxValue)
+                    playedNotes.RemoveRange(0, playedNotes.Count - maxValue);
             }
 
-            public struct Music(int[] notes, Action<MusicNoot> action)
+            #region debug player
+            [MyCommand("log_notes")]
+            private static void LogPlayedNotes(Player player)
             {
+                if (player.GetAttachedFeatureType<MusicNoot>() is MusicNoot musicNoot)
+                {
+                    ConsoleWrite(musicNoot.playedNotes.FormatEnumarable());
+                    return;
+                }
+
+                ConsoleWrite("Failed to find player music", Color.red);
+            }
+
+            private Music _debugPlayMusic;
+            private List<int> _debugNotesList = null;
+
+            [MyCommand("play_music")]
+            private static void PlayMusic(Player player, string musicName)
+            {
+                if (player.GetAttachedFeatureType<MusicNoot>() is MusicNoot musicNoot)
+                {
+                    musicNoot._debugPlayMusic = musics.First(m => m.name.ToLower() == musicName.ToLower());
+                    musicNoot._debugNotesList = musicNoot._debugPlayMusic.notes.ToList();
+                    musicNoot._debugNoteCooldown = 40;
+                    return;
+                }
+
+                ConsoleWrite("Failed to find player music", Color.red);
+            }
+
+            private int _debugNoteCooldown;
+            private void DebugNoteUpdate()
+            {
+                if (_debugNotesList == null)
+                    return;
+
+                _debugNoteCooldown--;
+                if (_debugNoteCooldown > 0)
+                    return;
+
+                _debugNoteCooldown = 15;
+
+                PlayNote(_debugNotesList[0]);
+                _debugNotesList.RemoveAt(0);
+
+                if (_debugNotesList.Count == 0)
+                {
+                    LogUnity("Played", FormatObject(_debugPlayMusic.name));
+                    _debugPlayMusic.action(this);
+                    _debugNotesList = null;
+                }
+
+            }
+            #endregion
+
+            
+
+            private void PlayNote(int note)
+            {
+                LogInfo("playing note", note);
+                if (note < 0)
+                {
+                    player.room.PlaySound(SoundID.Small_Needle_Worm_Intense_Trumpet_Scream, player.mainBodyChunk.pos, 1f, Mathf.Lerp(0.475f, 0.95f, (float)(Mathf.Abs(note) - 1) / 7f) * 0.714285f);
+                }
+                else
+                {
+                    player.room.PlaySound(SoundID.Small_Needle_Worm_Intense_Trumpet_Scream, player.mainBodyChunk.pos, 1f, Mathf.Lerp(0.95f, 1.9f, (float)(note - 1) / 7f) * 0.714285f);
+                }
+            }
+
+            public struct Music(string name, int[] notes, Func<MusicNoot, bool> action, bool octave = false)
+            {
+                public string name = name;
                 public int[] notes = notes;
-                public Action<MusicNoot> action = action;
+                public Func<MusicNoot, bool> action = action;
+                public bool octave = octave;
             }
             #endregion
 
@@ -293,14 +599,14 @@ namespace ArenaPlus.Features.NOOT
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
             {
                 var pPos = player.mainBodyChunk.pos;
-                var visible = IsPlaying && lastNote > -1;
+                var visible = IsPlaying && lastNote != 0;
 
                 sLeaser.sprites[0].isVisible = visible;
                 sLeaser.sprites[0].SetPosition((pPos + MusicInputVec.normalized * 40f) - camPos);
                 sLeaser.sprites[0].color = playerColor;
 
                 sLeaser.sprites[1].isVisible = visible;
-                var notePos = pPos + Custom.DegToVec(lastNote * 45f + 90f) * 30f;
+                var notePos = pPos + Custom.DegToVec((lastNote - 1) * 45f + 90f) * 30f;
                 sLeaser.sprites[1].SetPosition(notePos - camPos);
                 sLeaser.sprites[1].color = nootColor;
 
