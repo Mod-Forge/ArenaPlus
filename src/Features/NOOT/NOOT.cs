@@ -12,6 +12,7 @@ using Watcher;
 using System.Timers;
 using static ArenaPlus.Features.NOOT.NOOT.MusicNoot;
 using ArenaPlus.Features.Fun;
+using Unity.Burst.Intrinsics;
 
 namespace ArenaPlus.Features.NOOT
 {
@@ -230,7 +231,6 @@ namespace ArenaPlus.Features.NOOT
                 }
             }
 
-
             [MyCommand("snow")]
             // TODO: fix the crash
             private void AddSnow()
@@ -357,22 +357,39 @@ namespace ArenaPlus.Features.NOOT
                 ),
                 new Music(
                     "monkey city",
-                    [3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7],
+                    [3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7],
                     mn => {
                         // TODO: spawn scavengers
                         var world = mn.player.abstractCreature.world; var pos = mn.player.abstractCreature.pos;
-                        for (global::System.Int32 i = 0; i < 3; i++)
+
+                        int amount = ModManager.MSC ? 1 :
+                                     ModManager.DLCShared ? 2 :
+                                     3;
+                        for (global::System.Int32 i = 0; i < amount; i++)
                         {
                             var id = mn.player.abstractCreature.world.game.GetNewID();
-                            AbstractCreature abstractScav = new AbstractCreature(world, StaticWorld.GetCreatureTemplate(ModManager.DLCShared ? DLCSharedEnums.CreatureTemplateType.ScavengerElite : CreatureTemplate.Type.Scavenger), null, pos, id);
+
+                            AbstractCreature abstractScav = new AbstractCreature(world, StaticWorld.GetCreatureTemplate(ModManager.MSC ? MoreSlugcats.MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing
+                                                                                                                      : ModManager.DLCShared ? DLCSharedEnums.CreatureTemplateType.ScavengerElite
+                                                                                                                      : CreatureTemplate.Type.Scavenger), null, pos, id);
                             mn.room.abstractRoom.AddEntity(abstractScav);
                             (abstractScav.abstractAI as ScavengerAbstractAI).InitGearUp();
                             abstractScav.RealizeInRoom();
 
+                            for (int j = 0; j < world.game.Players.Count; j++)
+                            {
+                                abstractScav.state.socialMemory.GetOrInitiateRelationship(world.game.Players[j].ID).like = -1f;
+                                abstractScav.state.socialMemory.GetOrInitiateRelationship(world.game.Players[j].ID).tempLike = -1f;
+                            }
+                            abstractScav.state.socialMemory.GetOrInitiateRelationship(mn.player.abstractCreature.ID).like = 1f;
+                            abstractScav.state.socialMemory.GetOrInitiateRelationship(mn.player.abstractCreature.ID).tempLike = 1f;
+
+                            ScavengerMindControl.ForceLove(abstractScav.realizedCreature as Scavenger, mn.player.abstractCreature);
                         }
                         return false;
                     }
                 ),
+
                 new Music(
                     "old memory",
                     [-1, -5, 1, 2, 3, 2, 1, -5, -1, -5, 1, 2, 3],

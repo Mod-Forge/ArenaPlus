@@ -16,7 +16,7 @@ namespace ArenaPlus.Features.Slugcats
         description: "Give the watcher some powers (NightCat spoiler) (do nothing for now).",
         slugcat: "Watcher"
     )]
-    file class SpearMasterCustomSpears(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
+    file class WatcherPower(SlugcatFeatureInfoAttribute featureInfo) : SlugcatFeature(featureInfo)
     {
         protected override void Unregister()
         {
