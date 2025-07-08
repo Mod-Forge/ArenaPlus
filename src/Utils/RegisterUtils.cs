@@ -16,7 +16,7 @@ namespace ArenaPlus.Utils
 
         internal static void RegisterAllUtilsPostInit()
         {
-            try { Utils.MyDevConsole.Register(); } catch { }
+            try { Utils.MyDevConsoleImplementation.Register(); } catch (System.IO.FileLoadException) { } catch (Exception e) { LogWarning(e); }
             FeaturesManager.LoadFeatures();
         }
     }

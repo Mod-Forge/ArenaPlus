@@ -1,4 +1,4 @@
-﻿global using static ArenaPlus.Utils.MyDevConsole;
+﻿global using static ArenaPlus.Utils.MyDevConsoleImplementation;
 global using static ArenaPlus.Plugin;
 global using Random = UnityEngine.Random;
 global using static ArenaPlus.Utils.LoggingUtils;

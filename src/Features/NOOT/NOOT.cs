@@ -231,8 +231,8 @@ namespace ArenaPlus.Features.NOOT
                 }
             }
 
-            [MyCommand("snow")]
             // TODO: fix the crash
+            [MyCommand("snow")]
             private void AddSnow()
             {
                 if (!ModManager.DLCShared || room.roomSettings.DangerType == DLCSharedEnums.RoomRainDangerType.Blizzard)
@@ -260,6 +260,71 @@ namespace ArenaPlus.Features.NOOT
                 snowSource.intensity = 0.5f;
             }
 
+            public void Nuke()
+            {
+                Custom.Log(new string[] { "SINGULARITY EXPLODE" });
+                Vector2 vector = Vector2.Lerp(player.firstChunk.pos, player.firstChunk.lastPos, 0.35f);
+                var explodeColor = new Color(0.2f, 0.2f, 1f);
+                if (ModManager.MSC) room.AddObject(new MoreSlugcats.SingularityBomb.SparkFlash(player.firstChunk.pos, 300f, new Color(0f, 0f, 1f)));
+                room.AddObject(new Explosion(room, player, vector, 7, 450f, 6.2f, 10f, 280f, 0.25f, null, 0.3f, 160f, 1f));
+                room.AddObject(new Explosion(room, player, vector, 7, 2000f, 4f, 0f, 400f, 0.25f, null, 0.3f, 200f, 1f));
+                room.AddObject(new Explosion.ExplosionLight(vector, 280f, 1f, 7, explodeColor));
+                room.AddObject(new Explosion.ExplosionLight(vector, 230f, 1f, 3, new Color(1f, 1f, 1f)));
+                room.AddObject(new Explosion.ExplosionLight(vector, 2000f, 2f, 60, explodeColor));
+                room.AddObject(new ShockWave(vector, 750f, 1.485f, 300, true));
+                room.AddObject(new ShockWave(vector, 3000f, 1.185f, 180, false));
+                for (int i = 0; i < 25; i++)
+                {
+                    Vector2 vector2 = Custom.RNV();
+                    if (room.GetTile(vector + vector2 * 20f).Solid)
+                    {
+                        if (!room.GetTile(vector - vector2 * 20f).Solid)
+                        {
+                            vector2 *= -1f;
+                        }
+                        else
+                        {
+                            vector2 = Custom.RNV();
+                        }
+                    }
+                    for (int j = 0; j < 3; j++)
+                    {
+                        room.AddObject(new Spark(vector + vector2 * Mathf.Lerp(30f, 60f, global::UnityEngine.Random.value), vector2 * Mathf.Lerp(7f, 38f, global::UnityEngine.Random.value) + Custom.RNV() * 20f * global::UnityEngine.Random.value, Color.Lerp(explodeColor, new Color(1f, 1f, 1f), global::UnityEngine.Random.value), null, 11, 28));
+                    }
+                    room.AddObject(new Explosion.FlashingSmoke(vector + vector2 * 40f * global::UnityEngine.Random.value, vector2 * Mathf.Lerp(4f, 20f, Mathf.Pow(global::UnityEngine.Random.value, 2f)), 1f + 0.05f * global::UnityEngine.Random.value, new Color(1f, 1f, 1f), explodeColor, global::UnityEngine.Random.Range(3, 11)));
+                }
+
+                if (ModManager.MSC)
+                {
+                    for (int k = 0; k < 6; k++)
+                    {
+                        room.AddObject(new MoreSlugcats.SingularityBomb.BombFragment(vector, Custom.DegToVec(((float)k + global::UnityEngine.Random.value) / 6f * 360f) * Mathf.Lerp(18f, 38f, global::UnityEngine.Random.value)));
+                    }
+                }
+                room.ScreenMovement(new Vector2?(vector), default(Vector2), 0.9f);
+
+                this.room.PlaySound(SoundID.Bomb_Explode, player.firstChunk);
+                this.room.InGameNoise(new Noise.InGameNoise(vector, 9000f, player, 1f));
+                for (int m = 0; m < this.room.physicalObjects.Length; m++)
+                {
+                    for (int n = 0; n < this.room.physicalObjects[m].Count; n++)
+                    {
+                        if (this.room.physicalObjects[m][n] is Creature && (this.room.physicalObjects[m][n].abstractPhysicalObject.rippleLayer == player.abstractPhysicalObject.rippleLayer || this.room.physicalObjects[m][n].abstractPhysicalObject.rippleBothSides || player.abstractPhysicalObject.rippleBothSides) && Custom.Dist(this.room.physicalObjects[m][n].firstChunk.pos, player.firstChunk.pos) < 750f)
+                        {
+                            (this.room.physicalObjects[m][n] as Creature).SetKillTag(player.abstractCreature);
+                            (this.room.physicalObjects[m][n] as Creature).Die();
+                        }
+                    }
+                }
+                FirecrackerPlant.ScareObject scareObject = new FirecrackerPlant.ScareObject(player.firstChunk.pos, player.abstractPhysicalObject.rippleLayer);
+                scareObject.fearRange = 12000f;
+                scareObject.fearScavs = true;
+                scareObject.lifeTime = -600;
+                this.room.AddObject(scareObject);
+                this.room.InGameNoise(new Noise.InGameNoise(player.firstChunk.pos, 12000f, player, 1f));
+                this.room.AddObject(new UnderwaterShock(this.room, null, player.firstChunk.pos, 10, 1200f, 2f, player, new Color(0.8f, 0.8f, 1f)));
+            }
+
             static List<Music> musics = [
                 new Music(
                     "warp",
@@ -274,12 +339,13 @@ namespace ArenaPlus.Features.NOOT
                     "sus",
                     [1, 3, 4, 5, 4, 3, 2, 1, 3, 2],
                     mn => {
+                        mn.noot.Destroy();
                         mn.player.ObjectEaten(mn.noot);
                         return true;
                     }
                 ),
                 new Music(
-                    "💀",
+                    "dead",
                     [1, 1, 8, 5],
                     mn => {
                         mn.ExplodePlayer();
@@ -287,7 +353,7 @@ namespace ArenaPlus.Features.NOOT
                     }
                 ),
                 new Music(
-                    "💀2",
+                    "dead 2",
                     [-5, -5, 5, 2],
                     mn => {
                         mn.ExplodePlayer();
@@ -342,8 +408,6 @@ namespace ArenaPlus.Features.NOOT
                         }
                         room.AddWater();
                         room.waterObject.WaterIsLethal = false;
-
-                        // TODO: flood the screen
                         return true;
                     }
                 ),
@@ -351,7 +415,13 @@ namespace ArenaPlus.Features.NOOT
                     "picture of the past",
                     [6, 4, 6, 4, 6, 4, 6, 4, 5, 3, 5, 3, 5, 3, 5, 3],
                     mn => {
-                        // TODO: randomize your class
+                        Creature.Grasp[] graspCopy = (Creature.Grasp[]) mn.player.grasps.Clone();
+                        Player newPlayer = SlugcatsUtils.RecreatePlayerWithClass(mn.player, SlugcatsUtils.GetRandomSlugcat());
+                        for (global::System.Int32 i = 0; i < graspCopy.Length; i++) {           
+                            if (graspCopy[i] is Creature.Grasp grasp) {
+                                newPlayer.SlugcatGrab(grasp.grabbed, grasp.graspUsed);
+                            }
+                        }
                         return true;
                     }
                 ),
@@ -359,7 +429,6 @@ namespace ArenaPlus.Features.NOOT
                     "monkey city",
                     [3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7, 3, 4, 5, 7],
                     mn => {
-                        // TODO: spawn scavengers
                         var world = mn.player.abstractCreature.world; var pos = mn.player.abstractCreature.pos;
 
                         int amount = ModManager.MSC ? 1 :
@@ -384,9 +453,9 @@ namespace ArenaPlus.Features.NOOT
                             abstractScav.state.socialMemory.GetOrInitiateRelationship(mn.player.abstractCreature.ID).like = 1f;
                             abstractScav.state.socialMemory.GetOrInitiateRelationship(mn.player.abstractCreature.ID).tempLike = 1f;
 
-                            ScavengerMindControl.ForceLove(abstractScav.realizedCreature as Scavenger, mn.player.abstractCreature);
+                            ScavengerMindControl.SetScavengerLover(abstractScav.realizedCreature as Scavenger, mn.player.abstractCreature);
                         }
-                        return false;
+                        return true;
                     }
                 ),
 
@@ -421,11 +490,29 @@ namespace ArenaPlus.Features.NOOT
                     "open sky",
                     [-1, 1, 2, 3, 5, -1, 1, 2, 3, -1, 1, 2, 3, 5, -1, 1, 2, 3],
                     mn => {
-                        // TODO: spawn a king vulture from the sky
+                        if (!mn.room.abstractRoom.nodes.Any(n => n.type == AbstractRoomNode.Type.SkyExit))
+                            return true;
+
+                        
+                        var skyNode = mn.room.abstractRoom.nodes.FirstOrDefault(n => n.type == AbstractRoomNode.Type.SkyExit);
+                        var world = mn.player.abstractCreature.world; var id = mn.player.abstractCreature.world.game.GetNewID();
+                        var pos = WorldCoordinate.AddIntVector(mn.room.LocalCoordinateOfNode(Array.IndexOf(mn.room.abstractRoom.nodes, skyNode)), new IntVector2(0, 20));
+
+                        AbstractCreature abstractVulture = new AbstractCreature(world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.KingVulture), null, pos, id);
+                        mn.room.abstractRoom.AddEntity(abstractVulture);
+                        abstractVulture.RealizeInRoom();
+                        abstractVulture.realizedCreature.mainBodyChunk.vel.y -= 100f;
+
+                        foreach (var abstractCreature in world.game.Players) {
+                            if (abstractCreature?.realizedCreature is Player player) {
+                                abstractVulture.abstractAI.RealAI.preyTracker.AddPrey(abstractVulture.abstractAI.RealAI.tracker.RepresentationForObject(player, true));
+                            }
+                        }
                         return true;
                     },
                     octave: true
-                ),
+                ){
+                },
                 new Music(
                     "last dream",
                     [1, -6, 3, -6, 1, -6, 1, 2, 3, -7, -5, 3, -5, -7, -5, -7, 1, 2, -6, -4, 1, -4, -6],
@@ -456,7 +543,7 @@ namespace ArenaPlus.Features.NOOT
                     "travelers",
                     [-1, -5, -7, -5, 1, -7, -6, -5, -6, -7, -5, -2, -5, -7, -5, 1, -7, -6, -5, -6, -7, 2, -7, -3, -5, -7, -5, 1, -7, -6, -5, -6, -7, -5],
                     mn => {
-                        // TODO: create a singluarity explosion
+                        mn.Nuke();
                         return true;
                     },
                     octave: true
@@ -531,11 +618,12 @@ namespace ArenaPlus.Features.NOOT
                 ConsoleWrite("Failed to find player music", Color.red);
             }
 
+
             private Music _debugPlayMusic;
             private List<int> _debugNotesList = null;
 
             [MyCommand("play_music")]
-            private static void PlayMusic(Player player, string musicName)
+            private static void PlayMusic(Player player, [Values(typeof(MusicNoot), nameof(GetMusicNames))] string musicName)
             {
                 if (player.GetAttachedFeatureType<MusicNoot>() is MusicNoot musicNoot)
                 {
@@ -546,6 +634,11 @@ namespace ArenaPlus.Features.NOOT
                 }
 
                 ConsoleWrite("Failed to find player music", Color.red);
+            }
+
+            private static string[] GetMusicNames()
+            {
+                return musics.ConvertAll(m => m.name).ToArray();
             }
 
             private int _debugNoteCooldown;

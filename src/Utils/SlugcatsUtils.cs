@@ -13,6 +13,17 @@ namespace ArenaPlus.Utils
 {
     internal static class SlugcatsUtils
     {
+        internal static SlugcatStats.Name _overrideName;
+        public static Player RecreatePlayerWithClass(Player player, SlugcatStats.Name newClass)
+        {
+            _overrideName = newClass;
+            player.abstractCreature.realizedCreature?.Abstractize();
+            player.abstractCreature.realizedCreature?.room?.RemoveObject(player.abstractCreature.realizedCreature);
+            player.abstractCreature.realizedObject = null;
+            player.abstractCreature.RealizeInRoom();
+            return player.abstractCreature.realizedCreature as Player;
+        }
+
         public static IntVector2 ThrowDirection(this Player player)
         {
             IntVector2 intVector = new IntVector2(player.ThrowDirection, 0);
@@ -179,8 +190,6 @@ namespace ArenaPlus.Utils
             return SlugcatStats.SlugcatUnlocked(id, GameUtils.RainWorldInstance);
         }
     }
-
-
     public class SlugcatObject
     {
         public static List<SlugcatObject> slugcats = [];
@@ -198,11 +207,11 @@ namespace ArenaPlus.Utils
             this.name = SlugcatStats.getSlugcatName(nameObject);
             this.color = PlayerGraphics.DefaultSlugcatColor(nameObject);
             this.configurable = OptionsInterface.instance.config.Bind($"enable_{GetValidSlugcatName()}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
-            
+
             if (name == "Watcher")
                 color = new Color(0.22f, 0.192f, 0.929f);
 
-            
+
             slugcats.Add(this);
         }
 
@@ -214,6 +223,26 @@ namespace ArenaPlus.Utils
         public static string GetValidSlugcatName(string slugcatName)
         {
             return slugcatName.Replace(' ', '_');
+        }
+    }
+    internal static class SlugcatsUtilsHooks
+    {
+        [HookRegister]
+        private static void Register()
+        {
+            On.Player.GetInitialSlugcatClass += Player_GetInitialSlugcatClass;
+        }
+
+        private static void Player_GetInitialSlugcatClass(On.Player.orig_GetInitialSlugcatClass orig, Player self)
+        {
+            orig(self);
+            if (SlugcatsUtils._overrideName != null)
+            {
+                self.SlugCatClass = SlugcatsUtils._overrideName;
+                SlugcatsUtils._overrideName = null;
+
+            }
+
         }
     }
 }

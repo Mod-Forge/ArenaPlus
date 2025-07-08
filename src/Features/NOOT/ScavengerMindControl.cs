@@ -29,7 +29,7 @@ namespace ArenaPlus.Features
             return val;
         }
 
-        public static void ForceLove(Scavenger scavenger, AbstractCreature abstPlayer)
+        public static void SetScavengerLover(Scavenger scavenger, AbstractCreature abstPlayer)
         {
             if (scavengerPlayer.TryGetValue(scavenger, out _))
             {
