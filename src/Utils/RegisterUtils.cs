@@ -1,4 +1,5 @@
 ﻿using ArenaPlus.Lib;
+using BepInEx.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace ArenaPlus.Utils
 
         internal static void RegisterAllUtilsPostInit()
         {
+            ConsoleWrite("test my dev console");
             try { Utils.MyDevConsoleImplementation.Register(); } catch (System.IO.FileLoadException) { } catch (Exception e) { LogWarning(e); }
             FeaturesManager.LoadFeatures();
         }

@@ -14,7 +14,46 @@ namespace ArenaPlus.Utils;
 
 internal static class MyDevConsoleImplementation
 {
+    internal static void Register()
+    {
+        MyDevConsoleCommandImplementation.Register();
+    }
+
+    [MyCommand("console_write")]
+    public static void ConsoleWrite(object message = null, Color? color = null)
+    {
+        try
+        {
+            GameConsoleWriteLine(message != null ? message : "", color.HasValue ? color.Value : Color.white);
+        }
+        catch (System.IO.FileLoadException) { }
+        catch (System.IO.FileNotFoundException) { }
+        catch (Exception ex) { LogError(ex); }
+
+        if (color == Color.red)
+        {
+            LogError(message);
+        }
+        else if (color == Color.yellow)
+        {
+            LogWarning(message);
+        }
+        else
+        {
+            LogMessage(message);
+        }
+    }
+
+    private static void GameConsoleWriteLine(object message, Color color)
+    {
+        DevConsole.GameConsole.WriteLine(message.ToString(), color);
+    }
+}
+
+file static class MyDevConsoleCommandImplementation
+{
     private static MyModCommand myModCommand;
+
     internal static void Register()
     {
         myModCommand = new MyModCommand("ArenaPlus");
@@ -115,34 +154,6 @@ internal static class MyDevConsoleImplementation
                 }
             }
             catch (Exception e) { myModCommand.logSource.LogError(e); }
-        }
-    }
-
-    [MyCommand("console_write")]
-    public static void ConsoleWrite(object message = null, Color? color = null)
-    {
-        try
-        {
-            GameConsoleWriteLine(message != null ? message : "", color.HasValue ? color.Value : Color.white);
-        }
-        catch (System.IO.FileLoadException) { }
-        catch (Exception ex) { LogError(ex); }
-    }
-
-    private static void GameConsoleWriteLine(object message, Color color)
-    {
-        DevConsole.GameConsole.WriteLine(message.ToString(), color);
-        if (color == Color.red)
-        {
-            LogError(message);
-        }
-        else if (color == Color.yellow)
-        {
-            LogWarning(message);
-        }
-        else
-        {
-            LogMessage(message);
         }
     }
 }
