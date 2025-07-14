@@ -26,8 +26,7 @@ internal static class MyDevConsoleImplementation
         {
             GameConsoleWriteLine(message != null ? message : "", color.HasValue ? color.Value : Color.white);
         }
-        catch (System.IO.FileLoadException) { }
-        catch (System.IO.FileNotFoundException) { }
+        catch (System.IO.IOException) { }
         catch (Exception ex) { LogError(ex); }
 
         if (color == Color.red)
