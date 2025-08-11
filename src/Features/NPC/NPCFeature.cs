@@ -621,6 +621,8 @@ namespace ArenaPlus.Features.NPC
             NPCName = new SlugcatStats.Name("ArenaNPC", true);
 
             On.AbstractCreature.Realize += AbstractCreature_Realize;
+            On.SlugcatStats.getSlugcatName += SlugcatStats_getSlugcatName;
+            On.JollyCoop.JollyMenu.JollySlidingMenu.NextClass += JollySlidingMenu_NextClass;
 
             On.MoreSlugcats.SlugNPCAI.DecideBehavior += SlugNPCAI_DecideBehavior;
             On.MoreSlugcats.SlugNPCAI.PassingGrab += SlugNPCAI_PassingGrab;
@@ -638,7 +640,16 @@ namespace ArenaPlus.Features.NPC
             On.MoreSlugcats.SlugNPCAI.NearestLethalWeapon += SlugNPCAI_NearestLethalWeapon;
             On.MoreSlugcats.SlugNPCAI.CanGrabItem += SlugNPCAI_CanGrabItem;
             On.Player.NPCForceGrab += Player_NPCForceGrab;
-            On.SlugcatStats.getSlugcatName += SlugcatStats_getSlugcatName;
+
+
+        }
+
+        private SlugcatStats.Name JollySlidingMenu_NextClass(On.JollyCoop.JollyMenu.JollySlidingMenu.orig_NextClass orig, JollyCoop.JollyMenu.JollySlidingMenu self, SlugcatStats.Name curClass)
+        {
+            var nClass = orig(self, curClass);
+            if (nClass == NPCName)
+                nClass = orig(self, nClass);
+            return nClass;
         }
 
         private string SlugcatStats_getSlugcatName(On.SlugcatStats.orig_getSlugcatName orig, SlugcatStats.Name i)

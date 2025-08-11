@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using Watcher;
@@ -215,7 +216,15 @@ namespace ArenaPlus.Utils
             this.nameObject = new SlugcatStats.Name(name, register: false);
             this.name = SlugcatStats.getSlugcatName(nameObject);
             this.color = PlayerGraphics.DefaultSlugcatColor(nameObject);
-            this.configurable = OptionsInterface.instance.config.Bind($"enable_{GetValidSlugcatName()}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
+            try
+            {
+                this.configurable = OptionsInterface.instance.config.Bind($"enable_{GetValidSlugcatName()}", true, new ConfigurableInfo($"Whether the {this.name} appears in arena", null, "", []));
+            }
+            catch (Exception e)
+            {
+                LogError($"failed to create config for slugcat", GetValidSlugcatName());
+                throw e;
+            }
 
             if (name == "Watcher")
                 color = new Color(0.22f, 0.192f, 0.929f);
@@ -235,7 +244,7 @@ namespace ArenaPlus.Utils
 
         public static string GetValidSlugcatName(string slugcatName)
         {
-            return slugcatName.Replace(' ', '_');
+            return Regex.Replace(slugcatName, "[^a-zA-Z0-9]", "_");
         }
     }
     internal static class SlugcatsUtilsHooks
