@@ -24,6 +24,7 @@ namespace ArenaPlus.Options.Tabs
         {
             var slugcats = SlugcatsUtils.GetUnlockedSlugcats();
 
+
             int contentSize = (slugcats.Count() + FeaturesManager.slugcatFeatures.Count) * 30 + 24;
 
             scrollBox = new(initialPos - new Vector2(0, HEIGHT - 100), new Vector2(560, HEIGHT), contentSize, false, false);

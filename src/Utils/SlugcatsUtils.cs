@@ -14,6 +14,28 @@ namespace ArenaPlus.Utils
     internal static class SlugcatsUtils
     {
         internal static SlugcatStats.Name _overrideName;
+
+        internal static string[] exceptions = [
+            "Night",
+            "Slugpup",
+            "Inv",
+            "JollyPlayer1",
+            "JollyPlayer2",
+            "JollyPlayer3",
+            "JollyPlayer4",
+            "ArenaNPC"
+        ];
+
+        internal static string[] vanillaSlugcats = [
+            "White",
+            "Yellow",
+            "Red",
+            "Rivulet",
+            "Artificer",
+            "Saint",
+            "Spear",
+            "Gourmand"
+        ];
         public static Player RecreatePlayerWithClass(Player player, SlugcatStats.Name newClass)
         {
             _overrideName = newClass;
@@ -51,37 +73,24 @@ namespace ArenaPlus.Utils
             return intVector;
         }
 
+        public static SlugcatObject GetSlugcatObject(SlugcatStats.Name name) => GetSlugcatObject(name.value);
+
+        public static SlugcatObject GetSlugcatObject(string name)
+        {
+            return SlugcatObject.slugcats.Find(s => s.codeName == name) ?? new SlugcatObject(name);
+        }
+
         public static SlugcatObject[] GetSlugcats()
         {
-            string[] exceptions = [
-                "Night",
-                "Slugpup",
-                "Inv",
-                "JollyPlayer1",
-                "JollyPlayer2",
-                "JollyPlayer3",
-                "JollyPlayer4"
-            ];
-
             return ExtEnumBase.GetNames(typeof(SlugcatStats.Name))
                 .Where(name => !exceptions.Contains(name))
                 .ToList()
-                .ConvertAll(name => SlugcatObject.slugcats.Find(slugcat => slugcat.codeName == name) ?? new SlugcatObject(name))
+                .ConvertAll(name => GetSlugcatObject(name))
                 .ToArray();
         }
 
         public static SlugcatObject[] GetModdedSlugcats()
         {
-            string[] vanillaSlugcats = [
-                "White",
-                "Yellow",
-                "Red",
-                "Rivulet",
-                "Artificer",
-                "Saint",
-                "Spear",
-                "Gourmand"
-            ];
             return GetSlugcats().Where(slugcat => !vanillaSlugcats.Contains(slugcat.name)).ToArray();
         }
 
@@ -214,6 +223,10 @@ namespace ArenaPlus.Utils
 
             slugcats.Add(this);
         }
+
+        //public bool AlwaysEnabled => SlugcatsUtils.devSlugcats.Contains(name) || nameObject == MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName.Sofanthiel;
+
+        //public bool ShowInRandom => !SlugcatsUtils.devSlugcats.Contains(name);
 
         public string GetValidSlugcatName()
         {

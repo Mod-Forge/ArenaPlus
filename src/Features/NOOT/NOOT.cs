@@ -749,6 +749,7 @@ namespace ArenaPlus.Features.NOOT
                 if (result.obj is Creature creature)
                 {
                     creature.Stun(40);
+                    creature.mainBodyChunk.vel += vel * 0.25f;
                     room.AddObject(new CreatureSpasmer(creature, false, 40));
                 }
                 else if (result.obj is PhysicalObject obj)

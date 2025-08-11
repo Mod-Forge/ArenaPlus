@@ -50,6 +50,8 @@ namespace ArenaPlus
             Sounds.Initialize();
 
             Futile.atlasManager.LoadAtlas("atlases/huntersprites");
+            Futile.atlasManager.LoadImage("atlases/huntersprites");
+
         }
 
         private void OnModInit(RainWorld rainWorld)
