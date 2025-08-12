@@ -135,6 +135,8 @@ namespace ArenaPlus.Features.NPC
         {
             RoomDebugDraw.SetupWithColor(Color.red);
             RoomDebugDraw.DrawArrow(weapon.firstChunk.lastPos, weapon.firstChunk.pos);
+            RoomDebugDraw.DrawArrowDir(weapon.firstChunk.pos, weapon.firstChunk.vel);
+
 
             RoomDebugDraw.color = new Color(1, 0f, 0f, 0.05f);
             bool hitChunk = false;
