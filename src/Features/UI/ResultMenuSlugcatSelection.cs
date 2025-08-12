@@ -1,16 +1,18 @@
 ﻿using ArenaPlus.Lib;
-using ArenaPlus.Options.Tabs;
 using ArenaPlus.Options;
+using ArenaPlus.Options.Tabs;
 using ArenaPlus.Utils;
 using Menu;
+using Menu.Remix.MixedUI;
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using UnityEngine;
-using Menu.Remix.MixedUI;
 
 namespace ArenaPlus.Features.UI
 {
@@ -29,8 +31,144 @@ namespace ArenaPlus.Features.UI
         public static SlugcatStats.Name[][] nameList = new SlugcatStats.Name[4][];
         public static SlugcatStats.Name[] lastCharactersNames = new SlugcatStats.Name[4];
         public static int[] cooldowns = new int[4];
+        public static Stack<ResultMenuIlustrationAnimation>[] menuIlustrationQue = new Stack<ResultMenuIlustrationAnimation>[4];
+
 
         public static readonly Configurable<int> selectionCountConfig = OptionsInterface.instance.config.Bind("selectionCount", 3, new ConfigurableInfo("The number of slugcat choices in the selector, also counts the current slugcat", new ConfigAcceptableRange<int>(2, 10), "", []));
+
+        public class ResultMenuIlustrationAnimation : MenuIllustration
+        {
+            public FSprite sprite2;
+            public string fileName2;
+            public Texture2D texture2;
+            public bool reverseAnimation;
+
+            public float animation = 0f;
+
+            public FLabel nameLabel;
+
+            public PlayerResultBox playerResultBox => owner as PlayerResultBox;
+            public ResultMenuIlustrationAnimation(Menu.Menu menu, PlayerResultBox owner, string newFileName, string lastFileName, Vector2 pos, bool reverseAnimation, bool crispPixels, bool anchorCenter) : base(menu, owner, "", newFileName, pos, crispPixels, anchorCenter)
+            {
+                fileName2 = lastFileName;
+                this.reverseAnimation = reverseAnimation;
+                LoadFile2();
+
+                sprite2 = new FSprite(fileName2);
+                if (!anchorCenter)
+                {
+                    sprite2.anchorX = 0f;
+                    sprite2.anchorY = 0f;
+                }
+                sprite2.alpha = 0f;
+                Container.AddChild(sprite2);
+
+                nameLabel = new FLabel(Custom.GetFont(), "scugcat");
+                nameLabel.isVisible = false;
+                Container.AddChild(nameLabel);
+            }
+
+            public void LoadFile2()
+            {
+                if (Futile.atlasManager.GetAtlasWithName(fileName2) != null)
+                {
+                    FAtlas atlasWithName = Futile.atlasManager.GetAtlasWithName(fileName2);
+                    texture = (Texture2D)atlasWithName.texture;
+                    return;
+                }
+
+                texture2 = new Texture2D(1, 1, TextureFormat.ARGB32, mipChain: false);
+                string text = AssetManager.ResolveFilePath("Illustrations" + Path.DirectorySeparatorChar + fileName2 + ".png");
+                string text2 = "file:///";
+                try
+                {
+                    AssetManager.SafeWWWLoadTexture(ref texture2, text2 + text, clampWrapMode: true, crispPixels);
+                }
+                catch (FileLoadException arg)
+                {
+                    Custom.LogWarning($"Error loading file: {arg}");
+                }
+
+                HeavyTexturesCache.LoadAndCacheAtlasFromTexture(fileName2, texture2, textureFromAsset: false);
+            }
+
+            public override void Update()
+            {
+                base.Update();
+                if (animation >= 1f && menuIlustrationQue[playerResultBox.player.playerNumber].Count > 0)
+                {
+                    var ilustration = menuIlustrationQue[playerResultBox.player.playerNumber].Pop();
+                    playerResultBox.portrait.RemoveSprites();
+                    playerResultBox.subObjects.Remove(playerResultBox.portrait);
+                    playerResultBox.portrait = ilustration;
+                    playerResultBox.subObjects.Add(playerResultBox.portrait);
+                }
+            }
+
+            public override void GrafUpdate(float timeStacker)
+            {
+                base.GrafUpdate(timeStacker);
+
+                animation = Mathf.Clamp01(animation + timeStacker * 0.25f);
+
+                nameLabel.isVisible = sprite.width < 2;
+                nameLabel.text = fileName.Split('-')[1];
+                nameLabel.SetPosition(sprite.GetPosition());
+
+                if (playerResultBox.player.readyForNextRound)
+                {
+                    sprite.shader = GameUtils.RainWorldInstance.Shaders["Basic"];
+                    sprite2.isVisible = false;
+                    return;
+                }
+
+                sprite2.isVisible = true;
+                sprite2.shader = GameUtils.RainWorldInstance.Shaders["VerticalSlice"];
+                sprite2.color = sprite.color;
+
+                Vector2 pos = new Vector2(sprite.x, sprite.y);
+
+                float height = Mathf.Max(sprite.height, 84);
+                if (reverseAnimation)
+                {
+
+                    sprite.SetPosition(pos - new Vector2(0, height * (1f - animation)));
+                    sprite.alpha = ((1f - animation) * 100f) / 255f;
+
+
+                    sprite2.SetPosition(pos + new Vector2(0, height * animation));
+
+
+                    sprite2.alpha = (((1f - animation) * 100f) + 100f) / 255f;
+
+                    sprite.shader = GameUtils.RainWorldInstance.Shaders["VerticalSlice"];
+                }
+                else
+                {
+                    sprite.SetPosition(pos + new Vector2(0, height * (1f - animation)));
+                    sprite2.SetPosition(pos - new Vector2(0, height * animation));
+
+
+                    sprite2.alpha = (animation * 100f) / 255f;
+
+                    sprite.shader = GameUtils.RainWorldInstance.Shaders["VerticalSlice"];
+                    sprite.alpha = ((animation * 100f) + 100f) / 255f;
+                }
+            }
+
+            public override void RemoveSprites()
+            {
+                base.RemoveSprites();
+                sprite2.RemoveFromContainer();
+                Container.RemoveChild(nameLabel);
+                texture2 = null;
+            }
+
+            public void UnloadFile2()
+            {
+                UnityEngine.Object.Destroy(texture2);
+            }
+        }
 
 
         public ResultMenuSlugcatSelection(FeatureInfoAttribute featureInfo) : base(featureInfo)
@@ -50,18 +188,29 @@ namespace ArenaPlus.Features.UI
             });
         }
 
-        protected override void Register()
-        {
-            On.Menu.SymbolButton.Update += SymbolButton_Update;
-            On.Menu.PlayerResultBox.Update += PlayerResultBox_Update;
-            On.Menu.PlayerResultBox.ctor += PlayerResultBox_ctor;
-        }
-
         protected override void Unregister()
         {
             On.Menu.SymbolButton.Update -= SymbolButton_Update;
             On.Menu.PlayerResultBox.Update -= PlayerResultBox_Update;
             On.Menu.PlayerResultBox.ctor -= PlayerResultBox_ctor;
+            On.Menu.MenuIllustration.UnloadFile -= MenuIllustration_UnloadFile;
+        }
+
+        protected override void Register()
+        {
+            On.Menu.SymbolButton.Update += SymbolButton_Update;
+            On.Menu.PlayerResultBox.Update += PlayerResultBox_Update;
+            On.Menu.PlayerResultBox.ctor += PlayerResultBox_ctor;
+            On.Menu.MenuIllustration.UnloadFile += MenuIllustration_UnloadFile;
+        }
+
+        private void MenuIllustration_UnloadFile(On.Menu.MenuIllustration.orig_UnloadFile orig, MenuIllustration self)
+        {
+            orig(self);
+            if (self is ResultMenuIlustrationAnimation result)
+            {
+                result.UnloadFile2();
+            }
         }
 
         private SlugcatStats.Name[] GenerateSlugcatList(SlugcatStats.Name lastChar)
@@ -109,7 +258,19 @@ namespace ArenaPlus.Features.UI
 
                 lastCharactersNames[player.playerNumber] = player.playerClass;
                 nameList[player.playerNumber] = GenerateSlugcatList(lastCharactersNames[player.playerNumber]);
-                cooldowns[player.playerNumber] = 20;
+                menuIlustrationQue[player.playerNumber] = new();
+                cooldowns[player.playerNumber] = 40;
+
+                var newIlustration = string.Concat("MultiplayerPortrait", self.player.playerNumber.ToString(), "0", "-", player.playerClass.value);
+                var ilustration = new ResultMenuIlustrationAnimation(menu, self, newIlustration, newIlustration, new Vector2(self.originalSize.y / 2f, self.originalSize.y / 2f), false, true, true)
+                {
+                    animation = 1f,
+                };
+                self.portrait.RemoveSprites();
+                self.subObjects.Remove(self.portrait);
+                self.portrait = ilustration;
+                self.subObjects.Add(self.portrait);
+
                 //randomSeeds[player.playerNumber] = (int)(Random.value * 100);
             }
             catch (Exception e) { LogError(e); }
@@ -140,6 +301,7 @@ namespace ArenaPlus.Features.UI
                             index = nameList[self.player.playerNumber].IndexOf(self.player.playerClass);
                             LogDebug($"found index of {self.player.playerClass}: " + index);
                         }
+
                         index += inputPackage.y;
                         if (index >= nameList[self.player.playerNumber].Count())
                             index = 0;
@@ -149,7 +311,7 @@ namespace ArenaPlus.Features.UI
 
 
                         SlugcatStats.Name newName = nameList[self.player.playerNumber][index];
-
+                        SlugcatStats.Name lastName = self.player.playerClass;
                         self.player.playerClass = newName;
                         //self.portrait.sprite.SetElementByName(string.Concat(new string[]
                         //{
@@ -160,21 +322,32 @@ namespace ArenaPlus.Features.UI
                         //    newName.value
                         //}));
 
-                        Menu.Menu menu = self.portrait.menu;
-                        self.portrait.RemoveSprites();
-                        self.subObjects.Remove(self.portrait);
-
-                        self.portrait = new MenuIllustration(menu, self, "", string.Concat(new string[]
+                        if (menuIlustrationQue[self.player.playerNumber].Count > 0)
                         {
-                        "MultiplayerPortrait",
-                        self.player.playerNumber.ToString(),
-                        "1",
-                        "-",
-                        newName.value
-                        }), new Vector2(self.originalSize.y / 2f, self.originalSize.y / 2f), true, true);
+                            if (menuIlustrationQue[self.player.playerNumber].Peek().reverseAnimation != (inputPackage.y < 0))
+                            {
+                                menuIlustrationQue[self.player.playerNumber].Clear();
+                            }
+                        }
 
-                        self.subObjects.Add(self.portrait);
+                        Menu.Menu menu = self.portrait.menu;
+                        var newIlustration = string.Concat("MultiplayerPortrait", self.player.playerNumber.ToString(), "1", "-", newName.value);
+                        var lastIlustration = string.Concat("MultiplayerPortrait", self.player.playerNumber.ToString(), "1", "-", lastName.value);
+                        var ilustration = new ResultMenuIlustrationAnimation(menu, self, newIlustration, lastIlustration, new Vector2(self.originalSize.y / 2f, self.originalSize.y / 2f), inputPackage.y < 0, true, true);
+
+                        menuIlustrationQue[self.player.playerNumber].Push(ilustration);
+                        //if (self.portrait is ResultMenuIlustrationAnimation)
+                        //{
+                        //}
+                        //else
+                        //{
+                        //    self.portrait.RemoveSprites();
+                        //    self.subObjects.Remove(self.portrait);
+                        //    self.portrait = ilustration;
+                        //    self.subObjects.Add(self.portrait);
+                        //}
                         self.menu.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
+
 
                         //if (inputPackage.y > 0)
                         //data.scrollDownButton.Bump();
