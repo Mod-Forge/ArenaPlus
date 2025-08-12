@@ -12,7 +12,7 @@ namespace ArenaPlus.Features
     [FeatureInfo(
         id: "arenaMultiplicationRandomizer",
         name: "Random multi-arenas",
-        description: "Randomize the arenas list when multiply by 2x to 5x",
+        description: "Randomize the arenas list when multiplied by 2x to 5x",
         enabledByDefault: false
     )]
     file class ArenaMultiplicationRandomizer(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

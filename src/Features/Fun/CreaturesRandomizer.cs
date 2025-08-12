@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Menu.Remix.MixedUI;
 using RWCustom;
-using ArenaPlus.Features.Fun;
 using UnityEngine.SocialPlatforms.Impl;
 
-namespace ArenaPlus.Features;
+namespace ArenaPlus.Features.Fun;
 
 [FeatureInfo(
     id: "creaturesRandomizer",
     name: "Creatures randomizer",
     description: "Randomize creature spawned",
+    category: BuiltInCategory.Fun,
     enabledByDefault: false
 )]
 file class CreaturesRandomizer : Feature
@@ -45,7 +45,7 @@ file class CreaturesRandomizer : Feature
             updown.colorEdge = NoTolerance ? specialColor : baseColor;
             updown.OnUpdate += () =>
             {
-                bool noTolerance = (updown.valueInt >= (randomizerTolerance.info.acceptable as ConfigAcceptableRange<int>).MaxValue);
+                bool noTolerance = updown.valueInt >= (randomizerTolerance.info.acceptable as ConfigAcceptableRange<int>).MaxValue;
                 updown.colorEdge = noTolerance ? specialColor : baseColor;
                 updown.description = GetDescription(noTolerance);
             };
@@ -85,7 +85,7 @@ file class CreaturesRandomizer : Feature
     {
         try
         {
-            if (!Custom.DistLess(self.AI.creature.realizedCreature.mainBodyChunk.pos, noise.pos, noise.strength * (1f - self.AI.creature.realizedCreature.Deaf) * self.hearingSkill * (1f - self.room.BackgroundNoise) * ((self.AI.creature.realizedCreature.room.PointSubmerged(noise.pos) || self.AI.creature.realizedCreature.room.GetTile(self.AI.creature.realizedCreature.mainBodyChunk.pos).DeepWater) ? 0.2f : 1f)))
+            if (!Custom.DistLess(self.AI.creature.realizedCreature.mainBodyChunk.pos, noise.pos, noise.strength * (1f - self.AI.creature.realizedCreature.Deaf) * self.hearingSkill * (1f - self.room.BackgroundNoise) * (self.AI.creature.realizedCreature.room.PointSubmerged(noise.pos) || self.AI.creature.realizedCreature.room.GetTile(self.AI.creature.realizedCreature.mainBodyChunk.pos).DeepWater ? 0.2f : 1f)))
             {
                 return;
             }
@@ -115,7 +115,7 @@ file class CreaturesRandomizer : Feature
             for (int i = 0; i < self.sources.Count; i++)
             {
                 float num3 = self.sources[i].NoiseMatch(noise);
-                if (num3 < num2 && num3 < ((self.sources[i].creatureRep != null) ? Custom.LerpMap((float)self.sources[i].creatureRep.TicksSinceSeen, 20f, 600f, 200f, 1000f) : 300f))
+                if (num3 < num2 && num3 < (self.sources[i].creatureRep != null ? Custom.LerpMap(self.sources[i].creatureRep.TicksSinceSeen, 20f, 600f, 200f, 1000f) : 300f))
                 {
                     num2 = num3;
                     theorizedSource = self.sources[i];
@@ -138,7 +138,7 @@ file class CreaturesRandomizer : Feature
                 for (int j = 0; j < self.tracker.CreaturesCount; j++)
                 {
                     float num5 = self.NoiseMatch(noise, self.tracker.GetRep(j));
-                    if (num5 < num2 && num5 < Custom.LerpMap((float)self.tracker.GetRep(j).TicksSinceSeen, 20f, 600f, 200f, 1000f))
+                    if (num5 < num2 && num5 < Custom.LerpMap(self.tracker.GetRep(j).TicksSinceSeen, 20f, 600f, 200f, 1000f))
                     {
                         num2 = num5;
                         creatureRepresentation2 = self.tracker.GetRep(j);
@@ -148,7 +148,7 @@ file class CreaturesRandomizer : Feature
                         num4++;
                     }
                 }
-                if (num2 > Custom.LerpMap((float)num4, 0f, (float)self.tracker.maxTrackedCreatures, 1000f, 300f))
+                if (num2 > Custom.LerpMap(num4, 0f, self.tracker.maxTrackedCreatures, 1000f, 300f))
                 {
                     creatureRepresentation2 = null;
                 }
@@ -220,7 +220,7 @@ file class CreaturesRandomizer : Feature
         }
         else
         {
-            for (global::System.Int32 i = 0; i < ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count; i++)
+            for (int i = 0; i < ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.Count; i++)
             {
                 string unlockName = ExtEnum<MultiplayerUnlocks.SandboxUnlockID>.values.GetEntry(i);
                 int score = 0;
@@ -234,7 +234,7 @@ file class CreaturesRandomizer : Feature
                     score = ScoreForEveryone.defaultKillScores[i];
                 }
 
-                if (NoTolerance || (score != 0 && Mathf.Abs(score - origScore) <= randomizerTolerance.Value))
+                if (NoTolerance || score != 0 && Mathf.Abs(score - origScore) <= randomizerTolerance.Value)
                 {
                     if (ExtEnum<CreatureTemplate.Type>.values.entries.Contains(unlockName) && unlocks.IsCreatureUnlockedForLevelSpawn(new CreatureTemplate.Type(unlockName, false)) && !exceptions.Contains(unlockName))
                     {
@@ -284,7 +284,7 @@ file class CreaturesRandomizer : Feature
         AbstractRoom abstractRoom = abstractCreature.world.GetAbstractRoom(0);
         if (abstractCreature.creatureTemplate.type == CreatureTemplate.Type.YellowLizard || abstractCreature.creatureTemplate.type == CreatureTemplate.Type.Scavenger)
         {
-            for (global::System.Int32 i = 0; i < Random.Range(0, 4); i++)
+            for (int i = 0; i < Random.Range(0, 4); i++)
             {
                abstractRoom.MoveEntityToDen(new AbstractCreature(abstractCreature.world, abstractCreature.creatureTemplate, null, abstractCreature.pos, abstractCreature.world.game.GetNewID()));
             }

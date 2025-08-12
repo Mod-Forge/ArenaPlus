@@ -9,12 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ArenaPlus.Features
+namespace ArenaPlus.Features.Fun
 {
     [FeatureInfo(
         id: "objectsRandomizer",
         name: "Objects randomizer",
         description: "Whether objects in arena are random",
+        category: BuiltInCategory.Fun,
         enabledByDefault: false
     )]
     public class ObjectsRandomizer(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
@@ -208,7 +209,7 @@ namespace ArenaPlus.Features
 
             if (randObj is SpearRandomObject spearRandObj)
             {
-                if (((int)spearRandObj.spearType) <= 2)
+                if ((int)spearRandObj.spearType <= 2)
                 {
                     return new AbstractSpear(room.world, null, pos, entityID, spearRandObj.spearType == SpearRandomObject.Type.Explosive, spearRandObj.spearType == SpearRandomObject.Type.Electric);
                 }
@@ -221,7 +222,7 @@ namespace ArenaPlus.Features
                 {
                     AbstractPhysicalObject newObject = new AbstractSpear(room.world, null, pos, entityID, false);
                     (newObject as AbstractSpear).poison = 1.7f;
-                    (newObject as AbstractSpear).poisonHue = 0.3f + UnityEngine.Random.value * 0.6f;
+                    (newObject as AbstractSpear).poisonHue = 0.3f + Random.value * 0.6f;
                     return newObject;
                 }
 
@@ -237,7 +238,7 @@ namespace ArenaPlus.Features
                 }
                 
                 AbstractPhysicalObject newObject = new JokeRifle.AbstractRifle(room.world, null, pos, entityID, ammo);
-                (newObject as JokeRifle.AbstractRifle).setCurrentAmmo(rifleRandObj.bulletAmount.HasValue ? rifleRandObj.bulletAmount.Value : (int)Random.Range(5, 40));
+                (newObject as JokeRifle.AbstractRifle).setCurrentAmmo(rifleRandObj.bulletAmount.HasValue ? rifleRandObj.bulletAmount.Value : Random.Range(5, 40));
                 return newObject;
             }
 
@@ -291,13 +292,13 @@ namespace ArenaPlus.Features
 
             public override string ToString()
             {
-                return $"{this.GetType().Name} {type.value} chance:{chance} rare:{rare}";
+                return $"{GetType().Name} {type.value} chance:{chance} rare:{rare}";
             }
         }
 
-        public class SpearRandomObject(SpearRandomObject.Type type, int chance) : RandomObject(AbstractPhysicalObject.AbstractObjectType.Spear, chance, type != SpearRandomObject.Type.Basic && type != SpearRandomObject.Type.Poison)
+        public class SpearRandomObject(SpearRandomObject.Type type, int chance) : RandomObject(AbstractPhysicalObject.AbstractObjectType.Spear, chance, type != Type.Basic && type != Type.Poison)
         {
-            public SpearRandomObject.Type spearType = type;
+            public Type spearType = type;
             public enum Type
             {
                 Basic,
@@ -318,7 +319,7 @@ namespace ArenaPlus.Features
 
             public override string ToString()
             {
-                return $"{this.GetType().Name} Spear.{spearType} chance:{chance} rare:{rare}";
+                return $"{GetType().Name} Spear.{spearType} chance:{chance} rare:{rare}";
             }
         }
 
@@ -334,7 +335,7 @@ namespace ArenaPlus.Features
 
             public override string ToString()
             {
-                return $"{this.GetType().Name} Rifle bullet:{(bulletType != null ? bulletType : "rand")}({(bulletAmount.HasValue ? bulletAmount.Value : "rand")}) chance:{chance} rare:{rare}";
+                return $"{GetType().Name} Rifle bullet:{(bulletType != null ? bulletType : "rand")}({(bulletAmount.HasValue ? bulletAmount.Value : "rand")}) chance:{chance} rare:{rare}";
             }
         }
 

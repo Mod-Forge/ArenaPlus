@@ -29,6 +29,23 @@ namespace ArenaPlus.Features.NPC
 			}
 		}
 
+		private void VisualizeJump(PathFinder.PathingCell pathingCell)
+		{
+            RoomDebugDraw.SetupWithColor(this.bestJump.grabWhenLanding ? new Color(1f, 1f, 1f) : new Color(0f, 0f, 1f));
+            RoomDebugDraw.DrawRect(this.room.MiddleOfTile(pathingCell.worldCoordinate), Vector2.one * 10f);
+            RoomDebugDraw.DrawArrowDir(this.room.MiddleOfTile(this.startPos), this.bestJump.initVel);
+        }
+
+        private void VisualizePosses()
+		{
+            RoomDebugDraw.SetupWithColor(new Color(1f, 1f, 1f, 0.5f));
+            RoomDebugDraw.DrawRect(room.MiddleOfTile(startPos), Vector2.one * 10f);
+            RoomDebugDraw.DrawArrowDir(this.room.MiddleOfTile(this.startPos), this.bestJump.initVel);
+
+            RoomDebugDraw.color = Color.white;
+            RoomDebugDraw.DrawRect(pos, Vector2.one * 5f);
+        }
+
 		// Token: 0x060048E1 RID: 18657 RVA: 0x004F9448 File Offset: 0x004F7648
 		public void Update()
 		{
@@ -63,13 +80,11 @@ namespace ArenaPlus.Features.NPC
 			}
             if (this.visualize)
             {
-                RoomDebugDraw.SetupWithColor(new Color(1f, 1f, 1f, 0.5f));
-                RoomDebugDraw.DrawRect(room.MiddleOfTile(startPos), Vector2.one * 10f);
-                RoomDebugDraw.DrawArrowDir(this.room.MiddleOfTile(this.startPos), this.bestJump.initVel);
-
-				RoomDebugDraw.color = Color.white;
-                RoomDebugDraw.DrawRect(pos, Vector2.one * 5f);
-
+				try
+				{
+					VisualizePosses();
+				}
+				catch (Exception e) { }
             }
             if (this.owner.actOnJump == this)
 			{
@@ -134,9 +149,11 @@ namespace ArenaPlus.Features.NPC
 						}
                         if (this.visualize)
                         {
-							RoomDebugDraw.SetupWithColor(this.bestJump.grabWhenLanding ? new Color(1f, 1f, 1f) : new Color(0f, 0f, 1f));
-                            RoomDebugDraw.DrawRect(this.room.MiddleOfTile(pathingCell.worldCoordinate), Vector2.one * 10f);
-                            RoomDebugDraw.DrawArrowDir(this.room.MiddleOfTile(this.startPos), this.bestJump.initVel);
+							try
+							{
+								VisualizeJump(pathingCell);
+							}
+							catch (Exception e) { }
                         }
                     }
 				}

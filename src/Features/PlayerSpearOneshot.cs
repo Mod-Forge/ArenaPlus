@@ -11,7 +11,7 @@ namespace ArenaPlus.Features
     [FeatureInfo(
         id: "playerSpearOneshot",
         name: "Player spear oneshot",
-        description: "Whether spears throwed by players oneshot other slugcats",
+        description: "Make spears thrown by players oneshot other slugcats",
         enabledByDefault: false
     )]
     file class PlayerSpearOneshot(FeatureInfoAttribute featureInfo) : Feature(featureInfo)

@@ -653,7 +653,7 @@ namespace ArenaPlus.Features.NPC
                 if (upcoming != null)
                 {
                     this.jumpCell = this.AI.pathFinder.PathingCellAtWorldCoordinate(base.abstractCreature.pos);
-                    if (this.jumpFinders.Count < 4 && upcoming.Count > 1)
+                    if (this.jumpFinders.Count < (FeaturesManager.GetFeature(nameof(AdvancedNPC)).configurable.Value ? 4 : 0) && upcoming.Count > 1)
                     {
                         WorldCoordinate dest = upcoming[global::UnityEngine.Random.Range(0, upcoming.Count)].destinationCoord;
                         if (dest.TileDefined && dest.Tile.FloatDist(abstractCreature.pos.Tile) > 2f && !this.room.aimap.getAItile(dest).narrowSpace && LizardJumpModule.PathWeightComparison(jumpCell, AI.pathFinder.PathingCellAtWorldCoordinate(dest)))
