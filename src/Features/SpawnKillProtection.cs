@@ -43,15 +43,6 @@ namespace ArenaPlus.Features
             });
         }
 
-        protected override void Register()
-        {
-            On.ArenaGameSession.ctor += ArenaGameSession_ctor;
-            On.Player.Die += Player_Die;
-            On.Player.Destroy += Player_Destroy;
-            On.RWInput.PlayerInputLogic_int_int += RWInput_PlayerInputLogic_int_int;
-            On.Player.ThrowObject += Player_ThrowObject;
-        }
-
         protected override void Unregister()
         {
             On.ArenaGameSession.ctor -= ArenaGameSession_ctor;
@@ -59,6 +50,25 @@ namespace ArenaPlus.Features
             On.Player.Destroy -= Player_Destroy;
             On.RWInput.PlayerInputLogic_int_int -= RWInput_PlayerInputLogic_int_int;
             On.Player.ThrowObject -= Player_ThrowObject;
+        }
+
+        protected override void Register()
+        {
+            On.ArenaGameSession.ctor += ArenaGameSession_ctor;
+            On.Player.Die += Player_Die;
+            On.Player.Destroy += Player_Destroy;
+            On.RWInput.PlayerInputLogic_int_int += RWInput_PlayerInputLogic_int_int;
+            On.Player.ThrowObject += Player_ThrowObject;
+            On.Player.Stun += Player_Stun;
+        }
+
+        private void Player_Stun(On.Player.orig_Stun orig, Player self, int st)
+        {
+            if (SpawnProtectionTimerBehavior.protection)
+            {
+                return;
+            }
+            orig(self, st);
         }
 
         private void Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
