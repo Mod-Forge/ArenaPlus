@@ -148,9 +148,4 @@ namespace ArenaPlus.Features.UI
         }
     }
 
-    file class MultiplayerMenuData : CustomData
-    {
-        public SymbolButton[] nextClassButtons;
-        public SymbolButton[] previousClassButtons;
-    }
 }

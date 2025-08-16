@@ -27,7 +27,7 @@ using ArenaPlus.Features;
 
 namespace ArenaPlus
 {
-    [BepInPlugin(MOD_ID, "ArenaPlus", "2.2.3")]
+    [BepInPlugin(MOD_ID, "ArenaPlus", "2.2.5")]
     class Plugin : BaseUnityPlugin
     {
         internal const string MOD_ID = "modforge.ArenaPlus";

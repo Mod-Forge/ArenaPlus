@@ -102,12 +102,12 @@ namespace ArenaPlus.Features.Reworks
                 self.karmaCharging = -1;
                 self.godTimer = (int)Math.Floor(self.godTimer);
 
-                if (self.wantToJump > 0 && self.monkAscension)
+                if ((self.wantToJump > 0 || (self.input[0].spec && !self.input[1].spec)) && self.monkAscension)
                 {
                     self.DeactivateAscension();
                     self.wantToJump = 0;
                 }
-                else if (self.wantToJump > 0 && self.input[0].pckp && self.canJump <= 0 && !self.monkAscension && (self.tongue == null || !self.tongue.Attached) && self.godTimer > 0)
+                else if (((self.wantToJump > 0 && self.input[0].pckp && self.canJump <= 0) || (self.input[0].spec && !self.input[1].spec)) && !self.monkAscension && (self.tongue == null || !self.tongue.Attached) && self.godTimer > 0)
                 {
                     self.bodyMode = Player.BodyModeIndex.Default;
                     self.ActivateAscension();

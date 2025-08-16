@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using ArenaPlus.Features;
 using ArenaPlus.Features.UI;
 using ArenaPlus.Lib;
-using IL.Menu;
+using Menu;
 
 namespace ArenaPlus.Utils
 {
@@ -53,5 +53,12 @@ namespace ArenaPlus.Utils
     {
         public VisualScrollButton scrollUpButton;
         public VisualScrollButton scrollDownButton;
+    }
+
+    internal class MultiplayerMenuData : CustomData
+    {
+        public SymbolButton[] nextClassButtons;
+        public SymbolButton[] previousClassButtons;
+        public SimpleButton[] levelChangeButtons;
     }
 }

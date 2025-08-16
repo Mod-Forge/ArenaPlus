@@ -261,7 +261,7 @@ namespace ArenaPlus.Features.UI
                 menuIlustrationQue[player.playerNumber] = new();
                 cooldowns[player.playerNumber] = 40;
 
-                var newIlustration = string.Concat("MultiplayerPortrait", self.player.playerNumber.ToString(), "0", "-", player.playerClass.value);
+                var newIlustration = string.Concat("MultiplayerPortrait", self.player.playerNumber.ToString(), self.DeadPortraint ? "0" : "1", "-", player.playerClass.value);
                 var ilustration = new ResultMenuIlustrationAnimation(menu, self, newIlustration, newIlustration, new Vector2(self.originalSize.y / 2f, self.originalSize.y / 2f), false, true, true)
                 {
                     animation = 1f,

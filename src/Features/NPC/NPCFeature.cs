@@ -14,6 +14,8 @@ namespace ArenaPlus.Features.NPC
 {
     public class ArenaNPCPlayer : Player, Weapon.INotifyOfFlyingWeapons
     {
+        public int NPCLevel => NPCLevelButtons.NPCLevels[playerState.playerNumber] + 1;
+
         public float JumpPower => 0.5f;
         public List<JumpFinder> jumpFinders = new List<JumpFinder>();
         public PathFinder.PathingCell jumpCell;
@@ -28,7 +30,7 @@ namespace ArenaPlus.Features.NPC
         {
             if (this.isNPC)
             {
-                LogNPC("npc created");
+                LogInfo($"$lv {NPCLevel} npc created");
             }
             lastGroundPos = mainBodyChunk.pos;
             abstractCreature.personality.aggression = 1f;
@@ -101,7 +103,7 @@ namespace ArenaPlus.Features.NPC
         public override void Collide(PhysicalObject otherObject, int myChunk, int otherChunk)
         {
             base.Collide(otherObject, myChunk, otherChunk);
-            if (otherObject is Creature creature && creature.abstractCreature.creatureTemplate.type != CreatureTemplate.Type.Fly)
+            if (NPCLevel >= 5 && otherObject is Creature creature && creature.abstractCreature.creatureTemplate.type != CreatureTemplate.Type.Fly)
             {
                 if (collisionDodgeCooldown <= 0 && !creature.dead && creature.Consious)
                 {
@@ -128,6 +130,9 @@ namespace ArenaPlus.Features.NPC
                 return;
             }
 
+            if (NPCLevel <= 1)
+                return;
+
             if (dodgeCooldown > 0)
                 dodgeCooldown--;
 
@@ -142,7 +147,8 @@ namespace ArenaPlus.Features.NPC
             }
             if (voidTeleportCooldown > 0) voidTeleportCooldown--;
 
-
+            if (NPCLevel <= 2)
+                return;
 
             if (AI == null)
                 return;
@@ -199,9 +205,12 @@ namespace ArenaPlus.Features.NPC
 
         public void PlayerMurderIntent()
         {
+            if (NPCLevel < 6)
+                return;
+
             foreach (var absPlayer in room.game.Players)
             {
-                if (absPlayer.realizedCreature is Player player && player != this && (absPlayer.realizedCreature is not ArenaNPCPlayer npc || NPCFeature.npcAttackNpc))
+                if (absPlayer.realizedCreature is Player player && player != this && !player.dead && (absPlayer.realizedCreature is not ArenaNPCPlayer npc || NPCFeature.npcAttackNpc))
                 {
                     if (this.AI.HasLethal(player))
                     {
@@ -296,17 +305,20 @@ namespace ArenaPlus.Features.NPC
             this.rollDirection = 0;
         }
 
+        private bool PyroCheck()
+        {
+            return !this.pyroJumpped && base.Consious && this.bodyMode != Player.BodyModeIndex.Crawl && this.bodyMode != Player.BodyModeIndex.CorridorClimb && this.bodyMode != Player.BodyModeIndex.ClimbIntoShortCut && this.animation != Player.AnimationIndex.HangFromBeam && this.animation != Player.AnimationIndex.ClimbOnBeam && this.bodyMode != Player.BodyModeIndex.WallClimb && this.bodyMode != Player.BodyModeIndex.Swimming && this.animation != Player.AnimationIndex.AntlerClimb && this.animation != Player.AnimationIndex.VineGrab && this.animation != Player.AnimationIndex.ZeroGPoleGrab && this.onBack == null;
+        }
         public bool CanPyro()
         {
             int max = Mathf.Max(1, MoreSlugcats.MoreSlugcats.cfgArtificerExplosionCapacity.Value - 5);
-            return Consious && this.pyroJumpCounter < max;
+            return Consious && PyroCheck() && this.pyroJumpCounter < max;
         }
 
         public void PyroJump(int dir = 0)
         {
             standing = true;
-            wantToJump = 1;
-            this.input[0].pckp = true;
+            this.input[0].spec = true;
             this.input[0].y = 1;
             if (dir != 0)
                 this.input[0].x = (int)Mathf.Clamp01(dir);
@@ -405,6 +417,12 @@ namespace ArenaPlus.Features.NPC
 
         public void FlyingWeapon(Weapon weapon)
         {
+            if (NPCLevel < 3 && Random.Range(0, 9) > NPCLevel)
+            {
+                dodgeCooldown = 5;
+                return;
+            }
+
             LogNPC("=========== FlyingWeapon =========");
             if (weapon.slatedForDeletetion || weapon.room != room)
                 return;
@@ -474,7 +492,7 @@ namespace ArenaPlus.Features.NPC
             int weaponDir = (int)Mathf.Sign(weapon.firstChunk.vel.x);
             float weaponDist = Custom.Dist(weapon.firstChunk.pos, mainBodyChunk.pos);
 
-            if (standing && lowerBodyFramesOnGround >= 5 && hitChunks[0] && !hitChunks[1] && weaponDist > 60f)
+            if (NPCLevel >= 5 && standing && lowerBodyFramesOnGround >= 5 && hitChunks[0] && !hitChunks[1] && weaponDist > 60f)
             {
                 Vector2[] dodgePos = [
                     bodyChunks[0].pos + Vector2.down * 5f,
@@ -495,7 +513,7 @@ namespace ArenaPlus.Features.NPC
             LogNPC("skip crouch");
 
 
-            if (!room.GetTile(bodyChunks[1].pos + Vector2.down * 20f).Solid && canJump > 0)
+            if (NPCLevel >= 4 && !room.GetTile(bodyChunks[1].pos + Vector2.down * 20f).Solid && canJump > 0)
             {
                 Vector2[] dodgePos = [
                     bodyChunks[0].pos + Vector2.down * 20f,
@@ -512,7 +530,7 @@ namespace ArenaPlus.Features.NPC
             LogNPC("skip drop");
 
 
-            if (!room.GetTile(bodyChunks[0].pos + Vector2.up * 20f).Solid && weaponDist > 60f)
+            if (NPCLevel >=  4 && !room.GetTile(bodyChunks[0].pos + Vector2.up * 20f).Solid && weaponDist > 60f)
             {
                 Vector2[] dodgePos = [
                     bodyChunks[0].pos + Vector2.up * 20f,
@@ -546,7 +564,7 @@ namespace ArenaPlus.Features.NPC
             LogNPC("skip jumps");
 
             // check for throw parry
-            if (weaponDist > 60f && weaponDist < 120f && grasps.Any(g => g != null && g.grabbed is Weapon) && BallisticCollision(bodyChunks[0].pos, weapon.firstChunk.lastPos, weapon.firstChunk.pos, weapon.firstChunk.rad * 2f, (weapon is Spear) ? 0.45f : 0.9f))
+            if (NPCLevel >= 5 && weaponDist > 60f && weaponDist < 120f && grasps.Any(g => g != null && g.grabbed is Weapon) && BallisticCollision(bodyChunks[0].pos, weapon.firstChunk.lastPos, weapon.firstChunk.pos, weapon.firstChunk.rad * 2f, (weapon is Spear) ? 0.45f : 0.9f))
             {
                 LogNPC("TAKE IT DOWN!");
                 flipDirection = -weaponDir;
@@ -566,8 +584,11 @@ namespace ArenaPlus.Features.NPC
             LogNPC("skip parry");
 
 
-            LogNPC("use the old dodge");
-            OldDodge(weapon, weapon.firstChunk.pos, weapon.firstChunk.vel.normalized);
+            if (NPCLevel >= 5)
+            {
+                LogNPC("use the old dodge");
+                OldDodge(weapon, weapon.firstChunk.pos, weapon.firstChunk.vel.normalized);
+            }
         }
 
         public void OldDodge(Weapon proj, Vector2 projPos, Vector2 dir)
@@ -619,10 +640,6 @@ namespace ArenaPlus.Features.NPC
             flipDirection = pDir;
             mainBodyChunk.vel.x = Mathf.Abs(mainBodyChunk.vel.x) * flipDirection;
             wantToThrow = 5;
-
-            // TODO: a real parry logic
-
-            //dodgeCooldown = 1;
         }
         #endregion
 
@@ -633,8 +650,8 @@ namespace ArenaPlus.Features.NPC
                 return;
             }
 
-            int max = Mathf.Max(1, MoreSlugcats.MoreSlugcats.cfgArtificerExplosionCapacity.Value - 6);
-            bool canJump = base.Consious && pyroJumpCounter < max;
+            int max = Mathf.Max(1, MoreSlugcats.MoreSlugcats.cfgArtificerExplosionCapacity.Value - (15 - NPCLevel));
+            bool canJump = base.Consious && PyroCheck() && pyroJumpCounter < max;
             for (int i = this.jumpFinders.Count - 1; i >= 0; i--)
             {
                 if (this.jumpFinders[i].slatedForDeletion)
@@ -653,7 +670,13 @@ namespace ArenaPlus.Features.NPC
                 if (upcoming != null)
                 {
                     this.jumpCell = this.AI.pathFinder.PathingCellAtWorldCoordinate(base.abstractCreature.pos);
-                    if (this.jumpFinders.Count < (FeaturesManager.GetFeature(nameof(AdvancedNPC)).configurable.Value ? 4 : 0) && upcoming.Count > 1)
+
+                    int jumpFinderCount = (int)Mathf.Round(
+                            Mathf.Clamp(
+                                Custom.MapRange(NPCLevel, 6, 9, 1, 4)
+                            , 0, 4)
+                        );
+                    if (this.jumpFinders.Count < jumpFinderCount && upcoming.Count > 1)
                     {
                         WorldCoordinate dest = upcoming[global::UnityEngine.Random.Range(0, upcoming.Count)].destinationCoord;
                         if (dest.TileDefined && dest.Tile.FloatDist(abstractCreature.pos.Tile) > 2f && !this.room.aimap.getAItile(dest).narrowSpace && LizardJumpModule.PathWeightComparison(jumpCell, AI.pathFinder.PathingCellAtWorldCoordinate(dest)))
@@ -757,8 +780,19 @@ namespace ArenaPlus.Features.NPC
             On.MoreSlugcats.SlugNPCAI.NearestLethalWeapon += SlugNPCAI_NearestLethalWeapon;
             On.MoreSlugcats.SlugNPCAI.CanGrabItem += SlugNPCAI_CanGrabItem;
             On.Player.NPCForceGrab += Player_NPCForceGrab;
+            On.Player.ThrowObject += Player_ThrowObject;
 
 
+        }
+
+        private void Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
+        {
+            if (self is ArenaNPCPlayer npc && Random.Range(0, 9) > npc.NPCLevel)
+            {
+                self.wantToThrow = 0;
+                return;
+            }
+            orig(self, grasp, eu);
         }
 
         private SlugcatStats.Name JollySlidingMenu_NextClass(On.JollyCoop.JollyMenu.JollySlidingMenu.orig_NextClass orig, JollyCoop.JollyMenu.JollySlidingMenu self, SlugcatStats.Name curClass)
@@ -796,7 +830,7 @@ namespace ArenaPlus.Features.NPC
 
         private static bool SlugNPCAI_CanGrabItem(On.MoreSlugcats.SlugNPCAI.orig_CanGrabItem orig, SlugNPCAI self, PhysicalObject obj)
         {
-            return orig(self, obj) || (self.cat is ArenaNPCPlayer npc && npc.CNPCGrabCheck(obj));
+            return orig(self, obj) || (self.cat is ArenaNPCPlayer npc && npc.NPCLevel >= 3 && npc.CNPCGrabCheck(obj));
         }
 
         private static PhysicalObject SlugNPCAI_NearestLethalWeapon(On.MoreSlugcats.SlugNPCAI.orig_NearestLethalWeapon orig, SlugNPCAI self, Creature target)
@@ -925,7 +959,7 @@ namespace ArenaPlus.Features.NPC
             if (self.cat is not ArenaNPCPlayer npc)
                 return orig(self, dRelation);
 
-            if (dRelation.trackerRep.representedCreature.creatureTemplate.type == CreatureTemplate.Type.Fly)
+            if (dRelation.trackerRep.representedCreature.creatureTemplate.type == CreatureTemplate.Type.Fly || dRelation.trackerRep.representedCreature.realizedCreature == null || dRelation.trackerRep.representedCreature.realizedCreature.dead)
             {
                 return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 1f);
             }
