@@ -210,7 +210,7 @@ namespace ArenaPlus.Features.NPC
 
             foreach (var absPlayer in room.game.Players)
             {
-                if (absPlayer.realizedCreature is Player player && player != this && !player.dead && (absPlayer.realizedCreature is not ArenaNPCPlayer npc || NPCFeature.npcAttackNpc))
+                if (absPlayer.realizedCreature is Player player && player != this && !player.dead && (absPlayer.realizedCreature is not ArenaNPCPlayer npc || NPCFeature.NPCAttackNpc))
                 {
                     if (this.AI.HasLethal(player))
                     {
@@ -748,8 +748,9 @@ namespace ArenaPlus.Features.NPC
     {
         public static SlugcatStats.Name NPCName;
 
-        [MyCommand("npc_attack_npc")]
-        internal static bool npcAttackNpc { get; set; } = true;
+        internal static bool NPCAttackNpc => NPCAttackPlayers.npcAttackNPC.Value;
+        internal static bool NPCAttackPlayer => FeaturesManager.GetFeature("NPCAttackPlayers").configurable.Value;
+
 
         [MyCommand("npc_logging")]
         internal static bool ncpLogs { get; set; } = false;
@@ -969,7 +970,7 @@ namespace ArenaPlus.Features.NPC
                 return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Attacks, 1f);
             }
 
-            if (!npcAttackNpc && dRelation.trackerRep.representedCreature.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && dRelation.trackerRep.representedCreature.realizedCreature is ArenaNPCPlayer)
+            if (dRelation.trackerRep.representedCreature.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && (!NPCAttackPlayer || (!NPCAttackNpc && dRelation.trackerRep.representedCreature.realizedCreature is ArenaNPCPlayer)))
             {
                 return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 1f);
             }
