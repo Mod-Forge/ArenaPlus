@@ -79,6 +79,20 @@ namespace ArenaPlus.Features.NPC
             this.room.game.GetArenaGameSession.Players[index] = abstractCreature;
 
             this.Destroy();
+
+            if (GameUtils.rainWorldGame.cameras[0]?.hud == null)
+                return;
+
+            foreach (var part in GameUtils.rainWorldGame.cameras[0].hud.parts)
+            {
+                if (part is not HUD.PlayerSpecificMultiplayerHud playerHud)
+                    continue;
+
+                if (playerHud.abstractPlayer == base.abstractCreature)
+                {
+                    playerHud.abstractPlayer = abstractCreature;
+                }
+            }
         }
 
         private void initPlayer(Player pl)
