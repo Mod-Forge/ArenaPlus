@@ -321,6 +321,9 @@ namespace ArenaPlus.Features.NPC
 
         private bool PyroCheck()
         {
+            if (FeaturesManager.GetFeature("NormalNPC").configurable.Value == true)
+                return false;
+
             return !this.pyroJumpped && base.Consious && this.bodyMode != Player.BodyModeIndex.Crawl && this.bodyMode != Player.BodyModeIndex.CorridorClimb && this.bodyMode != Player.BodyModeIndex.ClimbIntoShortCut && this.animation != Player.AnimationIndex.HangFromBeam && this.animation != Player.AnimationIndex.ClimbOnBeam && this.bodyMode != Player.BodyModeIndex.WallClimb && this.bodyMode != Player.BodyModeIndex.Swimming && this.animation != Player.AnimationIndex.AntlerClimb && this.animation != Player.AnimationIndex.VineGrab && this.animation != Player.AnimationIndex.ZeroGPoleGrab && this.onBack == null;
         }
         public bool CanPyro()
