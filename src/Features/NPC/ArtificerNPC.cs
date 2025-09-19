@@ -15,6 +15,7 @@ namespace ArenaPlus.Features.NPC;
     name: "Normal CPU",
     description: "Make CPU stop using artificer powers",
     category: BuiltInCategory.Fun,
+    requireDLC: [DLCIdentifiers.MSC],
     enabledByDefault: false
 )]
 internal class NormalNPC(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
