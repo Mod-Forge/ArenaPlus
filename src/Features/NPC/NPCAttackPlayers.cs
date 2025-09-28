@@ -16,6 +16,7 @@ namespace ArenaPlus.Features.NPC;
     id: "NPCAttackPlayers",
     name: "CPU attack players",
     description: "Make CPU attack players",
+    requireDLC: [DLCIdentifiers.MSC],
     enabledByDefault: true
 )]
 internal class NPCAttackPlayers : Feature
