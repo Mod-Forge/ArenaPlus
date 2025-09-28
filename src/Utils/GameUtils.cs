@@ -40,7 +40,7 @@ namespace ArenaPlus.Utils
             {
                 if (rainWorldGame != null)
                 {
-                    return rainWorldGame.IsArenaSession && !(ModManager.MSC && rainWorldGame.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == MoreSlugcatsEnums.GameTypeID.Challenge);
+                    return rainWorldGame.IsArenaSession && !(ModManager.MSC && rainWorldGame.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == DLCSharedEnums.GameTypeID.Challenge);
                 }
                 else return false;
             }
@@ -60,7 +60,7 @@ namespace ArenaPlus.Utils
 
         public static bool IsChallengeGameSession(RainWorldGame game)
         {
-            return game.IsArenaSession && ModManager.MSC && game.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == MoreSlugcatsEnums.GameTypeID.Challenge;
+            return game.IsArenaSession && ModManager.MSC && game.GetArenaGameSession.arenaSitting.gameTypeSetup.gameType == DLCSharedEnums.GameTypeID.Challenge;
         }
 
         public static RainWorld RainWorldInstance

@@ -205,7 +205,7 @@ namespace ArenaPlus.Features.NPC
             }
             this.DangerGraspPickup(eu);
 
-            if (!grasps.Any(g => g != null && g.grabbed is Weapon))
+            if (FeaturesManager.GetFeature("NormalNPC").configurable.Value != true && !grasps.Any(g => g != null && g.grabbed is Weapon))
             {
                 AllGraspsLetGoOfThisObject(true);
                 stun = 0;
