@@ -1,9 +1,6 @@
 {
-  "Name": "Arena+",
-  "ID": "modforge.ArenaPlus",
-  "Version": "2.2.7",
   "WorkshopID": 2945515690,
-  "LatestGameVersion": "v1.10.4",
+  "LatestGameVersion": "v1.11.1",
   "UpdateTitle": false,
   "UpdateDescription": false,
   "MarkAsPublic": true,

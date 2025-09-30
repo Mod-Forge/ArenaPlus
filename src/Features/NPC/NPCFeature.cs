@@ -813,11 +813,11 @@ namespace ArenaPlus.Features.NPC
             orig(self, grasp, eu);
         }
 
-        private SlugcatStats.Name JollySlidingMenu_NextClass(On.JollyCoop.JollyMenu.JollySlidingMenu.orig_NextClass orig, JollyCoop.JollyMenu.JollySlidingMenu self, SlugcatStats.Name curClass)
+        private SlugcatStats.Name JollySlidingMenu_NextClass(On.JollyCoop.JollyMenu.JollySlidingMenu.orig_NextClass orig, JollyCoop.JollyMenu.JollySlidingMenu self, SlugcatStats.Name curClass, int playerIndex)
         {
-            var nClass = orig(self, curClass);
+            var nClass = orig(self, curClass, playerIndex);
             if (nClass == NPCName)
-                nClass = orig(self, nClass);
+                nClass = orig(self, nClass, playerIndex);
             return nClass;
         }
 
