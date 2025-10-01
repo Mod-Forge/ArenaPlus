@@ -55,7 +55,7 @@ namespace ArenaPlus
             var bundle = AssetBundle.LoadFromFile(AssetManager.ResolveFilePath("assetbundles/arenaplus"));
             LogInfo(bundle.name, "loaded with:", bundle.GetAllAssetNames().FormatEnumarable());
             var shader = bundle.LoadAsset<Shader>("assets/arenaplus/verticalslice.shader");
-            Custom.rainWorld.Shaders.Add("VerticalSlice", FShader.CreateShader(shader.name, shader));
+            Custom.rainWorld.Shaders.Add("VerticalSlice", FShader.CreateShader("VerticalSlice", shader));
         }
 
         private void OnModInit(RainWorld rainWorld)
