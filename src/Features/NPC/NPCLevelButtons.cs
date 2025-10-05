@@ -18,6 +18,8 @@ namespace ArenaPlus.Features.NPC
 
         protected override void Register()
         {
+            if (!ModManager.MSC)
+                return;
             On.Menu.MultiplayerMenu.Singal += MultiplayerMenu_Singal;
             On.Menu.MultiplayerMenu.ClearGameTypeSpecificButtons += MultiplayerMenu_ClearGameTypeSpecificButtons;
             On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += MultiplayerMenu_InitiateGameTypeSpecificButtons;

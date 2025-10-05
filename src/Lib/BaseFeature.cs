@@ -32,7 +32,15 @@ namespace ArenaPlus.Lib
             registered = true;
 
             LogDebug($"Enabling {Id}");
-            Register();
+
+            try
+            {
+                Register();
+            }
+            catch (Exception e)
+            {
+                LogError($"Failed to register feature {Name}", e);
+            }
         }
 
         public virtual void Disable()
@@ -42,7 +50,15 @@ namespace ArenaPlus.Lib
             configurable.Value = false;
             registered = false;
             LogDebug($"Disabling {Id}");
-            Unregister();
+
+            try
+            {
+                Unregister();
+            }
+            catch (Exception e)
+            {
+                LogError($"Failed to unregister feature {Name}", e);
+            }
         }
 
         protected abstract void Register();
