@@ -144,6 +144,14 @@ namespace ArenaPlus.Options.Tabs
                         label.color = checkBox.bumpBehav.GetColor(checkBox.colorEdge);
                         label.text = "Require a DLC!";
                     }
+                    else if (!FeaturesManager.GetFeature("unlockAllFeatures").configurable.Value && !feature.configurable.Value && feature.IsLocked(out string reason))
+                    {
+                        checkBox.greyedOut = true;
+                        checkBox.colorEdge *= 2f;
+                        checkBox.description = reason;
+                        label.color = checkBox.bumpBehav.GetColor(checkBox.colorEdge);
+                        label.text = "Locekd!";
+                    }
                     else
                     {
                         feature.complementaryElementAction?.Invoke(expandable, new Vector2(xPos + CHECKBOX_SIZE + MARGIN + label.GetDisplaySize().x + MARGIN, lastPos));

@@ -44,6 +44,11 @@ namespace ArenaPlus.Lib
                 return false;
             return true;
         }
+        public virtual bool IsLocked(out string reason)
+        {
+            reason = null;
+            return false;
+        }
 
         public override void Enable()
         {

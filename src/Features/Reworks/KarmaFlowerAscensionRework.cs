@@ -22,6 +22,12 @@ namespace ArenaPlus.Features.Reworks
     )]
     file class KarmaFlowerAscensionRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
+        public override bool IsLocked(out string reason)
+        {
+            reason = $"Require: Beaten Saint";
+            return !GameUtils.RainWorldInstance.progression.miscProgressionData.beaten_Saint;
+        }
+
         protected override void Register()
         {
             On.PlayerGraphics.DrawSprites += PlayerGraphics_DrawSprites;

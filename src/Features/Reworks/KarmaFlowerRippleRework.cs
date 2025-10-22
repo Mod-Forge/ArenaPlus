@@ -22,12 +22,19 @@ namespace ArenaPlus.Features.Reworks
     )]
     file class KarmaFlowerRippleRework(FeatureInfoAttribute featureInfo) : Feature(featureInfo)
     {
+        public override bool IsLocked(out string reason)
+        {
+            reason = $"Require: Beten Watcher echo quest";
+            return !GameUtils.RainWorldInstance.progression.miscProgressionData.beaten_Watcher_SpinningTop;
+        }
+
         protected override void Unregister()
         {
         }
 
         protected override void Register()
         {
+            //GameUtils.RainWorldInstance.progression.miscProgressionData.beaten_Watcher_SpinningTop
         }
     }
 }
