@@ -1,4 +1,5 @@
-﻿using ArenaPlus.Lib;
+﻿using ArenaPlus.Features.NPC;
+using ArenaPlus.Lib;
 using ArenaPlus.Utils;
 using Menu;
 using MonoMod.RuntimeDetour;
@@ -134,6 +135,9 @@ namespace ArenaPlus.Features.UI
                 //LogDebug($"go from {curClass.Index} to {curClass.Index - 1}");
                 name = new SlugcatStats.Name(ExtEnum<SlugcatStats.Name>.values.GetEntry(curClass.Index - 1), false);
             }
+
+            if (name == NPCFeature.NPCName)
+                return name;
 
             if (!SlugcatsUtils.IsSlugcatUnlocked(name) || (!FeaturesManager.GetFeature("keepSlugcatsSelectable").Enabled && !SlugcatsUtils.IsSlugcatEnabled(name)))
             {

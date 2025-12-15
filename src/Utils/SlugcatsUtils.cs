@@ -1,4 +1,5 @@
-﻿using ArenaPlus.Lib;
+﻿using ArenaPlus.Features.NPC;
+using ArenaPlus.Lib;
 using ArenaPlus.Options;
 using RWCustom;
 using System;
@@ -102,6 +103,9 @@ namespace ArenaPlus.Utils
 
         public static bool IsSlugcatEnabled(SlugcatStats.Name id)
         {
+            if (id == NPCFeature.NPCName)
+                return true;
+
             foreach (var slugcat in GetSlugcats())
             {
                 if (slugcat.nameObject.value == id.value) return slugcat.configurable.Value;

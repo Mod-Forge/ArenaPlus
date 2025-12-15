@@ -800,7 +800,14 @@ namespace ArenaPlus.Features.NPC
             On.Player.NPCForceGrab += Player_NPCForceGrab;
             On.Player.ThrowObject += Player_ThrowObject;
 
+            // hide slugcat
+            On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
 
+        }
+
+        private bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
+        {
+            return orig(i) || i == NPCName;
         }
 
         private void Player_ThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
