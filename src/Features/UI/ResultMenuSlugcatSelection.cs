@@ -216,6 +216,7 @@ namespace ArenaPlus.Features.UI
         private SlugcatStats.Name[] GenerateSlugcatList(SlugcatStats.Name lastChar)
         {
             List<SlugcatStats.Name> allSlugcats = SlugcatsUtils.GetActiveSlugcats();
+            var selectionCount = ResultMenuSlugcatSelection.selectionCount;
             SlugcatStats.Name[] slugcats = new SlugcatStats.Name[selectionCount];
             if (allSlugcats.Count < selectionCount)
             {
