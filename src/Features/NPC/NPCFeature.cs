@@ -335,7 +335,8 @@ namespace ArenaPlus.Features.NPC
         public void PyroJump(int dir = 0)
         {
             standing = true;
-            this.input[0].spec = true;
+            wantToJump = 5;
+            this.input[0].pckp = true;
             this.input[0].y = 1;
             if (dir != 0)
                 this.input[0].x = (int)Mathf.Clamp01(dir);
