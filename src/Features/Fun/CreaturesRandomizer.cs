@@ -77,8 +77,8 @@ file class CreaturesRandomizer : Feature
     {
         On.ArenaCreatureSpawner.CreateAbstractCreature += ArenaCreatureSpawner_CreateAbstractCreature;
         // test / debug
-        On.ArenaCreatureSpawner.SpawnArenaCreatures += ArenaCreatureSpawner_SpawnArenaCreatures;
-        On.NoiseTracker.HeardNoise += NoiseTracker_HeardNoise;
+        //On.ArenaCreatureSpawner.SpawnArenaCreatures += ArenaCreatureSpawner_SpawnArenaCreatures;
+        //On.NoiseTracker.HeardNoise += NoiseTracker_HeardNoise;
     }
 
     private void NoiseTracker_HeardNoise(On.NoiseTracker.orig_HeardNoise orig, NoiseTracker self, Noise.InGameNoise noise)
