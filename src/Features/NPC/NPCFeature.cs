@@ -43,6 +43,24 @@ namespace ArenaPlus.Features.NPC
                 return;
             LogUnity([$"[NPC: {this?.playerState.playerNumber}]", .. data]);
         }
+
+        internal static bool CanAttackPlayer(Player player)
+        {
+            if (player is ArenaNPCPlayer)
+            {
+                if (!NPCFeature.NPCAttackNPC)
+                {
+                    return false;
+                }
+            }
+            else if (!NPCFeature.NPCAttackPlayer)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private void Replace()
         {
             WorldCoordinate worldPos = this.abstractCreature.pos;
@@ -117,6 +135,10 @@ namespace ArenaPlus.Features.NPC
         public override void Collide(PhysicalObject otherObject, int myChunk, int otherChunk)
         {
             base.Collide(otherObject, myChunk, otherChunk);
+            if (otherObject is Player player && !CanAttackPlayer(player))
+            {
+                return;
+            }
             if (NPCLevel >= 5 && otherObject is Creature creature && creature.abstractCreature.creatureTemplate.type != CreatureTemplate.Type.Fly)
             {
                 if (collisionDodgeCooldown <= 0 && !creature.dead && creature.Consious)
@@ -224,7 +246,8 @@ namespace ArenaPlus.Features.NPC
 
             foreach (var absPlayer in room.game.Players)
             {
-                if (absPlayer.realizedCreature is Player player && player != this && !player.dead && (absPlayer.realizedCreature is not ArenaNPCPlayer npc || NPCFeature.NPCAttackNpc))
+
+                if (absPlayer.realizedCreature is Player player && player != this && !player.dead && CanAttackPlayer(player))
                 {
                     if (this.AI.HasLethal(player))
                     {
@@ -766,7 +789,7 @@ namespace ArenaPlus.Features.NPC
     {
         public static SlugcatStats.Name NPCName;
 
-        internal static bool NPCAttackNpc => NPCAttackPlayers.npcAttackNPC.Value;
+        internal static bool NPCAttackNPC => NPC.NPCAttackPlayers.npcAttackNPC.Value;
         internal static bool NPCAttackPlayer => FeaturesManager.GetFeature("NPCAttackPlayers").configurable.Value;
 
 
@@ -990,14 +1013,21 @@ namespace ArenaPlus.Features.NPC
                 return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 1f);
             }
 
-            if (dRelation.trackerRep.representedCreature.creatureTemplate.type == CreatureTemplate.Type.Slugcat)
-            {
-                return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Attacks, 1f);
-            }
-
-            if (dRelation.trackerRep.representedCreature.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && (!NPCAttackPlayer || (!NPCAttackNpc && dRelation.trackerRep.representedCreature.realizedCreature is ArenaNPCPlayer)))
+            if (dRelation.trackerRep.representedCreature.realizedCreature is Player player && !ArenaNPCPlayer.CanAttackPlayer(player))
             {
                 return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 1f);
+            }
+
+            if (dRelation.trackerRep.representedCreature.creatureTemplate.type == CreatureTemplate.Type.Slugcat)
+            {
+                if (NPCAttackPlayer)
+                {
+                    return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Attacks, 1f);
+                }
+                else
+                {
+                    return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 1f);
+                }
             }
 
             return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Attacks, 0.6f);
