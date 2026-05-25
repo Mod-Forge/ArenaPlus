@@ -95,7 +95,10 @@ namespace ArenaPlus.Features.NOOT
         private void SmallNeedleWorm_BitByPlayer(On.SmallNeedleWorm.orig_BitByPlayer orig, SmallNeedleWorm self, Creature.Grasp grasp, bool eu)
         {
             if (!GameUtils.IsCompetitiveOrSandboxSession)
+            {
                 orig(self, grasp, eu);
+                return;
+            }
 
             Player player = grasp.grabber as Player;
             if (player.GetAttachedFeatureType<MusicNoot>() is not MusicNoot musicNoot)
